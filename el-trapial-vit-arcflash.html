@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Para móviles: evita zoom accidental y habilita PWA -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <title>El Trapial - Arc Flash & Validación VIT</title>
+
+  <!-- PWA manifest + theme color -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#005daa">
+
+  <style>
+    :root {
+      --brand-prim: #005daa;  /* Cambiá a tu color corporativo si querés */
+      --brand-sec:  #ed1c24;
+      --bg: #eef2f3;
+      --fg: #333;
+      --card: #fff;
+      --muted: #6c757d;
+    }
+    [data-theme="dark"] {
+      --bg: #0f1419;
+      --fg: #e6e6e6;
+      --card: #151a21;
+      --muted: #8a94a6;
+    }
+    html, body { background: var(--bg); color: var(--fg); }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 10px; margin:0; }
+    .card { background: var(--card); max-width: 560px; margin: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; }
+    .header-logo { background: var(--card); padding: 18px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 4px solid var(--brand-prim); }
+    .brand-name { color: var(--brand-prim); font-weight: 700; font-size: 1.2em; letter-spacing: 0.3px; }
+    .content { padding: 20px; }
+    h2 { color: var(--brand-prim); text-align: center; font-size: 1.2em; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    label { font-weight: 600; display: block; margin-top: 12px; font-size: 0.92em; }
+    input, select { width: 100%; padding: 11px; margin-top: 6px; border: 1.4px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1em; background: var(--card); color: var(--fg); }
+    .calc-box { background: #f8f9fa; padding: 15px; border: 1px solid var(--brand-prim); border-radius: 8px; margin-top: 16px; }
+    .calc-box h3 { color: var(--brand-prim); margin-top: 0; font-size: 1em; }
+    .alerta-loto { background: var(--brand-sec); color: white; padding: 12px; border-radius: 6px; margin-top: 12px; font-weight: bold; display: none; text-align: center; }
+    #signature-pad { border: 1px solid #333; background: #fff; width: 100%; height: 160px; margin-top: 10px; touch-action: none; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .btn { flex: 1; padding: 12px; background: var(--brand-prim); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1em; }
+    .btn-secondary { background: var(--muted); color: #fff; }
+    .btn-danger { background: var(--brand-sec); }
+    .btn-ghost { background: transparent; color: var(--brand-prim); border: 1px solid var(--brand-prim); }
+    #res-display {
+      margin-top: 16px; padding: 16px; border-radius: 8px;
+      display: none; border: 2px solid; text-align: left;
+    }
+    .disclaimer { font-size: 0.78em; color: #222; background: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 6px; margin-top: 12px; }
+    .checklist { margin-top: 8px; font-size: 0.92em; }
+    .checklist label { font-weight: normal; display: flex; align-items: center; gap: 8px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tag-row { display:flex; gap:8px; align-items:center; margin-top:8px; }
+    .tag-row input { flex:1; }
+    .mode-toggle { margin-left:auto; }
+    small#lookupInfo { display:block; color:#555; margin-top:4px; }
+  </style>
+</head>
+<body>
+
+<div class="card" id="appCard" data-theme="light">
+  <!-- Encabezado sin logo, con leyenda "EL TRAPIAL" -->
+  <div class="header-logo" aria-label="Encabezado El Trapial">
+    <span class="brand-name">EL TRAPIAL</span>
+    <button class="btn btn-ghost mode-toggle" id="btnMode">🌙 Modo oscuro</button>
+  </div>
+
+  <div class="content">
+    <h2>Cálculo preliminar de arco y Validación VIT</h2>
+
+    <!-- Identificación -->
+    <label for="nombre">Nombre del Operador:</label>
+    <input type="text" id="nombre" autocomplete="name" placeholder="Ej: J. Perusini"/>
+
+    <div class="tag-row">
+      <div style="flex:1">
+        <label for="equipo">Equipo / Tag / Activo:</label>
+        <input type="text" id="equipo" placeholder="Ej: MCC-03 / Tablero 480V"/>
+      </div>
+      <button class="btn btn-secondary" id="btnLookup">🔎 Buscar etiqueta</button>
+    </div>
+    <small id="lookupInfo"></small>
+
+    <!-- Tipo de tarea y LOTO -->
+    <label for="tipo">Tipo de Tarea:</label>
+    <select id="tipo" onchange="verificarTarea()" aria-label="Tipo de tarea">
+      <option value="Inspeccion">Inspección Visual</option>
+      <option value="Medicion">Medición / Pruebas de Voltaje</option>
+      <option value="Contacto">Trabajo a Contacto (Mantenimiento)</option>
+    </select>
+    <div id="alertaPeligro" class="alerta-loto">⚠️ REGLA QUE SALVA VIDAS: REQUIERE AISLAMIENTO Y BLOQUEO (LOTO)</div>
+
+    <!-- Parámetros eléctricos -->
+    <div class="calc-box">
+      <h3>📈 Parámetros Eléctricos (entrada mínima)</h3>
+      <div class="row">
+        <div>
+          <label for="volt">Tensión del sistema (V):</label>
+          <input type="number" id="volt" placeholder="Ej: 480" step="1" min="1"/>
+        </div>
+        <div>
+          <label for="ka">Corriente de cortocircuito (kA):</label>
+          <input type="number" id="ka" placeholder="Ej: 12.5" step="0.1" min="0.1"/>
+        </div>
+        <div>
+          <label for="tiempo">Tiempo de despeje (s):</label>
+          <input type="number" id="tiempo" placeholder="Ej: 0.10" step="0.01" min="0.01"/>
+        </div>
+        <div>
+          <label>Distancia de trabajo (cm):</label>
+          <div class="tag-row">
+            <select id="distPreset">
+              <option value="30">30</option>
+              <option value="45" selected>45</option>
+              <option value="60">60</option>
+            </select>
+            <input type="number" id="dist" placeholder="Ej: 45" step="1" min="1" style="max-width:120px"/>
+          </div>
+        </div>
+      </div>
+      <div class="disclaimer">
+        ⚠️ Este cálculo es <strong>estimativo</strong> y no reemplaza el estudio de arco IEEE 1584 ni las etiquetas del equipo.
+        La selección de EPP debe basarse en el <em>ATPV/cal/cm²</em> del conjunto y en NFPA 70E (usar un método por equipo).
+      </div>
+    </div>
+
+    <!-- Firma -->
+    <label>Firma Digital de Conformidad:</label>
+    <canvas id="signature-pad" aria-label="Área de firma"></canvas>
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="btnClear">Borrar Firma</button>
+      <button class="btn btn-secondary" id="btnSaveSig">Guardar Firma</button>
+    </div>
+
+    <!-- Checklist IOGP mínima -->
+    <div class="checklist">
+      <label><input type="checkbox" id="chk-alcance"/> Alcance definido y permisos vigentes</label>
+      <label><input type="checkbox" id="chk-ident"/> Identificación de fuentes de energía</label>
+      <label><input type="checkbox" id="chk-barreras"/> Barreras/fajas y control de acceso</label>
+      <label><input type="checkbox" id="chk-guardia"/> Guardia/observador presente</label>
+      <label><input type="checkbox" id="chk-rescate"/> Plan de rescate y primeros auxilios</label>
+    </div>
+
+    <!-- Acciones -->
+    <div class="btn-row">
+      <button class="btn" id="btnCalcular">VALIDAR TRABAJO Y CALCULAR</button>
+      <button class="btn btn-danger" id="btnDescargar">Descargar Reporte</button>
+      <button class="btn btn-secondary" id="btnGuardarRegistro">Guardar Registro</button>
+      <button class="btn btn-secondary" id="btnCargarRegistro">Cargar Último</button>
+    </div>
+
+    <!-- Resultados -->
+    <div id="res-display" role="status" aria-live="polite"></div>
+  </div>
+</div>
+
+<script>
+  // ====== Modo oscuro ======
+  const appCard = document.getElementById('appCard');
+  document.getElementById('btnMode').addEventListener('click', () => {
+    const current = appCard.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    appCard.setAttribute('data-theme', next);
+    document.getElementById('btnMode').textContent = next === 'dark' ? '☀️ Modo claro' : '🌙 Modo oscuro';
+  });
+
+  // ====== Firma (canvas responsivo con guardado) ======
+  const canvas = document.getElementById('signature-pad');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  let drawing = false, savedSignatureDataURL = null;
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = rect.width * ratio;
+    canvas.height = 160 * ratio;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = '160px';
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#000";
+    if (savedSignatureDataURL) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width/ratio, canvas.height/ratio);
+      img.src = savedSignatureDataURL;
+    }
+  }
+  window.addEventListener('resize', resizeCanvas);
+  setTimeout(resizeCanvas, 50);
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: cx - rect.left, y: cy - rect.top };
+  }
+  function startDraw(e) { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); }
+  function moveDraw(e) { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }
+  function endDraw() { drawing = false; }
+
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', moveDraw);
+  window.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove', moveDraw, { passive: false });
+  window.addEventListener('touchend', endDraw);
+
+  document.getElementById('btnClear').addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    savedSignatureDataURL = null;
+  });
+  document.getElementById('btnSaveSig').addEventListener('click', () => {
+    savedSignatureDataURL = canvas.toDataURL('image/png');
+    alert('Firma guardada en memoria del navegador.');
+  });
+
+  // ====== LOTO ======
+  function verificarTarea() {
+    document.getElementById('alertaPeligro').style.display =
+      (document.getElementById('tipo').value === 'Contacto') ? 'block' : 'none';
+  }
+  window.verificarTarea = verificarTarea;
+
+  // ====== Presets de distancia ======
+  const distPreset = document.getElementById('distPreset');
+  distPreset.addEventListener('change', () => {
+    document.getElementById('dist').value = distPreset.value;
+  });
+
+  // ====== Etiquetas del estudio de arco (JSON de ejemplo) ======
+  const labeledAssets = {
+    "MCC-03": { volt: 480, dist_cm: 45, etiqueta_cal_cm2: 9.5, epp: "ATPV ≥ 12 cal/cm², capucha arco, guantes arc-rated", nota: "Panel MCC, puerta cerrada, mantenimiento a contacto: LOTO." },
+    "SWG-15KV-A": { volt: 15000, dist_cm: 91, etiqueta_cal_cm2: 5.0, epp: "ATPV ≥ 8 cal/cm², visor/balaclava", nota: "Switchgear 15 kV, trabajo con puerta cerrada." }
+  };
+
+  document.getElementById('btnLookup').addEventListener('click', () => {
+    const tag = document.getElementById('equipo').value.trim();
+    const info = labeledAssets[tag];
+    const infobox = document.getElementById('lookupInfo');
+    if (info) {
+      infobox.style.color = '#2e7d32';
+      infobox.innerHTML = `Etiqueta encontrada: ${info.etiqueta_cal_cm2} cal/cm² • ${info.epp}. Se aplican voltaje ${info.volt} V y distancia ${info.dist_cm} cm. El cálculo manual quedará bloqueado si usás la etiqueta.`;
+      document.getElementById('volt').value = info.volt;
+      document.getElementById('dist').value = info.dist_cm;
+      distPreset.value = String(info.dist_cm);
+      window.useLabel = true;
+      window.labelEnergy = info.etiqueta_cal_cm2;
+      window.labelEPP = info.epp;
+      window.labelNote = info.nota;
+    } else {
+      infobox.style.color = '#b00020';
+      infobox.textContent = 'No se encontró etiqueta para ese tag. Podés continuar con estimación preliminar.';
+      window.useLabel = false;
+      window.labelEnergy = null;
+      window.labelEPP = null;
+      window.labelNote = null;
+    }
+  });
+
+  // ====== Categoría de EPP orientativa (NFPA 70E) ======
+  function getPPECategory(energia) {
+    if (energia <= 1.2) return "Sin categoría (≤ 1.2 cal/cm²)";
+    if (energia <= 4)   return "Categoría 1 (ATPV ≥ 4 cal/cm²)";
+    if (energia <= 8)   return "Categoría 2 (ATPV ≥ 8 cal/cm²)";
+    if (energia <= 25)  return "Categoría 3 (ATPV ≥ 25 cal/cm²)";
+    if (energia <= 40)  return "Categoría 4 (ATPV ≥ 40 cal/cm²)";
+    return "Categoría 4 (ATPV ≥ 40 cal/cm²) — Evaluación adicional obligatoria (EI > 40)";
+  }
+
+  // ====== Validación y cálculo ======
+  document.getElementById('btnCalcular').addEventListener('click', generarValidacion);
+
+  function generarValidacion() {
+    const nombre = document.getElementById('nombre').value.trim();
+    const equipo  = document.getElementById('equipo').value.trim();
+    const volt    = parseFloat(document.getElementById('volt').value);
+    const ka      = parseFloat(document.getElementById('ka').value);
+    const t       = parseFloat(document.getElementById('tiempo').value);
+    const dist    = parseFloat(document.getElementById('dist').value);
+
+    const checks = ['chk-alcance','chk-ident','chk-barreras','chk-guardia','chk-rescate']
+      .map(id => document.getElementById(id).checked);
+    const checklistOk = checks.every(x => x);
+
+    if(!nombre || !equipo || !volt || !dist) {
+      alert("Error: Ingrese nombre, activo, voltaje y distancia.");
+      return;
+    }
+    if(!checklistOk) {
+      alert("Complete la checklist IOGP antes de validar.");
+      return;
+    }
+    if(volt <= 0 || dist <= 0) {
+      alert("Error: Los valores deben ser mayores que 0.");
+      return;
+    }
+
+    // Selección de fuente de EI
+    let energia, eppSug, fuenteCalc = "Etiqueta del equipo";
+    if (window.useLabel && window.labelEnergy) {
+      energia = window.labelEnergy;
+      eppSug = window.labelEPP || "";
+    } else {
+      if(!ka || !t || ka <= 0 || t <= 0) {
+        alert("Para estimación sin etiqueta, ingrese kA y tiempo de despeje (>0).");
+        return;
+      }
+      // Estimación preliminar (NO IEEE 1584): orden de magnitud
+      const C = 46.2;
+      energia = C * ka * t * Math.pow(480/volt, 0.5) * Math.pow(45/dist, 1.5);
+      fuenteCalc = "Estimación preliminar";
+    }
+
+    // Mapeo por ATPV (orientativo)
+    let colorFondo = "#2ecc71", colorTexto = "white";
+    if (energia <= 1.2) { eppSug = eppSug || "Algodón no fundible; EPP FR no requerido por arco (ATPV ≥ 1.2 cal/cm²)."; }
+    else if (energia <= 8) { eppSug = eppSug || "Conjunto FR con ATPV ≥ 8 cal/cm² + protección facial/balaclava."; colorFondo = "#f39c12"; colorTexto = "black"; }
+    else if (energia <= 25) { eppSug = eppSug || "Conjunto FR con ATPV ≥ 25 cal/cm² + capucha arco y guantes."; colorFondo = "#d35400"; }
+    else { eppSug = eppSug || "Conjunto FR ≥ 40 cal/cm² y medidas adicionales. Evaluación detallada obligatoria."; colorFondo = "#c0392b"; }
+
+    // Categoría NFPA 70E (orientativa)
+    const catNFPA = getPPECategory(energia);
+
+    const res = document.getElementById('res-display');
+    res.style.display = "block";
+    res.style.backgroundColor = colorFondo;
+    res.style.borderColor = "#fff";
+    res.style.color = colorTexto;
+
+    const fecha = new Date().toLocaleString();
+    const tipoTarea = document.getElementById('tipo').value;
+    const notaEtiqueta = window.labelNote ? `<p><strong>Nota etiqueta:</strong> ${window.labelNote}</p>` : "";
+
+    res.innerHTML = `
+      <h3 style="margin-top:0; border-bottom:1px solid ${colorTexto};">REPORTE DE SEGURIDAD VIT</h3>
+      <p><strong>Fecha/Hora:</strong> ${fecha}</p>
+      <p><strong>Operador:</strong> ${nombre}</p>
+      <p><strong>Activo:</strong> ${equipo}</p>
+      <p><strong>Tarea:</strong> ${tipoTarea}</p>
+      <p><strong>Parámetros:</strong> ${volt} V • ${dist} cm ${(!window.useLabel ? `• ${ka} kA • ${t} s` : '')}</p>
+      <p><strong>Energía incidente (${fuenteCalc}):</strong> ${energia.toFixed(2)} cal/cm²</p>
+      <p><strong>Categoría de EPP (orientativa):</strong> ${catNFPA}</p>
+      <p><strong>EPP sugerido (por ATPV):</strong> ${eppSug}</p>
+      ${notaEtiqueta}
+      <p style="font-size:0.85em; border-top:1px solid ${colorTexto}; padding-top:10px;">
+        ✅ <em>Checklist IOGP confirmada: Alcance, identificación, barreras, guardia y rescate.</em>
+      </p>
+      <p class="disclaimer" style="background: rgba(255,255,255,0.2); border-color: ${colorTexto};">
+        Este resultado es estimativo. NFPA 70E establece usar <em>un</em> método por equipo:
+        categoría <strong>o</strong> análisis de energía incidente, <strong>no ambos</strong>.
+        El cálculo formal/etiquetado se realiza conforme IEEE 1584-2018.
+        LOTO obligatorio en trabajos a contacto.
+      </p>
+    `;
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+
+  // ====== Descarga de reporte ======
+  document.getElementById('btnDescargar').addEventListener('click', descargarReporte);
+  function descargarReporte() {
+    const res = document.getElementById('res-display');
+    if (res.style.display !== 'block') {
+      alert('Primero genere el reporte.');
+      return;
+    }
+    const firmaHTML = (savedSignatureDataURL)
+        ? `${savedSignatureDataURL}`
+        : `<div style="border:1px dashed #333; padding:8px; color:#555;">Sin firma</div>`;
+
+    const printable = `
+      <html><head><meta charset="UTF-8"><title>Reporte VIT</title>
+      <style> body { font-family: Segoe UI, Tahoma, sans-serif; margin: 20px; color:#111; }
+              h2 { color:#005daa; }
+              .box { border:1px solid #ccc; padding:12px; border-radius:8px; background:#fafafa; }
+              .firma { margin-top: 12px; }
+      </style></head><body>
+        <h2>Reporte de Seguridad VIT - El Trapial</h2>
+        <div class="box">${res.innerHTML}</div>
+        <div class="firma"><h3>Firma del Operador</h3>${firmaHTML}</div>
+      </body></html>`;
+    const blob = new Blob([printable], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const w = window.open(url, '_blank');
+    if (w) w.onload = () => w.print();
+  }
+
+  // ====== Guardar/Cargar registro en LocalStorage ======
+  document.getElementById('btnGuardarRegistro').addEventListener('click', () => {
+    const payload = {
+      nombre: document.getElementById('nombre').value.trim(),
+      equipo: document.getElementById('equipo').value.trim(),
+      tipo: document.getElementById('tipo').value,
+      volt: document.getElementById('volt').value,
+      ka: document.getElementById('ka').value,
+      tiempo: document.getElementById('tiempo').value,
+      dist: document.getElementById('dist').value,
+      resHTML: document.getElementById('res-display').innerHTML,
+      firma: savedSignatureDataURL || null,
+      ts: new Date().toISOString()
+    };
+    localStorage.setItem('vit_arcflash_last', JSON.stringify(payload));
+    alert('Registro guardado localmente.');
+  });
+
+  document.getElementById('btnCargarRegistro').addEventListener('click', () => {
+    const raw = localStorage.getItem('vit_arcflash_last');
+    if (!raw) { alert('No hay registros guardados.'); return; }
+    const payload = JSON.parse(raw);
+    document.getElementById('nombre').value = payload.nombre || '';
+    document.getElementById('equipo').value = payload.equipo || '';
+    document.getElementById('tipo').value = payload.tipo || 'Inspeccion';
+    document.getElementById('volt').value = payload.volt || '';
+    document.getElementById('ka').value = payload.ka || '';
+    document.getElementById('tiempo').value = payload.tiempo || '';
+    document.getElementById('dist').value = payload.dist || '';
+    const res = document.getElementById('res-display');
+    if (payload.resHTML) { res.innerHTML = payload.resHTML; res.style.display = 'block'; }
+    if (payload.firma) { savedSignatureDataURL = payload.firma; resizeCanvas(); }
+    alert('Último registro cargado.');
+  });
+</script>
+
+<!-- Registrar Service Worker para PWA -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .catch(err => console.error('SW fail:', err));
+}
+</script>
+</body>
+</html>
