@@ -8,7 +8,7 @@
   <title>El Trapial — Evaluación de Riesgo para Trabajo Eléctrico</title>
 
   <!-- PWA manifest (correcto y NO visible) -->
-  ./manifest.json
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#005daa">
 
   <style>
@@ -76,6 +76,21 @@
     .modal-grid img { width:100%; height:140px; object-fit:cover; border-radius:8px; background:#f5f7fb; }
     .modal-grid .m-title { font-weight:700; color:#0d47a1; margin-bottom:4px; }
     .info-btn { display:inline-block; margin-left:8px; padding:4px 8px; font-size:0.9em; border:1px solid var(--brand-prim); color: var(--brand-prim); border-radius:8px; background: #fff; cursor:pointer; }
+
+    /* ===== OVERLAY PROHIBICIÓN CAT 3/4 ===== */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.75);
+      display: none; align-items: center; justify-content: center; z-index: 9999;
+    }
+    .overlay .panel {
+      background: #fff; color:#111; width: min(800px, 90vw); border-radius: 16px; padding: 24px;
+      box-shadow: 0 12px 48px rgba(0,0,0,.5); border: 6px solid #d0021b; /* rojo */
+    }
+    .panel h3 { margin-top:0; font-size: 28px; }
+    .callout { background: #ffe9ec; border-left: 6px solid #d0021b; padding: 12px 16px; margin: 12px 0; }
+    .panel .actions { display:flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .btn.primary   { background: #d0021b; color:#fff; }
+    .btn.secondary { background: #eee; color:#111; }
   </style>
 </head>
 <body>
@@ -304,6 +319,25 @@
   </div>
 </div>
 
+<!-- ===== OVERLAY: prohibición cuando CAT 3/4 ===== -->
+<div id="blockOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="blockTitle">
+  <div class="panel">
+    <h3 id="blockTitle">🚫 Trabajo PROHIBIDO — Riesgo de Arco Eléctrico (CAT <span id="blockCat">3–4</span>)</h3>
+    <div class="callout">
+      <p><strong>No continuar con la tarea.</strong> Comuníquese con <strong>Mantenimiento Eléctrico</strong> y revise el plan/EPP antes de cualquier acción.</p>
+    </div>
+    <ul>
+      <li>Detener el trabajo y notificar al supervisor.</li>
+      <li>Aplicar LOTO si corresponde.</li>
+      <li>Contactar a Mantenimiento Eléctrico.</li>
+    </ul>
+    <div class="actions">
+      <button class="btn primary" id="contactBtn">Contactar Mantenimiento</button>
+      <button class="btn secondary" id="ackBtn">Entendido</button>
+    </div>
+  </div>
+</div>
+
 <script>
   // ===== Modo oscuro =====
   const appCard = document.getElementById('appCard');
@@ -358,6 +392,15 @@
     if (ei <= 40)  return "CATEGORÍA 4 (ATPV ≥ 40)";
     return "CATEGORÍA 4 (EI > 40) — Evaluación adicional";
   }
+  // NUEVO: categoría numérica para UI (1..4)
+  function getPPECategoryNumber(ei) {
+    if (ei <= 4)   return 1;  // incluye ≤ 1.2
+    if (ei <= 8)   return 2;
+    if (ei <= 25)  return 3;
+    if (ei <= 40)  return 4;
+    return 4; // mayor a 40 lo tratamos como CAT 4 (alto riesgo)
+  }
+
   function cortoDesdeTx(kva, vll, zpct) {
     const Ifl = (kva*1000)/(Math.sqrt(3)*vll);
     const Zpu = zpct/100;
@@ -454,7 +497,6 @@
 
   document.getElementById('btnVITGuia').addEventListener('click', () => {
     modalTitle.textContent = "Guía visual VIT eléctrica — Trabajos con energía/alta tensión";
-    // intentamos cargar imágenes si existen en /vit/; si no, caemos a texto
     const items = [
       { id:'alcance',       titulo:'Alcance autorizado',             desc:'Revisar permiso/plan. Analizar detener si cambian condiciones.' },
       { id:'identificacion',titulo:'Identificación del equipo',      desc:'Equipo correcto y etiquetado. N° de etiqueta / marcas.' },
@@ -469,7 +511,8 @@
     items.forEach(it=>{
       html += `
       <div class="modal-grid">
-        vit/${it.id}.jpg
+        <!-- Si existen imágenes, colocá aquí <img src="vit/${it.id}.jpg" alt="${it.titulo}"> -->
+        <div></div>
         <div>
           <div class="m-title">${it.titulo}</div>
           <div>${it.desc}</div>
@@ -515,14 +558,27 @@
     const ka_tx = cortoDesdeTx(kva, volt, zpct);
     const ei = estimarEI(ka_tx, t, volt, dist);
     const cat = getPPECategory(ei);
+    const catNum = getPPECategoryNumber(ei);     // NUEVO: número de categoría
     const shock = shockBoundaries(volt);
     const afb_m = arcoBoundary(ei, dist);
 
+    // Sugerencia de EPP (texto)
     let eppSug = "Algodón no fundible; EPP FR no requerido (ATPV ≥ 1.2).";
-    let colorFondo = "#2ecc71", colorTexto = "white";
-    if (ei > 1.2 && ei <= 8) { eppSug = "Conjunto FR ATPV ≥ 8 cal/cm² + protección facial/balaclava."; colorFondo = "#f39c12"; colorTexto = "black"; }
-    else if (ei > 8 && ei <= 25) { eppSug = "Conjunto FR ATPV ≥ 25 cal/cm² + capucha arco y guantes."; colorFondo = "#d35400"; }
-    else if (ei > 25) { eppSug = "Conjunto FR ≥ 40 cal/cm² y medidas adicionales. Evaluación detallada obligatoria."; colorFondo = "#c0392b"; }
+    if (catNum === 1)      eppSug = "ATPV ≥ 4 cal/cm² (CAT 1).";
+    else if (catNum === 2) eppSug = "ATPV ≥ 8 cal/cm² + protección facial/balaclava (CAT 2).";
+    else if (catNum === 3) eppSug = "ATPV ≥ 25 cal/cm² + capucha arco y guantes (CAT 3).";
+    else if (catNum === 4) eppSug = "ATPV ≥ 40 cal/cm² y medidas adicionales (CAT 4).";
+
+    // Colores por categoría (pedido):
+    // CAT ≤ 1 -> VERDE | CAT 2 -> AMARILLO | CAT 3/4 -> ROJO + overlay
+    let colorFondo, colorTexto;
+    if (catNum <= 1)       { colorFondo = "#1f8c3a"; colorTexto = "white"; }
+    else if (catNum === 2) { colorFondo = "#f5a623"; colorTexto = "black"; }
+    else { // CAT 3 o 4
+      colorFondo = "#d0021b"; colorTexto = "white";
+      document.getElementById('blockCat').textContent = String(catNum);
+      document.getElementById('blockOverlay').style.display = "flex";
+    }
 
     const res = document.getElementById('res-display');
     res.style.display = "block";
@@ -699,6 +755,16 @@
     alert('Último registro cargado.');
   });
 
+  // ===== Overlay: botones =====
+  document.getElementById('ackBtn')?.addEventListener('click', () => {
+    document.getElementById('blockOverlay').style.display = 'none';
+  });
+  document.getElementById('contactBtn')?.addEventListener('click', () => {
+    // Reemplazar por mailto corporativo si corresponde
+    // window.location.href = 'mailto:mantenimientotrapialelectrico@chevron.com?subject=Alerta%20CAT%20alta';
+    alert('Contactar Mantenimiento Eléctrico');
+  });
+
   // ===== Service Worker para PWA =====
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW fail:', err));
@@ -706,6 +772,7 @@
 </script>
 </body>
 </html>
+
 
 
 
