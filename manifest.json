@@ -2,7 +2,7 @@
 {
   "name": "El Trapial - VIT Arc Flash",
   "short_name": "Trapial VIT",
-  "start_url": "./el-trapial-vit-arcflash.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#eef2f3",
   "theme_color": "#005daa",
@@ -11,3 +11,4 @@
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
+
