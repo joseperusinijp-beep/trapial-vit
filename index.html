@@ -7,8 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <title>El Trapial — Evaluación de Riesgo para Trabajo Eléctrico</title>
 
-  <!-- PWA manifest (correcto, NO visible) -->
-  <link rel="manifest" href="./manifest.json" />
+  <!-- PWA manifest (correcto y NO visible) -->
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#005daa">
 
   <style>
@@ -19,13 +19,15 @@
       --fg: #333;
       --card: #fff;
       --muted: #6c757d;
+      --ok: #2e7d32;
+      --warn: #c62828;
     }
     [data-theme="dark"] {
       --bg: #0f1419; --fg: #e6e6e6; --card: #151a21; --muted: #8a94a6;
     }
     html, body { background: var(--bg); color: var(--fg); }
     body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 10px; margin:0; }
-    .card { background: var(--card); max-width: 720px; margin: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; }
+    .card { background: var(--card); max-width: 900px; margin: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; }
     .header-logo { background: var(--card); padding: 18px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 4px solid var(--brand-prim); }
     .brand-name { color: var(--brand-prim); font-weight: 800; font-size: 1.2em; letter-spacing: 0.3px; }
     .content { padding: 20px; }
@@ -43,58 +45,37 @@
     .btn-secondary { background: var(--muted); color: #fff; }
     .btn-danger { background: var(--brand-sec); }
     .btn-ghost { background: transparent; color: var(--brand-prim); border: 1px solid var(--brand-prim); }
+    .btn-ok { background: var(--ok); color:#fff; }
 
     #res-display { margin-top: 16px; padding: 16px; border-radius: 8px; display: none; border: 2px solid; text-align: left; }
     .disclaimer { font-size: 0.78em; color: #222; background: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 6px; margin-top: 12px; }
-    .checklist { margin-top: 8px; font-size: 0.92em; }
-    .checklist label { font-weight: normal; display: flex; align-items: center; gap: 8px; }
-
-    .vit-grid { margin-top:8px; border:1px dashed #bbb; padding:10px; border-radius:8px; background:#fcfcfc; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-
-    .tag-row { display:flex; gap:8px; align-items:center; margin-top:8px; }
-    .tag-row input { flex:1; }
-    .mode-toggle { margin-left:auto; }
-
-    .etiqueta-box { margin-top:16px; border: 2px solid #000; border-radius:14px; background:#fff; }
-    .etiqueta-header { background:#d32f2f; color:#fff; padding:10px 16px; border-radius:12px 12px 0 0; font-weight:900; font-size:1.3em; text-align:center; letter-spacing:1px; }
-    .etiqueta-body { display:grid; grid-template-columns: 1fr 2fr 1fr; gap:0; align-items:stretch; border-top:3px solid #000; }
-    .etq-col { padding:12px; min-height:200px; border-right:2px solid #000; }
-    .etq-col:last-child { border-right:none; }
-    .etq-titulo { font-weight:800; margin-bottom:8px; text-align:center; }
-    .etq-item { display:flex; justify-content:space-between; margin:6px 0; }
-    .etq-item b { min-width:58%; }
-    .etq-pict { display:flex; align-items:center; justify-content:center; font-size:2.4em; }
-    .etq-footer { padding:8px 12px; border-top:2px solid #000; display:flex; justify-content:space-between; align-items:center; font-weight:700; }
-    .etq-dato-rojo { color:#c62828; font-weight:800; }
-    .etq-cat { color:#c62828; font-weight:900; }
-    .etq-acc { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
-
     .help { font-size:0.82em; color:#444; }
+
+    .vit-grid { margin-top:14px; }
+    .vit-header { display:flex; justify-content:space-between; align-items:center; }
+    .vit-cards { display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-top:12px; }
+    @media (min-width: 860px) { .vit-cards { grid-template-columns: repeat(4, 1fr); } }
+    .vit-card { background:#fff; border:1px solid #ddd; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.08); }
+    .vit-img { width:100%; height:120px; background:#f0f3f8; display:flex; align-items:center; justify-content:center; }
+    .vit-img img { width:100%; height:100%; object-fit:cover; display:block; }
+    .vit-icon { font-size:40px; color:#0d47a1; }
+    .vit-body { padding:10px; }
+    .vit-title { font-weight:700; color:#0d47a1; margin-bottom:6px; }
+    .vit-check { display:flex; align-items:center; gap:8px; margin-top:6px; }
+    .vit-check input { transform:scale(1.2); }
+    .vit-note { font-size:0.84em; color:#555; margin-top:4px; }
+
     .chip { display:inline-block; background:#e3f2fd; border:1px solid #90caf9; color:#0d47a1; padding:4px 8px; border-radius:999px; font-size:0.85em; margin-top:6px; }
 
     /* ===== MODAL de ayuda ===== */
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-      display: none; align-items: center; justify-content: center; z-index: 9999;
-    }
-    .modal {
-      background: #fff; color:#111; max-width: 640px; width: 92%;
-      border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.35);
-      padding: 18px; position: relative;
-    }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 9999; }
+    .modal { background: #fff; color:#111; max-width: 820px; width: 96%; border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.35); padding: 18px; position: relative; }
     .modal h4 { margin: 0 0 8px 0; color: var(--brand-prim); }
-    .modal .close-btn {
-      position:absolute; right: 12px; top: 12px; border:none; background:transparent;
-      font-size: 1.2em; cursor:pointer; color:#444;
-    }
-    .modal ul { margin:8px 0 0 18px; }
-    .info-btn {
-      display:inline-block; margin-left:8px; padding:4px 8px; font-size:0.9em;
-      border:1px solid var(--brand-prim); color: var(--brand-prim); border-radius:8px; background: #fff;
-      cursor:pointer;
-    }
+    .modal .close-btn { position:absolute; right: 12px; top: 12px; border:none; background:transparent; font-size: 1.2em; cursor:pointer; color:#444; }
+    .modal-grid { display:grid; grid-template-columns: 200px 1fr; gap:12px; align-items:start; margin-top:10px; }
+    .modal-grid img { width:100%; height:140px; object-fit:cover; border-radius:8px; background:#f5f7fb; }
+    .modal-grid .m-title { font-weight:700; color:#0d47a1; margin-bottom:4px; }
+    .info-btn { display:inline-block; margin-left:8px; padding:4px 8px; font-size:0.9em; border:1px solid var(--brand-prim); color: var(--brand-prim); border-radius:8px; background: #fff; cursor:pointer; }
   </style>
 </head>
 <body>
@@ -106,7 +87,7 @@
   </div>
 
   <div class="content">
-    <h2>Evaluación preliminar de arco eléctrico, choque y generación de etiqueta</h2>
+    <h2>Evaluación preliminar de arco eléctrico, choque, VIT y generación de etiqueta</h2>
 
     <!-- Identificación -->
     <label for="nombre">Nombre del Operador:</label>
@@ -138,9 +119,7 @@
         </div>
       </div>
 
-      <h3>⚙️ Transformador (solo potencia)
-        <button class="info-btn" id="btnInfoZ">ℹ️ Z% típica</button>
-      </h3>
+      <h3>⚙️ Transformador (solo potencia) <button class="info-btn" id="btnInfoZ">ℹ️ Z% típica</button></h3>
       <div class="row">
         <div>
           <label for="kva">Potencia del transformador (kVA):</label>
@@ -154,493 +133,11 @@
         </div>
       </div>
 
-      <h3>🛡️ Dispositivo de protección (genérico)
-        <button class="info-btn" id="btnInfoDP">ℹ️ Info DP</button>
-      </h3>
+      <h3>🛡️ Dispositivo de protección (genérico) <button class="info-btn" id="btnInfoDP">ℹ️ Info DP</button></h3>
       <div class="row">
         <div>
-          <label for="dp_tipo_gen">Tipo de protección:</label>
-          <select id="dp_tipo_gen">
-            <option value="MCCB_CHICO">MCCB pequeño (≤250 A)</option>
-            <option value="MCCB_MEDIO">MCCB mediano (250–630 A)</option>
-            <option value="FUSIBLE_J">Fusible Clase J</option>
-            <option value="FUSIBLE_RK5">Fusible Clase RK5</option>
-            <option value="DISY_GRANDE">Disyuntor industrial (>630 A)</option>
-            <option value="OTRO">Otro (editar manual)</option>
-          </select>
-          <span id="dp_chip" class="chip">t=— s • kA=—</span>
-        </div>
-        <div>
-          <label><input type="checkbox" id="dp_avanzado"/> Editar valores avanzados (t/kA)</label>
-          <div class="row" id="dp_avanzado_box" style="display:none; margin-top:8px;">
-            <div>
-              <label for="tiempo">Tiempo de despeje (s):</label>
-              <input type="number" id="tiempo" placeholder="Ej: 0.015" step="0.001" min="0.005"/>
-            </div>
-            <div>
-              <label for="dp_kA">Capacidad interruptiva (kA):</label>
-              <input type="number" id="dp_kA" placeholder="Ej: 36" step="1" min="1"/>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="disclaimer">
-        ⚠️ Este cálculo es <strong>estimativo</strong> y no reemplaza el estudio de arco <strong>IEEE 1584</strong> ni las etiquetas oficiales.
-        La selección de EPP por <strong>categorías NFPA 70E</strong> se muestra como <em>orientativa</em> cuando el método principal es por energía incidente.
-        Use siempre el método <strong>único</strong> por equipo (tablas <strong>o</strong> EI) y siga permisos/LOTO.
-      </div>
-    </div>
 
-    <!-- VIT (Verificación para Inicio de Trabajo) eléctrica -->
-    <h3>✅ VIT — Verificaciones para el inicio del trabajo (Eléctrico)</h3>
-    <div class="vit-grid">
-      <div class="checklist">
-        <label><input type="checkbox" id="vit1"/> Alcance del trabajo revisado y aceptado (permiso/plan).</label>
-        <label><input type="checkbox" id="vit2"/> El circuito/equipo a intervenir está identificado en el plan.</label>
-        <label><input type="checkbox" id="vit3"/> EPP calificado (peligros eléctricos, tensión/arco) inspeccionado y sin daños.</label>
-        <label><input type="checkbox" id="vit4"/> Barreras colocadas y acceso restringido controlado.</label>
-        <label><input type="checkbox" id="vit5"/> Guardia eléctrica presente (si aplica) y responsabilidades acordadas.</label>
-        <label><input type="checkbox" id="vit6"/> Plan de comunicación acordado y probado con el equipo.</label>
-        <label><input type="checkbox" id="vit7"/> Herramientas aisladas/equipos de prueba certificados e inspeccionados.</label>
-        <label><input type="checkbox" id="vit8"/> Plan de respuesta ante emergencias listo y materiales en sitio.</label>
-      </div>
-      <small class="help">La etiqueta y el cálculo sólo se habilitan si todas las verificaciones están OK.</small>
-    </div>
-
-    <!-- Acciones -->
-    <div class="btn-row">
-      <button class="btn" id="btnCalcular">VALIDAR TRABAJO Y CALCULAR</button>
-      <button class="btn btn-danger" id="btnDescargar">Descargar Reporte</button>
-      <button class="btn btn-secondary" id="btnGuardarRegistro">Guardar Registro</button>
-      <button class="btn btn-secondary" id="btnCargarRegistro">Cargar Último</button>
-      <button class="btn" id="btnCrearEtiqueta">CREAR ETIQUETA</button>
-    </div>
-
-    <!-- Resultados -->
-    <div id="res-display" role="status" aria-live="polite"></div>
-
-    <!-- Contenedor etiqueta generada -->
-    <div id="etiqueta-container" class="etiqueta-box" style="display:none;">
-      <div class="etiqueta-header">⚠️ DANGER</div>
-      <div class="etiqueta-body">
-        <div class="etq-col etq-pict">⚡</div>
-        <div class="etq-col">
-          <div class="etq-titulo">Peligro de Arco Eléctrico y de Descarga</div>
-          <div class="etq-item"><b>Límite de Protección Arco Eléctrico</b><span id="etq-afb">—</span></div>
-          <div class="etq-item"><b>Energía Incidente (cal/cm²)</b><span id="etq-ei" class="etq-dato-rojo">—</span></div>
-          <div class="etq-item"><b>Distancia de Trabajo</b><span id="etq-dist">—</span></div>
-          <div class="etq-item"><b>Nivel Requerido de EPP</b><span id="etq-cat" class="etq-cat">—</span></div>
-          <div class="etq-item"><b>Tensión de Peligro de Choque</b><span id="etq-vac" class="etq-dato-rojo">—</span></div>
-          <div class="etq-item"><b>Acercamiento Limitado</b><span id="etq-lim">—</span></div>
-          <div class="etq-item"><b>Acercamiento Restringido</b><span id="etq-res">—</span></div>
-        </div>
-        <div class="etq-col etq-pict">⚡</div>
-      </div>
-      <div class="etq-footer">
-        <span id="etq-equipo">Equipo —</span>
-        <span id="etq-fecha">—</span>
-      </div>
-      <div class="etq-acc">
-        <button class="btn" id="btnValidarEtiqueta">VALIDAR</button>
-        <button class="btn btn-secondary" id="btnGuardarEtiqueta">Guardar etiqueta (HTML)</button>
-        <button class="btn btn-secondary" id="btnEnviarEtiqueta">Enviar por email</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== MODAL GENÉRICO ===== -->
-<div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <button class="close-btn" id="modalClose" aria-label="Cerrar">✖</button>
-    <h4 id="modalTitle">Ayuda</h4>
-    <div id="modalContent"></div>
-  </div>
-</div>
-
-<script>
-  // ====== Modo oscuro ======
-  const appCard = document.getElementById('appCard');
-  document.getElementById('btnMode').addEventListener('click', () => {
-    const current = appCard.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    appCard.setAttribute('data-theme', next);
-    document.getElementById('btnMode').textContent = next === 'dark' ? '☀️ Modo claro' : '🌙 Modo oscuro';
-  });
-
-  // ====== LOTO visual ======
-  function verificarTarea() {
-    document.getElementById('alertaPeligro').style.display =
-      (document.getElementById('tipo').value === 'Contacto') ? 'block' : 'none';
-  }
-  window.verificarTarea = verificarTarea;
-
-  // ====== Tabla de impedancia típica por kVA ======
-  function zPctFromKVA(kva) {
-    if (kva >= 10 && kva <= 25)   return 3.5;
-    if (kva >= 30 && kva <= 75)   return 4.25;
-    if (kva >= 100 && kva <= 150) return 4.75;
-    if (kva >= 200 && kva <= 300) return 5.25;
-    if (kva >= 400 && kva <= 500) return 5.75;
-    if (kva >= 630 && kva <= 750) return 5.85;
-    if (kva >= 800 && kva <= 1000) return 6.5;
-    return 5.75; // defecto común
-  }
-
-  // ====== Tipos genéricos de protección: t y kA por defecto ======
-  function dpDefaults(tipo) {
-    switch (tipo) {
-      case 'MCCB_CHICO':  return { t: 0.010, kA: 25 };
-      case 'MCCB_MEDIO':  return { t: 0.015, kA: 36 };
-      case 'FUSIBLE_J':   return { t: 0.010, kA: 100 };
-      case 'FUSIBLE_RK5': return { t: 0.012, kA: 50 };
-      case 'DISY_GRANDE': return { t: 0.025, kA: 50 };
-      default:            return { t: null, kA: null };
-    }
-  }
-
-  // ====== Estimaciones (orden de magnitud) ======
-  function estimarEI(ka, t, volt, dist_cm) {
-    const C = 46.2; // constante de orden de magnitud (no IEEE 1584)
-    return C * ka * t * Math.pow(480/volt, 0.5) * Math.pow(45/dist_cm, 1.5);
-  }
-  function getPPECategory(ei) {
-    if (ei <= 1.2) return "Sin categoría (≤ 1.2 cal/cm²)";
-    if (ei <= 4)   return "CATEGORÍA 1 (ATPV ≥ 4)";
-    if (ei <= 8)   return "CATEGORÍA 2 (ATPV ≥ 8)";
-    if (ei <= 25)  return "CATEGORÍA 3 (ATPV ≥ 25)";
-    if (ei <= 40)  return "CATEGORÍA 4 (ATPV ≥ 40)";
-    return "CATEGORÍA 4 (EI > 40) — Evaluación adicional";
-  }
-  function cortoDesdeTx(kva, vll, zpct) {
-    const Ifl = (kva*1000)/(Math.sqrt(3)*vll); // A nominal
-    const Zpu = zpct/100;
-    const IscA = Ifl / Zpu; // A de corto
-    return IscA/1000; // kA
-  }
-  function arcoBoundary(ei_work, dist_cm) {
-    if (ei_work <= 0) return "—";
-    const exponent = 1.5;
-    const Db_cm = dist_cm * Math.pow(ei_work/1.2, 1.0/exponent);
-    return (Db_cm/100).toFixed(2) + " m";
-  }
-  function shockBoundaries(volt) {
-    if (volt <= 150) return { limited: "N/A (≤150 V — evitar contacto)", restricted: "N/A" };
-    if (volt <= 750) return { limited: "1.07 m", restricted: "0.30 m" };
-    if (volt <= 15000) return { limited: "3.05 m", restricted: "0.81 m" };
-    return { limited: "Personal calificado — consultar NFPA", restricted: "Personal calificado — consultar NFPA" };
-  }
-
-  // ====== UI: vincular kVA → Z% y DP tipo → t/kA por defecto ======
-  const kvaInput = document.getElementById('kva');
-  const zpctView = document.getElementById('zpct_view');
-  const dpTipoSel = document.getElementById('dp_tipo_gen');
-  const dpChip = document.getElementById('dp_chip');
-  const dpAvChk = document.getElementById('dp_avanzado');
-  const dpAvBox = document.getElementById('dp_avanzado_box');
-  const tInput = document.getElementById('tiempo');
-  const kAInput = document.getElementById('dp_kA');
-
-  function refreshZpct() {
-    const kva = parseFloat(kvaInput.value);
-    if (!isFinite(kva)) { zpctView.value = "—"; return; }
-    const z = zPctFromKVA(kva);
-    zpctView.value = z.toFixed(2) + " %";
-  }
-  function refreshDPDefaults() {
-    const tipo = dpTipoSel.value;
-    const def = dpDefaults(tipo);
-    if (tipo === 'OTRO') {
-      dpChip.textContent = "t=— s • kA=—";
-      dpAvChk.checked = true;
-      dpAvBox.style.display = "grid";
-      tInput.value = "";
-      kAInput.value = "";
-    } else {
-      dpChip.textContent = `t=${def.t.toFixed(3)} s • kA=${def.kA}`;
-      if (!dpAvChk.checked) {
-        tInput.value = def.t;
-        kAInput.value = def.kA;
-        dpAvBox.style.display = "none";
-      }
-    }
-  }
-  kvaInput.addEventListener('input', refreshZpct);
-  dpTipoSel.addEventListener('change', refreshDPDefaults);
-  dpAvChk.addEventListener('change', () => {
-    dpAvBox.style.display = dpAvChk.checked ? "grid" : "none";
-    if (!dpAvChk.checked) refreshDPDefaults();
-  });
-  // Inicializar
-  refreshZpct(); refreshDPDefaults();
-
-  // ====== MODAL de ayuda ======
-  const backdrop = document.getElementById('modalBackdrop');
-  const modalClose = document.getElementById('modalClose');
-  const modalTitle = document.getElementById('modalTitle');
-  const modalContent = document.getElementById('modalContent');
-  document.getElementById('btnInfoZ').addEventListener('click', () => {
-    modalTitle.textContent = "Impedancia típica (Z%) por potencia (kVA)";
-    modalContent.innerHTML = `
-      <p>La impedancia del transformador (<b>Z%</b>) se usa para estimar el corto disponible. En campo, si no se conoce la placa, usamos valores típicos por rango de kVA.</p>
-      <ul>
-        <li>10–25 kVA → ~3.5%</li>
-        <li>30–75 kVA → ~4.25%</li>
-        <li>100–150 kVA → ~4.75%</li>
-        <li>200–300 kVA → ~5.25%</li>
-        <li>400–500 kVA → ~5.75%</li>
-        <li>630–750 kVA → ~5.85%</li>
-        <li>800–1000 kVA → ~6.5%</li>
-      </ul>
-      <p><b>Nota:</b> Si el valor real de placa difiere, usar el valor de placa. Este cálculo es <i>estimativo</i>.</p>
-    `;
-    backdrop.style.display = "flex";
-  });
-  document.getElementById('btnInfoDP').addEventListener('click', () => {
-    modalTitle.textContent = "Tipos genéricos de protección (t y kA típicos)";
-    modalContent.innerHTML = `
-      <p>Para estimar el tiempo de despeje (<b>t</b>) y la capacidad interruptiva (<b>kA</b>) del dispositivo, usamos tipos genéricos:</p>
-      <ul>
-        <li><b>MCCB pequeño (≤250 A):</b> t≈0.010 s, kA≈25</li>
-        <li><b>MCCB mediano (250–630 A):</b> t≈0.015 s, kA≈36</li>
-        <li><b>Fusible Clase J:</b> t≈0.010 s, kA≈100</li>
-        <li><b>Fusible Clase RK5:</b> t≈0.012 s, kA≈50</li>
-        <li><b>Disyuntor industrial (>630 A):</b> t≈0.025 s, kA≈50</li>
-      </ul>
-      <p>Si tenés la curva/modelo del equipo, elegí “<b>OTRO</b>” y podés editar <b>t</b> y <b>kA</b> manualmente.</p>
-    `;
-    backdrop.style.display = "flex";
-  });
-  modalClose.addEventListener('click', () => backdrop.style.display = "none");
-  backdrop.addEventListener('click', (e) => { if (e.target === backdrop) backdrop.style.display = "none"; });
-
-  // ====== Estado del cálculo ======
-  let ultimoResultado = null;
-
-  // ====== Validación y cálculo ======
-  document.getElementById('btnCalcular').addEventListener('click', generarValidacion);
-  function generarValidacion() {
-    const nombre = document.getElementById('nombre').value.trim();
-    const equipo  = document.getElementById('equipo').value.trim();
-    const volt    = parseFloat(document.getElementById('volt').value);
-    const dist    = parseFloat(document.getElementById('dist').value);
-    const kva     = parseFloat(document.getElementById('kva').value);
-
-    const zpct    = zPctFromKVA(kva);
-    const tipoDP  = document.getElementById('dp_tipo_gen').value;
-    const vitOK = ['vit1','vit2','vit3','vit4','vit5','vit6','vit7','vit8'].map(id=>document.getElementById(id).checked).every(x=>x);
-
-    // t y kA: por defecto del tipo, salvo edición avanzada/OTRO
-    const dpAvChk = document.getElementById('dp_avanzado').checked;
-    let t = null, dp_kA = null;
-    if (tipoDP === 'OTRO' || dpAvChk) {
-      t = parseFloat(document.getElementById('tiempo').value);
-      dp_kA = parseFloat(document.getElementById('dp_kA').value);
-    } else {
-      const def = dpDefaults(tipoDP);
-      t = def.t; dp_kA = def.kA;
-    }
-
-    if (!nombre || !equipo || !isFinite(volt) || !isFinite(dist) || !isFinite(kva)) {
-      alert("Completar operador, equipo, tensión, distancia y kVA.");
-      return;
-    }
-    if (!isFinite(t) || !isFinite(dp_kA)) {
-      alert("Completar t y kA del dispositivo (o elegir tipo genérico).");
-      return;
-    }
-    if (!vitOK) { alert("Completar la VIT eléctrica antes de validar."); return; }
-
-    const ka_tx = cortoDesdeTx(kva, volt, zpct);       // kA corto estimado
-    const ei = estimarEI(ka_tx, t, volt, dist);        // EI estimada
-    const cat = getPPECategory(ei);
-    const shock = shockBoundaries(volt);
-    const afb_m = arcoBoundary(ei, dist);
-
-    let eppSug = "Algodón no fundible; EPP FR no requerido (ATPV ≥ 1.2).";
-    let colorFondo = "#2ecc71", colorTexto = "white";
-    if (ei > 1.2 && ei <= 8) { eppSug = "Conjunto FR ATPV ≥ 8 cal/cm² + protección facial/balaclava."; colorFondo = "#f39c12"; colorTexto = "black"; }
-    else if (ei > 8 && ei <= 25) { eppSug = "Conjunto FR ATPV ≥ 25 cal/cm² + capucha arco y guantes."; colorFondo = "#d35400"; }
-    else if (ei > 25) { eppSug = "Conjunto FR ≥ 40 cal/cm² y medidas adicionales. Evaluación detallada obligatoria."; colorFondo = "#c0392b"; }
-
-    const res = document.getElementById('res-display');
-    res.style.display = "block";
-    res.style.backgroundColor = colorFondo;
-    res.style.borderColor = "#fff";
-    res.style.color = colorTexto;
-
-    const fecha = new Date().toLocaleString();
-    const tipoTarea = document.getElementById('tipo').value;
-
-    res.innerHTML = `
-      <h3 style="margin-top:0; border-bottom:1px solid ${colorTexto};">REPORTE — Evaluación de Riesgo Eléctrico</h3>
-      <p><strong>Fecha/Hora:</strong> ${fecha}</p>
-      <p><strong>Operador:</strong> ${nombre}</p>
-      <p><strong>Equipo:</strong> ${equipo}</p>
-      <p><strong>Tarea:</strong> ${tipoTarea}</p>
-
-      <h4>Parámetros</h4>
-      <p>V=${volt} V • Dist=${dist} cm • Tx=${kva} kVA • Z=${zpct.toFixed(2)}%</p>
-      <p><strong>Dispositivo:</strong> ${tipoDP} • t=${t.toFixed(3)} s • kA=${dp_kA}</p>
-      <p><strong>Corto estimado (sec Tx):</strong> ${ka_tx.toFixed(2)} kA</p>
-      <p><strong>Energía incidente (estimada):</strong> ${ei.toFixed(2)} cal/cm²</p>
-      <p><strong>Límite de protección arco (AFB):</strong> ${afb_m}</p>
-      <p><strong>Fronteras de choque:</strong> Limitado=${shock.limited} • Restringido=${shock.restricted}</p>
-
-      <p><strong>Categoría de EPP (orientativa):</strong> ${cat}</p>
-      <p><strong>EPP sugerido (por ATPV):</strong> ${eppSug}</p>
-
-      <h4>VIT Eléctrica — OK</h4>
-      <p>Alcance, identificación, EPP calificado, barreras, guardia eléctrica, comunicación, herramientas aisladas, emergencias.</p>
-
-      <p class="disclaimer" style="background: rgba(255,255,255,0.2); border-color: ${colorTexto};">
-        Este resultado es estimativo. Use un método por equipo (tablas NFPA 70E o análisis IEEE 1584), no ambos. 
-        Ajuste el tiempo de despeje según curvas reales del dispositivo y valide contra el estudio.
-      </p>
-    `;
-
-    ultimoResultado = { fecha, nombre, equipo, volt, dist, kva, zpct, tipoDP, dp_kA, t, ka_tx, ei, afb_m, shock, cat, eppSug };
-    window.scrollTo(0, document.body.scrollHeight);
-  }
-
-  // ====== Crear etiqueta ======
-  document.getElementById('btnCrearEtiqueta').addEventListener('click', () => {
-    if (!ultimoResultado) { alert("Primero valide y calcule (botón VALIDAR)."); return; }
-    const e = ultimoResultado;
-    const cont = document.getElementById('etiqueta-container');
-    cont.style.display = "block";
-
-    document.getElementById('etq-afb').textContent  = `${e.afb_m}`;
-    document.getElementById('etq-ei').textContent   = `${e.ei.toFixed(2)}`;
-    document.getElementById('etq-dist').textContent = `${e.dist} cm`;
-    document.getElementById('etq-cat').textContent  = `${e.cat}`;
-    document.getElementById('etq-vac').textContent  = `${e.volt} VAC`;
-    document.getElementById('etq-lim').textContent  = `${e.shock.limited}`;
-    document.getElementById('etq-res').textContent  = `${e.shock.restricted}`;
-    document.getElementById('etq-equipo').textContent = `Equipo ${e.equipo}`;
-    document.getElementById('etq-fecha').textContent  = new Date().toLocaleDateString();
-
-    window.scrollTo(0, document.body.scrollHeight);
-  });
-
-  // Validar etiqueta
-  document.getElementById('btnValidarEtiqueta').addEventListener('click', () => {
-    const vitOK = ['vit1','vit2','vit3','vit4','vit5','vit6','vit7','vit8'].map(id=>document.getElementById(id).checked).every(x=>x);
-    alert(vitOK ? "Etiqueta validada con VIT eléctrica OK." : "Complete la VIT eléctrica antes de validar la etiqueta.");
-  });
-
-  // Guardar etiqueta (HTML)
-  document.getElementById('btnGuardarEtiqueta').addEventListener('click', () => {
-    const cont = document.getElementById('etiqueta-container');
-    if (cont.style.display !== 'block') { alert('Cree la etiqueta primero.'); return; }
-    const html = `
-      <html><head><meta charset="UTF-8"><title>Etiqueta Arco - El Trapial</title>
-      <style>${document.querySelector('style').innerHTML}</style></head><body>
-      ${cont.outerHTML}
-      </body></html>`;
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `Etiqueta_${(ultimoResultado?.equipo||'equipo').replace(/\s+/g,'_')}.html`;
-    a.click(); URL.revokeObjectURL(url);
-  });
-
-  // Enviar por email
-  document.getElementById('btnEnviarEtiqueta').addEventListener('click', () => {
-    if (!ultimoResultado) { alert("Primero crea la etiqueta."); return; }
-    const e = ultimoResultado;
-    const asunto = `Etiqueta Arco/Choque — ${e.equipo} — ${new Date().toLocaleDateString()}`;
-    const cuerpo = `Equipo: ${e.equipo}%0AFecha: ${e.fecha}%0A`+
-      `EI (cal/cm2): ${e.ei.toFixed(2)}%0A`+
-      `AFB: ${e.afb_m}%0A`+
-      `Distancia trabajo (cm): ${e.dist}%0A`+
-      `Categoría EPP: ${e.cat}%0A`+
-      `Tensión choque (VAC): ${e.volt}%0A`+
-      `Acercamiento limitado: ${e.shock.limited}%0A`+
-      `Acercamiento restringido: ${e.shock.restricted}%0A`+
-      `Tx: ${e.kva} kVA / Z=${e.zpct.toFixed(2)}% — Icc≈ ${e.ka_tx.toFixed(2)} kA%0A`+
-      `Dispositivo: ${e.tipoDP} • t=${e.t.toFixed(3)} s • kA=${e.dp_kA}%0A`+
-      `EPP sugerido: ${e.eppSug}%0A`+
-      `VIT eléctrica: OK`;
-    const mailto = `mailto:mantenimientotrapialelectrico@chevron.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-    window.location.href = mailto;
-  });
-
-  // ====== Reporte general (sin firma) ======
-  document.getElementById('btnDescargar').addEventListener('click', descargarReporte);
-  function descargarReporte() {
-    const res = document.getElementById('res-display');
-    if (res.style.display !== 'block') {
-      alert('Primero genere el reporte.');
-      return;
-    }
-    const printable = `
-      <html><head><meta charset="UTF-8"><title>Reporte VIT</title>
-      <style> body { font-family: Segoe UI, Tahoma, sans-serif; margin: 20px; color:#111; }
-              h2 { color:#005daa; }
-              .box { border:1px solid #ccc; padding:12px; border-radius:8px; background:#fafafa; }
-      </style></head><body>
-        <h2>Evaluación de Riesgo para Trabajo Eléctrico — El Trapial</h2>
-        <div class="box">${res.innerHTML}</div>
-      </body></html>`;
-    const blob = new Blob([printable], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const w = window.open(url, '_blank'); if (w) w.onload = () => w.print();
-  }
-
-  // ====== Guardar/Cargar registro ======
-  document.getElementById('btnGuardarRegistro').addEventListener('click', () => {
-    const payload = {
-      nombre: document.getElementById('nombre').value.trim(),
-      equipo: document.getElementById('equipo').value.trim(),
-      tipo: document.getElementById('tipo').value,
-      volt: document.getElementById('volt').value,
-      dist: document.getElementById('dist').value,
-      kva: document.getElementById('kva').value,
-      zpct: document.getElementById('zpct_view').value,
-      dp_tipo_gen: document.getElementById('dp_tipo_gen').value,
-      tiempo: document.getElementById('tiempo').value,
-      dp_kA: document.getElementById('dp_kA').value,
-      resHTML: document.getElementById('res-display').innerHTML,
-      ts: new Date().toISOString()
-    };
-    localStorage.setItem('vit_electrica_last', JSON.stringify(payload));
-    alert('Registro guardado localmente.');
-  });
-
-  document.getElementById('btnCargarRegistro').addEventListener('click', () => {
-    const raw = localStorage.getItem('vit_electrica_last');
-    if (!raw) { alert('No hay registros guardados.'); return; }
-    const p = JSON.parse(raw);
-    document.getElementById('nombre').value = p.nombre || '';
-    document.getElementById('equipo').value = p.equipo || '';
-    document.getElementById('tipo').value = p.tipo || 'Inspeccion';
-    document.getElementById('volt').value = p.volt || '';
-    document.getElementById('dist').value = p.dist || '';
-    document.getElementById('kva').value = p.kva || '';
-    document.getElementById('zpct_view').value = p.zpct || '—';
-    document.getElementById('dp_tipo_gen').value = p.dp_tipo_gen || 'MCCB_CHICO';
-    (function refreshDPDefaultsAfterLoad(){
-      const def = dpDefaults(document.getElementById('dp_tipo_gen').value);
-      document.getElementById('dp_chip').textContent =
-        def.t ? `t=${def.t.toFixed(3)} s • kA=${def.kA}` : 't=— s • kA=—';
-    })();
-    document.getElementById('tiempo').value = p.tiempo || '';
-    document.getElementById('dp_kA').value = p.dp_kA || '';
-
-    const res = document.getElementById('res-display');
-    if (p.resHTML) { res.innerHTML = p.resHTML; res.style.display = 'block'; }
-    alert('Último registro cargado.');
-  });
-
-  // ====== Service Worker para PWA ======
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW fail:', err));
-  }
-</script>
-</body>
-</html>
 
 
 
