@@ -1,26 +1,33 @@
 
-const CACHE_NAME = 'trapial-vit-v1';
+// Versión V3 para forzar actualización del cache
+const CACHE_NAME = 'trapial-vit-v3';
 const ASSETS = [
-  './el-trapial-vit-arcflash.html',
+  './index.html',
   './manifest.json',
+  './sw.js',
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+// Precarga de assets
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null)))
+// Limpieza de caches antiguos
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
     )
   );
 });
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then(res => res || fetch(e.request))
+// Estrategia: cache-first con fallback a red
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
