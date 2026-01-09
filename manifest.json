@@ -1,14 +1,28 @@
 
 {
-  "name": "El Trapial - VIT Arc Flash",
-  "short_name": "Trapial VIT",
+  "name": "El Trapial — Evaluación de Riesgo para Trabajo Eléctrico",
+  "short_name": "Trapial ERTE",
+  "lang": "es-AR",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#eef2f3",
   "theme_color": "#005daa",
+  "description": "Evaluación preliminar de arco y choque, VIT eléctrica y generación de etiqueta DANGER.",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
-  ]
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "business"],
+  "prefer_related_applications": false
 }
-
