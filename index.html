@@ -5,7 +5,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Arc Flash Safety Control - El Trapial</title>
-<meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT, etiqueta imprimible y envío de reporte por email.">
+<meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT.">
 <style>
   :root { --blue:#005aa2; --red:#b71c1c; --gold:#ffcc00; --dark:#1a1a1a; }
   body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f4f7f6;margin:0;padding:15px}
@@ -46,9 +46,7 @@
   .footer-info{background:#333;color:#fff;padding:12px;font-size:.95rem;text-align:left}
   .disclaimer{color:#444;font-size:.85rem;margin:10px 0}
   .actions{display:flex;gap:10px;justify-content:center;margin-top:14px}
-  .email-actions{display:flex;gap:10px;justify-content:center;margin-top:10px}
-  .email-actions .btn{background:#0b8043} /* verde Outlook-like */
-  @media print{.header,.tabs,.section .btn,.actions,.email-actions{display:none!important}#result-display{display:block!important;padding:0}.app-container{box-shadow:none;border:none}}
+  @media print{.header,.tabs,.section .btn,.actions{display:none!important}#result-display{display:block!important;padding:0}.app-container{box-shadow:none;border:none}}
 </style>
 </head>
 <body>
@@ -188,19 +186,11 @@
       <button class="btn btn-secondary" onclick="limpiar()">NUEVA EVALUACIÓN</button>
     </div>
 
-    <!-- Acciones de Email -->
-    <div id="email-actions" class="email-actions" style="display:none;">
-      <button class="btn" onclick="enviarEmailNFPA()">ENVIAR REPORTE POR EMAIL</button>
-    </div>
-
     <p style="text-align:center;font-weight:bold;color:#005aa2;margin-top:16px;">Reporte generado para Mantenimiento El Trapial</p>
   </div>
 </div>
 
 <script>
-  // ====== Estado para email ======
-  let lastResult = null; // guarda último resultado NFPA para el mail
-
   // ====== Pestañas ======
   function showPane(id){
     document.getElementById('pane_estudio').style.display = (id==='pane_estudio')?'block':'none';
@@ -208,7 +198,6 @@
     document.getElementById('tab_estudio').classList.toggle('active', id==='pane_estudio');
     document.getElementById('tab_nfpa').classList.toggle('active', id==='pane_nfpa');
     document.getElementById('result-display').style.display = 'none';
-    document.getElementById('email-actions').style.display = 'none';
   }
 
   // ====== Con estudio ======
@@ -256,7 +245,7 @@
     document.getElementById('res_m').innerText  = metodo || "—";
     document.getElementById('res_e').innerText  = (energia!=null ? energia.toFixed(2) + " cal/cm²" : dist || "—");
     document.getElementById('res_eq').innerText = equipo || "—";
-    document.getElementById('res_t').innerText  = (tiempo!=null ? tiempo.toFixed(3) + " s" : "—";
+    document.getElementById('res_t').innerText  = (tiempo!=null ? tiempo.toFixed(3) + " s" : "—");
     document.getElementById('res_perm').innerText = permisosTxt || "—";
     document.getElementById('res_cat').innerText = (cat==='EXTREMO') ? "NO INTERVENIR" : ("CAT " + cat);
     document.getElementById('res_desc').innerHTML = eppText(cat);
@@ -275,8 +264,9 @@
     const trabajador = (document.getElementById('trabajador').value || '').trim();
     let fecha = document.getElementById('fecha').value;
     if (!fecha){
+      // Setear ahora en ISO local (compatible con datetime-local)
       const now = new Date();
-      const tzoffset = now.getTimezoneOffset() * 60000;
+      const tzoffset = now.getTimezoneOffset() * 60000; // minutos a ms
       fecha = new Date(now - tzoffset).toISOString().slice(0,16);
       document.getElementById('fecha').value = fecha;
     }
@@ -294,11 +284,11 @@
     }
     const permisosTxt = `${jsa?'JSA ✔':'JSA ✖'} • ${permiso?'Permiso ✔':'Permiso ✖'} • ${vit?'VIT ✔':'VIT ✖'}`;
 
-    // ----- Modo CON ESTUDIO -----
     if (modo === 'estudio'){
       const task = document.getElementById('task_type').value;
       if (!task){ alert("Seleccioná el tipo de tarea."); return; }
 
+      // Si es mantenimiento, exigir Reglas de Oro
       if (task === 'mantenimiento'){
         const checks = document.querySelectorAll('.rule-chk:checked').length;
         if (checks < 5){
@@ -326,14 +316,10 @@
         tiempo:null,
         cat, permisosTxt
       });
-
-      // No se envía email automáticamente en modo estudio
-      document.getElementById('email-actions').style.display = 'none';
-      lastResult = null;
       return;
     }
 
-    // ----- Modo NFPA 70E por tablas (solo V, Icc, t) -----
+    // ---- NFPA 70E por tablas (sin estudio) ----
     const V   = parseFloat(document.getElementById('volt_nfpa').value);
     const Icc = parseFloat(document.getElementById('scc_nfpa').value);
     const t   = parseFloat(document.getElementById('t_nfpa').value);
@@ -352,15 +338,11 @@
       });
       document.getElementById('res_desc').innerHTML =
         "<b>No válido:</b> el método de tablas aplica a ≤600 V. Requiere estudio IEEE 1584.";
-      // Mostrar botón de email (envía reporte con estado)
-      document.getElementById('email-actions').style.display = 'flex';
-      lastResult = { modo:'NFPA', trabajador, fecha, V, Icc, t, cat:'EXTREMO', condicion:'No válido para tablas', permisosTxt };
-      // Abrir email automáticamente
-      enviarEmailNFPA();
       return;
     }
 
     let categoria = null, condicion = '';
+    // Condiciones (resumen conservador) para equipos típicos ≤600 V
     if (V <= 240 && Icc <= 25 && t <= 0.03) {
       categoria = 1; condicion = 'Panel ≤240 V, Icc ≤25 kA, t ≤0,03 s';
     } else if (V > 240 && V <= 600 && Icc <= 65 && t <= 0.03) {
@@ -387,16 +369,9 @@
       h.innerText = "ADVERTENCIA";
       h.className = "et-head warning";
       window.scrollTo({ top: document.body.scrollHeight, behavior:'smooth' });
-
-      // Mostrar botón de email (envía reporte con estado)
-      document.getElementById('email-actions').style.display = 'flex';
-      lastResult = { modo:'NFPA', trabajador, fecha, V, Icc, t, cat:'NO USAR TABLAS', condicion:'Requiere estudio IEEE 1584', permisosTxt };
-      // Abrir email automáticamente
-      enviarEmailNFPA();
       return;
     }
 
-    // Mostrar categoría asignada por tablas
     renderResult({
       trabajador, fecha,
       metodo:'NFPA 70E por tablas',
@@ -407,61 +382,22 @@
       cat:categoria,
       permisosTxt
     });
-
-    // Guardar y enviar reporte por email automáticamente
-    document.getElementById('email-actions').style.display = 'flex';
-    lastResult = { modo:'NFPA', trabajador, fecha, V, Icc, t, cat:`CAT ${categoria}`, condicion, permisosTxt };
-    enviarEmailNFPA();
-  }
-
-  // ====== Email (NFPA) ======
-  function enviarEmailNFPA(){
-    if (!lastResult){ alert("No hay datos NFPA para enviar."); return; }
-    const to = "mantenimientoelectrico@chevron.com";
-    const subject = `REPORTE ARC FLASH (NFPA 70E) — ${lastResult.cat} — ${lastResult.V}V / ${lastResult.Icc}kA`;
-    const body =
-`REPORTE PROFESIONAL DE ANÁLISIS DE RIESGO — ARC FLASH (NFPA 70E)
-------------------------------------------------------------
-Trabajador: ${lastResult.trabajador}
-Fecha/hora: ${lastResult.fecha}
-Permisos: ${lastResult.permisosTxt}
-
-Método: NFPA 70E por tablas (≤600 V)
-Condición: ${lastResult.condicion}
-Tensión (V): ${lastResult.V}
-Cortocircuito disponible (kA): ${lastResult.Icc}
-Tiempo de despeje (s): ${lastResult.t}
-Categoría: ${lastResult.cat}
-
-Observaciones:
-• Si la condición no cumple tablas: realizar estudio IEEE 1584 y etiquetado correspondiente.
-• JSA, Permiso y VIT confirmados.
-
-Generado desde Arc Flash Safety Control — Chevron El Trapial
-`;
-
-    // Abrir cliente de correo con el reporte listo para enviar
-    window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
   // ====== Utilidades ======
   function limpiar(){
+    // Limpia campos clave (no resetea nombre para agilizar series)
     ['tag_id','volt_nfpa','scc_nfpa','t_nfpa'].forEach(id=>{
       const el=document.getElementById(id); if(el){ el.value=''; }
     });
+    // Limpiar check de Reglas de Oro
     document.querySelectorAll('.rule-chk').forEach(c=>c.checked=false);
     document.getElementById('task_type').value='';
     document.getElementById('estudio_div').style.display='none';
     document.getElementById('stop_card').style.display='none';
     document.getElementById('result-display').style.display='none';
-    document.getElementById('email-actions').style.display='none';
-    lastResult = null;
     window.scrollTo({ top: 0, behavior:'smooth' });
   }
 </script>
 </body>
 </html>
-
-
-
-
