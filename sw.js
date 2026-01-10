@@ -1,6 +1,6 @@
 
 /* sw.js — Service Worker simple para Trapial VIT */
-const CACHE_NAME = 'trapial-vit-v1.7 Final';
+const CACHE_NAME = 'trapial-vit-v1.8 Final';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -41,6 +41,7 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
 
 
 
