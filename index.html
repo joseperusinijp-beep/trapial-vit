@@ -28,14 +28,14 @@
         select:focus, input:focus { border-color: var(--chevron-blue); outline: none; background: #f0f7ff; }
  
         /* CARTEL ROJO DE SEGURIDAD */
-        .stop-card {
-            background: var(--danger);
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            margin: 20px 0;
-            display: none;
-            text-align: center;
+        .stop-card { 
+            background: var(--danger); 
+            color: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            display: none; 
+            text-align: center; 
             box-shadow: 0 8px 20px rgba(204,0,0,0.3);
         }
         .stop-card h2 { margin: 0 0 15px 0; font-size: 2.5rem; font-weight: 900; }
@@ -46,16 +46,16 @@
         .check-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 1.1rem; cursor: pointer; }
         .check-item input { width: 25px; height: 25px; margin-right: 15px; cursor: pointer; }
  
-        .btn-calculate {
-            background: var(--chevron-blue);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 22px;
-            font-size: 1.5rem;
-            font-weight: 800;
-            border-radius: 8px;
-            cursor: pointer;
+        .btn-calculate { 
+            background: var(--chevron-blue); 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 22px; 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            border-radius: 8px; 
+            cursor: pointer; 
             transition: 0.3s;
             margin-top: 10px;
         }
@@ -64,7 +64,214 @@
         /* ETIQUETA PROFESIONAL */
         #result-area { display: none; padding: 40px 20px; border-top: 2px solid #eee; }
  
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Seguridad Eléctrica - El Trapial</title>
+    <style>
+        :root {
+            --chevron-blue: #005aa2;
+            --danger: #cc0000;
+            --warning: #ffcc00;
+            --dark: #1a1a1a;
+            --white: #ffffff;
+        }
+ 
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; }
+        .container { max-width: 700px; margin: auto; background: var(--white); border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; border: 1px solid #ddd; }
+        
+        .header { background: var(--chevron-blue); color: white; padding: 25px; text-align: center; border-bottom: 5px solid #00447a; }
+        .header h1 { margin: 0; font-size: 1.6rem; text-transform: uppercase; }
+ 
+        .content { padding: 25px; }
+        .group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: var(--chevron-blue); font-size: 0.9rem; text-transform: uppercase; }
+        
+        select, input { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box; outline: none; }
+        select:focus, input:focus { border-color: var(--chevron-blue); }
+ 
+        /* CARTEL DE PARADA CRÍTICA */
+        .stop-alert { 
+            background: var(--danger); color: white; padding: 25px; border-radius: 12px; 
+            margin: 20px 0; display: none; text-align: center;
+            border-left: 10px solid #800000;
+        }
+        .stop-alert h2 { margin: 0 0 10px 0; font-size: 2rem; font-weight: 900; }
+        .checklist { text-align: left; margin-top: 15px; background: rgba(0,0,0,0.1); padding: 15px; border-radius: 8px; }
+        .check-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .check-row input { width: 22px; height: 22px; margin-right: 12px; }
+ 
+        .btn-main { 
+            background: var(--chevron-blue); color: white; border: none; width: 100%; 
+            padding: 20px; font-size: 1.3rem; font-weight: 800; border-radius: 8px; 
+            cursor: pointer; margin-top: 10px; transition: 0.3s;
+        }
+        .btn-main:hover { background: #003d6e; }
+ 
+        /* ETIQUETA PROFESIONAL */
+        #label-result { display: none; padding: 30px 15px; background: #e9ecef; }
+        .etiqueta-box { border: 8px solid black; background: white; max-width: 500px; margin: auto; }
+        .et-head { padding: 15px; text-align: center; font-size: 3rem; font-weight: 900; border-bottom: 8px solid black; }
+        .danger-head { background: var(--danger); color: white; }
+        .warning-head { background: var(--warning); color: black; }
+        
+        .et-body { padding: 20px; text-align: center; }
+        .cat-big { font-size: 7rem; font-weight: 1000; border: 6px solid black; display: inline-block; padding: 0 30px; margin: 15px 0; background: #eee; }
+        .data-row { display: flex; justify-content: space-between; font-size: 1.3rem; border-bottom: 2px solid #ddd; padding: 8px 0; text-align: left; }
+        .epp-footer { background: #333; color: white; padding: 15px; font-size: 1rem; text-align: left; border-top: 5px solid black; }
+    </style>
+</head>
+<body>
+ 
+<div class="container">
+    <div class="header">
+        <h1>Arc Flash Control</h1>
+        <small>Mantenimiento Eléctrico - El Trapial</small>
+    </div>
+ 
+    <div class="content">
+        <div class="group">
+            <label>1. TAG del Equipo</label>
+            <input type="text" id="tag_val" placeholder="Ej: TGD-01-NOC">
+        </div>
+ 
+        <div class="group">
+            <label>2. Tipo de Tarea</label>
+            <select id="task_sel" onchange="checkTask()">
+                <option value="none">-- Seleccione Actividad --</option>
+                <option value="estudio">Consultar Estudio SET NOC SUR</option>
+                <option value="medicion">Medición / Inspección (Tablero Abierto)</option>
+                <option value="maniobra">Maniobra Seccionador (Puerta Cerrada)</option>
+                <option value="mantenimiento">Mantenimiento / Cambio de Componentes</option>
+            </select>
+        </div>
+ 
+        <div id="stop_box" class="stop-alert">
+            <h2>¡DETENGA LA TAREA!</h2>
+            <p>Confirme la aplicación de las 5 Reglas de Oro:</p>
+            <div class="checklist">
+                <label class="check-row"><input type="checkbox" class="rules"> 1. Corte efectivo visible</label>
+                <label class="check-row"><input type="checkbox" class="rules"> 2. Bloqueo y Etiquetado (LOTO)</label>
+                <label class="check-row"><input type="checkbox" class="rules"> 3. Verificar ausencia de tensión</label>
+                <label class="check-row"><input type="checkbox" class="rules"> 4. Puesta a tierra / cortocircuito</label>
+                <label class="check-row"><input type="checkbox" class="rules"> 5. Señalización del área</label>
+            </div>
+        </div>
+ 
+        <div id="manual_inputs" style="display:none;">
+            <div class="group">
+                <label>Corriente de Corto (kA)</label>
+                <input type="number" id="ka_val" placeholder="Ej: 20">
+            </div>
+            <div class="group">
+                <label>Protección (Segundos)</label>
+                <select id="t_val">
+                    <option value="0.04">Fusible gG/gL (0.04s)</option>
+                    <option value="0.10">Interruptor Estándar (0.10s)</option>
+                    <option value="0.40">Retardo Ajustado (0.40s)</option>
+                </select>
+            </div>
+        </div>
+ 
+        <div id="estudio_inputs" style="display:none;">
+            <div class="group">
+                <label>Seleccionar Tablero</label>
+                <select id="tab_sel">
+                    <option value="playa1">TAB SECC PLAYA N°1 SET NOC</option>
+                    <option value="ssaa">TAB SERV AUX CA-CC SET NOC</option>
+                    <option value="shelter">TAB SECC SHELTER SET NOC</option>
+                    <option value="cargador">TAB CARG BAT 110VCC SET NOC</option>
+                </select>
+            </div>
+        </div>
+ 
+        <button class="btn-main" onclick="process()">GENERAR ETIQUETA EPP</button>
+    </div>
+ 
+    <div id="label-result">
+        <div class="etiqueta-box">
+            <div id="et_h" class="et-head warning-head">ADVERTENCIA</div>
+            <div class="et-body">
+                <div style="font-weight:900; font-size:1.4rem;">PELIGRO DE ARCO ELÉCTRICO</div>
+                <div style="font-weight:bold; margin-top:10px;">CATEGORÍA DE EPP REQUERIDO:</div>
+                <div id="res_cat" class="cat-big">--</div>
+                
+                <div class="data-row"><span>Energía:</span> <strong id="res_e">--</strong></div>
+                <div class="data-row"><span>Frontera:</span> <strong id="res_d">--</strong></div>
+                <div class="data-row"><span>TAG:</span> <strong id="res_t">--</strong></div>
+            </div>
+            <div id="res_desc" class="epp-footer"></div>
+        </div>
+    </div>
+</div>
+ 
+<script>
+    const data_noc = {
+        "playa1": { e: 0.28, d: 0.35, t: "TAB SECC PLAYA N°1" },
+        "ssaa": { e: 0.54, d: 0.48, t: "TAB SERV AUX CA-CC" },
+        "shelter": { e: 0.15, d: 0.25, t: "TAB SECC SHELTER" },
+        "cargador": { e: 0.10, d: 0.20, t: "TAB CARG BAT 110VCC" }
+    };
+ 
+    const epp_info = {
+        1: "<b>CAT 1:</b> Mameluco FR, careta de arco, guantes de cuero, protección auditiva.",
+        2: "<b>CAT 2:</b> Mameluco FR, BALACLAVA FR + careta de arco, guantes dieléctricos, protección auditiva.",
+        4: "<b>CAT 4:</b> Traje de Arco (40 cal), capucha de arco, guantes dieléctricos, doble protección auditiva.",
+        0: "<b>PELIGRO EXTREMO:</b> Energía > 40 cal. No trabajar energizado."
+    };
+ 
+    function checkTask() {
+        const v = document.getElementById('task_sel').value;
+        document.getElementById('stop_box').style.display = (v === 'mantenimiento') ? 'block' : 'none';
+        document.getElementById('manual_inputs').style.display = (v !== 'estudio' && v !== 'none') ? 'block' : 'none';
+        document.getElementById('estudio_inputs').style.display = (v === 'estudio') ? 'block' : 'none';
+    }
+ 
+    function process() {
+        const task = document.getElementById('task_sel').value;
+        if(task === 'none') return alert("Seleccione tarea");
+ 
+        if(task === 'mantenimiento') {
+            const checked = document.querySelectorAll('.rules:checked').length;
+            if(checked < 5) return alert("¡DEBE CONFIRMAR LAS 5 REGLAS DE ORO!");
+        }
+ 
+        let e, d, tag, cat;
+ 
+        if(task === 'estudio') {
+            const item = data_noc[document.getElementById('tab_sel').value];
+            e = item.e; d = item.d; tag = item.t;
+        } else {
+            const ka = parseFloat(document.getElementById('ka_val').value);
+            const t = parseFloat(document.getElementById('t_val').value);
+            if(!ka) return alert("Falta kA");
+            e = (0.123 * (ka * 0.72) * t * 1.5);
+            d = Math.sqrt(2.14 * ka * t);
+            tag = document.getElementById('tag_val').value || "EQUIPO CAMPO";
+        }
+ 
+        cat = e <= 1.2 ? 1 : (e <= 8 ? 2 : (e <= 40 ? 4 : 0));
+ 
+        document.getElementById('label-result').style.display = 'block';
+        document.getElementById('res_e').innerText = e.toFixed(2) + " cal/cm²";
+        document.getElementById('res_d').innerText = d.toFixed(2) + " m";
+        document.getElementById('res_t').innerText = tag;
+        document.getElementById('res_cat').innerText = cat === 0 ? "!!" : "CAT " + cat;
+        document.getElementById('res_desc').innerHTML = epp_info[cat];
+ 
+        const h = document.getElementById('et_h');
+        h.innerText = (e > 8 || cat === 0) ? "PELIGRO" : "ADVERTENCIA";
+        h.className = "et-head " + ((e > 8 || cat === 0) ? "danger-head" : "warning-head");
+    }
+</script>
+</body>
+</html>
+ 
+ 
    
  
+
 
 
