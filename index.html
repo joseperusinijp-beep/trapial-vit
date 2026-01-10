@@ -5,7 +5,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Arc Flash Safety Control - El Trapial</title>
-<meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT.">
+<meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT, y comparación por tablas NFPA 70E.">
 <style>
   :root { --blue:#005aa2; --red:#b71c1c; --gold:#ffcc00; --dark:#1a1a1a; }
   body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f4f7f6;margin:0;padding:15px}
@@ -26,7 +26,7 @@
   .checkbox-group{margin-bottom:10px;}
   .checkbox-group label{display:flex;align-items:center;font-weight:600;color:#333;font-size:1rem;text-transform:none;margin-bottom:4px;}
   .checkbox-group input[type="checkbox"]{margin-right:10px;width:20px;height:20px;}
-  .stop-box{background:var(--red);color:#fff;padding:18px 18px 10px 18px;border-radius:12px;margin:16px 0;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.18);}
+  .stop-box{background:var(--red);color:#fff;padding:18px 18px 10px 18px;border-radius:12px;margin:16px 0;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.18);display:none;}
   .stop-box h2{margin:0 0 10px 0;font-size:1.3rem;text-shadow:1px 1px 3px rgba(0,0,0,0.35);}
   .rules-checklist{text-align:left;margin-top:10px;background:rgba(0,0,0,.13);padding:12px;border-radius:8px;}
   .rule-item{display:flex;align-items:center;margin-bottom:8px;font-size:1rem;font-weight:600;cursor:pointer;}
@@ -112,8 +112,8 @@
       <div class="help">Valores del estudio (energía incidente y distancia) — usar los del estudio sin modificarlos.</div>
     </div>
 
-    <!-- Cartel de Reglas de Oro (accesible) -->
-    <div id="stop_card" class="stop-box" role="alert">
+    <!-- Cartel de Reglas de Oro (solo MANTENIMIENTO) -->
+    <div id="stop_card" class="stop-box" role="alert" aria-live="polite">
       <h2>¡DETENGA LA TAREA! — Aplique las 5 Reglas de Oro</h2>
       <div class="rules-checklist">
         <label class="rule-item"><input type="checkbox" class="rule-chk" onchange="updateUIEstudio()"> 1. Corte efectivo y visible</label>
@@ -143,7 +143,7 @@
       </div>
       <div class="input-group">
         <label for="scc_nfpa">Corriente de cortocircuito disponible (kA)</label>
-        <input type="number" id="scc_nfpa" min="1" max="100" step="0.1" placeholder="Ej: 20" required>
+        <input type="number" id="scc_nfpa" min="0.1" max="100" step="0.1" placeholder="Ej: 20" required>
       </div>
       <div class="input-group">
         <label for="t_nfpa">Tiempo total de despeje (s)</label>
@@ -207,18 +207,27 @@
     "shelter": { e:0.15, d:0.25, t:"TAB SECC SHELTER" },
     "cargador":{ e:0.10, d:0.20, t:"TAB CARG BAT 110VCC" }
   };
+
   function updateUIEstudio(){
     const task = document.getElementById('task_type').value;
     const btn  = document.getElementById('btn_estudio');
     const stopCard   = document.getElementById('stop_card');
     const estudioDiv = document.getElementById('estudio_div');
-    stopCard.style.display = (task === 'mantenimiento') ? 'block' : 'none';
+
+    // Mostrar estudio de tableros si corresponde
     estudioDiv.style.display = (task === 'estudio') ? 'block' : 'none';
-    if (task === '') { btn.disabled = true; }
-    else if (task === 'mantenimiento') {
+    // MOSTRAR REGLAS DE ORO SOLO EN MANTENIMIENTO
+    stopCard.style.display = (task === 'mantenimiento') ? 'block' : 'none';
+
+    // Habilitar botón
+    if (task === '') {
+      btn.disabled = true;
+    } else if (task === 'mantenimiento') {
       const checks = document.querySelectorAll('.rule-chk:checked').length;
       btn.disabled = (checks < 5);
-    } else { btn.disabled = false; }
+    } else {
+      btn.disabled = false;
+    }
   }
 
   // ====== Textos EPP por categoría ======
@@ -264,9 +273,8 @@
     const trabajador = (document.getElementById('trabajador').value || '').trim();
     let fecha = document.getElementById('fecha').value;
     if (!fecha){
-      // Setear ahora en ISO local (compatible con datetime-local)
       const now = new Date();
-      const tzoffset = now.getTimezoneOffset() * 60000; // minutos a ms
+      const tzoffset = now.getTimezoneOffset() * 60000;
       fecha = new Date(now - tzoffset).toISOString().slice(0,16);
       document.getElementById('fecha').value = fecha;
     }
@@ -284,15 +292,16 @@
     }
     const permisosTxt = `${jsa?'JSA ✔':'JSA ✖'} • ${permiso?'Permiso ✔':'Permiso ✖'} • ${vit?'VIT ✔':'VIT ✖'}`;
 
+    // ----- Modo CON ESTUDIO -----
     if (modo === 'estudio'){
       const task = document.getElementById('task_type').value;
       if (!task){ alert("Seleccioná el tipo de tarea."); return; }
 
-      // Si es mantenimiento, exigir Reglas de Oro
+      // Si es mantenimiento, exigir las 5 Reglas de Oro
       if (task === 'mantenimiento'){
         const checks = document.querySelectorAll('.rule-chk:checked').length;
         if (checks < 5){
-          alert("Para mantenimiento, debes marcar las 5 Reglas de Oro.");
+          alert("Para mantenimiento, deben marcarse las 5 Reglas de Oro.");
           return;
         }
       }
@@ -319,7 +328,7 @@
       return;
     }
 
-    // ---- NFPA 70E por tablas (sin estudio) ----
+    // ----- Modo NFPA 70E por tablas (solo V, Icc, t) -----
     const V   = parseFloat(document.getElementById('volt_nfpa').value);
     const Icc = parseFloat(document.getElementById('scc_nfpa').value);
     const t   = parseFloat(document.getElementById('t_nfpa').value);
@@ -341,8 +350,8 @@
       return;
     }
 
+    // Comparación con condiciones (resumen conservador) de NFPA 70E para equipos ≤600 V
     let categoria = null, condicion = '';
-    // Condiciones (resumen conservador) para equipos típicos ≤600 V
     if (V <= 240 && Icc <= 25 && t <= 0.03) {
       categoria = 1; condicion = 'Panel ≤240 V, Icc ≤25 kA, t ≤0,03 s';
     } else if (V > 240 && V <= 600 && Icc <= 65 && t <= 0.03) {
@@ -352,7 +361,7 @@
     } else if (V <= 600 && Icc <= 65 && t <= 0.07) {
       categoria = 4; condicion = 'Switchgear ≤600 V, Icc ≤65 kA, t ≤0,07 s';
     } else {
-      // No cumplen tablas: instruir estudio formal
+      // No cumplen tablas → instruir estudio IEEE 1584
       document.getElementById('result-display').style.display = 'block';
       document.getElementById('res_trab').innerText = trabajador;
       document.getElementById('res_fecha').innerText = fecha;
@@ -372,6 +381,7 @@
       return;
     }
 
+    // Mostrar categoría asignada por tablas (NFPA)
     renderResult({
       trabajador, fecha,
       metodo:'NFPA 70E por tablas',
@@ -386,11 +396,9 @@
 
   // ====== Utilidades ======
   function limpiar(){
-    // Limpia campos clave (no resetea nombre para agilizar series)
     ['tag_id','volt_nfpa','scc_nfpa','t_nfpa'].forEach(id=>{
       const el=document.getElementById(id); if(el){ el.value=''; }
     });
-    // Limpiar check de Reglas de Oro
     document.querySelectorAll('.rule-chk').forEach(c=>c.checked=false);
     document.getElementById('task_type').value='';
     document.getElementById('estudio_div').style.display='none';
