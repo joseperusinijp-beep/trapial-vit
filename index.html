@@ -1,85 +1,174 @@
-<label for="tipo_seleccion">Origen de Datos:</label>
-<select id="tipo_seleccion" onchange="toggleManualInput()">
-  <option value="manual">Entrada Manual (Cualquier equipo del yacimiento)</option>
-  <option value="set_noc">SET NOC SUR (Datos del Estudio 25110.0-E4)</option>
-</select>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <title>Evaluación de Riesgo Eléctrico - El Trapial</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#005daa">
+  <style>
+    :root { 
+        --brand-prim: #005daa; --brand-sec: #ed1c24; --bg: #eef2f3; --fg: #333; 
+        --card: #fff; --ok: #1f8c3a; --warn: #f5a623; --stop: #d0021b; 
+    }
+    body { font-family: 'Segoe UI', sans-serif; padding: 10px; background: var(--bg); color: var(--fg); margin:0; }
+    .card { background: var(--card); max-width: 700px; margin: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; }
+    .header-logo { background: var(--brand-prim); padding: 15px; color: white; text-align: center; font-weight: bold; font-size: 1.2em; }
+    .content { padding: 20px; }
+    .calc-box { background: #f4f7f9; padding: 15px; border: 1px solid #ced4da; border-radius: 8px; margin-top: 15px; }
+    label { font-weight: 600; display: block; margin-top: 10px; font-size: 0.9em; }
+    input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1em; }
+    .btn { width: 100%; padding: 15px; background: var(--brand-prim); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1.1em; }
+    
+    /* Estilo para el resultado de Categoría */
+    #res-display { margin-top: 20px; padding: 20px; border-radius: 10px; display: none; text-align: center; border: 2px solid transparent; }
+    .cat-badge { font-size: 2.5em; font-weight: 900; display: block; margin: 10px 0; text-transform: uppercase; letter-spacing: 1px; }
+    .data-detail { text-align: left; background: rgba(255,255,255,0.2); padding: 10px; border-radius: 5px; font-size: 0.9em; margin-top: 10px; }
+  </style>
+</head>
+<body>
 
-<div id="selector_noc_container" style="display:none; margin-top:10px;">
-  <label for="equipo_lista">Seleccionar Tablero Validado:</label>
-  <select id="equipo_lista" onchange="cargarDatosSETNOC()">
-    <option value="">-- Seleccione un tablero --</option>
-    <option value="PLAYA_N1">1. TAB SECC PLAYA N1 (8 kA / 0.15s)</option>
-    <option value="SERV_AUX">2. TAB SERV AUX CA-CC (6 kA / 0.15s)</option>
-    <option value="SHELTER">3. TAB SECC SHELTER (5 kA / 0.1s)</option>
-    <option value="CARG_BAT">4. TAB CARG BAT 110VCC (5 kA / 0.1s)</option>
-    <option value="REFRIG">5/6. TAB REFRIG T1/T2 (5 kA / 0.1s)</option>
-    <option value="UPS">7. TAB UPS (5 kA / 0.1s)</option>
-  </select>
+<div class="card">
+  <div class="header-logo">CHEVRON - EL TRAPIAL / SEGURIDAD ELÉCTRICA</div>
+  <div class="content">
+    <label>Equipo / Tag / Activo:</label>
+    <input type="text" id="equipo" placeholder="Ej: TAB SECC PLAYA N1" oninput="validarEstudio()">
+
+    <div class="calc-box">
+      <h3 style="margin-top:0; color:var(--brand-prim)">Parámetros del Sistema</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+            <label>Tensión (V):</label>
+            <input type="number" id="volt" value="380">
+        </div>
+        <div>
+            <label>Distancia (cm):</label>
+            <input type="number" id="dist" value="61">
+        </div>
+      </div>
+      
+      <label>Potencia del Transformador (kVA):</label>
+      <input type="number" id="kva" placeholder="Ingrese kVA del Tx">
+      
+      <label>Impedancia del Tx (%Z):</label>
+      <input type="number" id="zpct" value="5">
+
+      <label>Tiempo de Despeje de Falla (s):</label>
+      <input type="number" id="tiempo" step="0.01" placeholder="Ej: 0.10">
+    </div>
+
+    <button class="btn" onclick="calcularIngenieria()">CALCULAR CATEGORÍA EPP</button>
+
+    <div id="res-display">
+      <span id="res-msg"></span>
+      <span id="res-cat" class="cat-badge"></span>
+      <div id="res-detalles" class="data-detail"></div>
+    </div>
+  </div>
 </div>
 
 <script>
-  [span_6](start_span)[span_7](start_span)// Base de datos técnica del estudio 25110.0-E4-MC-501-05[span_6](end_span)[span_7](end_span)
-  const DB_SET_NOC = {
-    "PLAYA_N1": { ik: 8.0, t: 0.15, v: 380, tag: "TAB SECC PLAYA N1 SET NOC" },
-    "SERV_AUX": { ik: 6.0, t: 0.15, v: 380, tag: "TAB SERV AUX CA-CC SET NOC" },
-    "SHELTER":  { ik: 5.0, t: 0.10, v: 380, tag: "TAB SECC SHELTER SET NOC" },
-    "CARG_BAT": { ik: 5.0, t: 0.10, v: 380, tag: "TAB CARG BAT 110VCC SET NOC" },
-    "REFRIG":   { ik: 5.0, t: 0.10, v: 380, tag: "TAB REFRIG T1/T2 SET NOC" },
-    "UPS":      { ik: 5.0, t: 0.10, v: 380, tag: "TAB UPS SET NOC" }
+  // Base de datos del estudio 25110.0-E4-MC-501-05 (SET NOC SUR)
+  const DATA_CHEVRON = {
+    "PLAYA N1": { ik: 8.0, t: 0.15, msg: "Dato validado por Estudio Arc Flash SET NOC" },
+    "AUX CA-CC": { ik: 6.0, t: 0.15, msg: "Dato validado por Estudio Arc Flash SET NOC" },
+    "SHELTER": { ik: 5.0, t: 0.10, msg: "Dato validado por Estudio Arc Flash SET NOC" },
+    "CARG BAT": { ik: 5.0, t: 0.10, msg: "Dato validado por Estudio Arc Flash SET NOC" },
+    "REFRIG": { ik: 5.0, t: 0.10, msg: "Dato validado por Estudio Arc Flash SET NOC" },
+    "UPS": { ik: 5.0, t: 0.10, msg: "Dato validado por Estudio Arc Flash SET NOC" }
   };
 
-  function toggleManualInput() {
-    const isManual = document.getElementById('tipo_seleccion').value === 'manual';
-    document.getElementById('selector_noc_container').style.display = isManual ? 'none' : 'block';
-    
-    [span_8](start_span)// Si es SET NOC, bloqueamos campos para usar solo datos del estudio[span_8](end_span)
-    const inputs = ['volt', 'tiempo', 'kva', 'zpct', 'vll'];
-    inputs.forEach(id => document.getElementById(id).disabled = !isManual);
-  }
-
-  function cargarDatosSETNOC() {
-    const key = document.getElementById('equipo_lista').value;
-    if (!key) return;
-    
-    const data = DB_SET_NOC[key];
-    document.getElementById('equipo').value = data.tag;
-    document.getElementById('volt').value = data.v;
-    document.getElementById('vll').value = data.v;
-    document.getElementById('tiempo').value = data.t;
-    // Valores de Tx genéricos para SET NOC (el cálculo usará Ik directo)
-    document.getElementById('zpct').value = 5; 
-    document.getElementById('kva').value = 500; 
-  }
-
-  // Lógica de cálculo mejorada para todo el yacimiento
-  function calcularCategoriaEficaz() {
-    const isManual = document.getElementById('tipo_seleccion').value === 'manual';
-    let ik_final, t_final;
-
-    if (!isManual) {
-      const key = document.getElementById('equipo_lista').value;
-      ik_final = DB_SET_NOC[key].ik;
-      t_final = DB_SET_NOC[key].t;
+  function validarEstudio() {
+    const inputEq = document.getElementById('equipo').value.toUpperCase();
+    const match = Object.keys(DATA_CHEVRON).find(k => inputEq.includes(k));
+    if (match) {
+        document.getElementById('tiempo').value = DATA_CHEVRON[match].t;
+        document.getElementById('tiempo').style.backgroundColor = "#e8f5e9";
     } else {
-      // Cálculo basado en transformador para cualquier punto del yacimiento
-      const kva = parseFloat(document.getElementById('kva').value);
-      const vll = parseFloat(document.getElementById('vll').value);
-      const zpct = parseFloat(document.getElementById('zpct').value);
-      ik_final = (kva * 1000) / (Math.sqrt(3) * vll * (zpct / 100)) / 1000; // kA
-      t_final = parseFloat(document.getElementById('tiempo').value);
+        document.getElementById('tiempo').style.backgroundColor = "";
+    }
+  }
+
+  function calcularIngenieria() {
+    const v = parseFloat(document.getElementById('volt').value);
+    const kva = parseFloat(document.getElementById('kva').value);
+    const z = parseFloat(document.getElementById('zpct').value);
+    const t = parseFloat(document.getElementById('tiempo').value);
+    const dist = parseFloat(document.getElementById('dist').value);
+    const eq = document.getElementById('equipo').value.toUpperCase();
+
+    if (!t || (!kva && !Object.keys(DATA_CHEVRON).some(k => eq.includes(k)))) {
+        alert("Por favor, ingrese los datos del transformador o un equipo del estudio.");
+        return;
     }
 
-    const volt = parseFloat(document.getElementById('volt').value);
-    const dist = parseFloat(document.getElementById('dist').value);
+    let ik;
+    let esEstudio = false;
 
-    [span_9](start_span)[span_10](start_span)// Ecuación simplificada IEEE 1584 / NFPA 70E para energía incidente[span_9](end_span)[span_10](end_span)
-    // EI = 46.2 * Ik * t * (480/V)^0.5 * (45/D)^n
-    const ei = 46.2 * ik_final * t_final * Math.pow(480 / volt, 0.5) * Math.pow(45 / dist, 1.5);
-    
-    return { ei, ik: ik_final, t: t_final };
+    // Lógica: Priorizar estudio o calcular por Tx
+    const match = Object.keys(DATA_CHEVRON).find(k => eq.includes(k));
+    if (match) {
+        ik = DATA_CHEVRON[match].ik;
+        esEstudio = true;
+    } else {
+        // Fórmula de Corriente de Cortocircuito: Isc = (kVA / (√3 * kV)) / (Z/100)
+        const ifl = kva / (Math.sqrt(3) * (v / 1000));
+        ik = (ifl / (z / 100)) / 1000; // kA
+    }
+
+    // Fórmula IEEE 1584 simplificada para Energía Incidente (cal/cm2)
+    // E = 46.2 * Isc * t * (480/V)^0.5 * (45/D)^1.5
+    const ei = 46.2 * ik * t * Math.pow(480 / v, 0.5) * Math.pow(45 / dist, 1.5);
+
+    renderResultados(ei, ik, t, esEstudio);
   }
 
-  // Actualiza tu función generarValidacion() para llamar a calcularCategoriaEficaz()
-  // y asegúrate de que el EPP siempre recomiende CATEGORÍA 1 si EI < 1.2 cal/cm² 
-  [span_11](start_span)// tal como concluye el estudio de Chevron[span_11](end_span).
+  function renderResultados(ei, ik, t, esEstudio) {
+    const resDiv = document.getElementById('res-display');
+    const resCat = document.getElementById('res-cat');
+    const resMsg = document.getElementById('res-msg');
+    const resDet = document.getElementById('res-detalles');
+
+    resDiv.style.display = "block";
+    
+    // Clasificación NFPA 70E (Actualizada)
+    let categoria, color, epp;
+    if (ei <= 1.2) {
+        categoria = "Categoría 1";
+        color = "#1f8c3a";
+        epp = "EPP Mínimo: Ropa FR (ATPV ≥ 4 cal/cm²), casco, protección ocular.";
+    } else if (ei <= 8) {
+        categoria = "Categoría 2";
+        color = "#f5a623";
+        epp = "EPP Requerido: Ropa FR + Careta Arc Flash (ATPV ≥ 8 cal/cm²).";
+    } else if (ei <= 25) {
+        categoria = "Categoría 3";
+        color = "#d35400";
+        epp = "EPP Requerido: Traje Arc Flash completo (ATPV ≥ 25 cal/cm²).";
+    } else if (ei <= 40) {
+        categoria = "Categoría 4";
+        color = "#c0392b";
+        epp = "EPP Requerido: Traje Arc Flash de alta protección (ATPV ≥ 40 cal/cm²).";
+    } else {
+        categoria = "PELIGRO EXTREMO";
+        color = "#000000";
+        epp = "TRABAJO PROHIBIDO: Energía > 40 cal/cm². Requiere desenergización.";
+    }
+
+    resDiv.style.backgroundColor = color;
+    resDiv.style.color = "white";
+    resDiv.style.borderColor = "white";
+    
+    resMsg.innerText = esEstudio ? "VALORES SEGÚN ESTUDIO CHEVRON" : "CÁLCULO AUTOMÁTICO REALIZADO";
+    resCat.innerText = categoria;
+    resDet.innerHTML = `
+        <b>Energía Incidente:</b> ${ei.toFixed(2)} cal/cm² <br>
+        <b>Corriente de Falla:</b> ${ik.toFixed(2)} kA <br>
+        <b>Tiempo de despeje:</b> ${t} seg <br><br>
+        <i>${epp}</i>
+    `;
+  }
 </script>
+
+</body>
+</html>
