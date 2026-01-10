@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Evaluación de Riesgos Eléctricos</title>
+    <title>Evaluación NFPA 70E</title>
     <style>
         :root { --brand: #005daa; --bg: #f4f7f6; --card: #fff; --ok: #1f8c3a; --stop: #d0021b; --warn: #ffcc00; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
@@ -15,124 +15,129 @@
         input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
         .btn-blue { background: var(--brand); color: white; }
-        .gold-rule { background: #fff; border: 1px solid #ddd; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
-        .gold-rule input { width: 20px; height: 20px; }
         .etiqueta { border: 5px solid #000; margin: 15px; background: white; }
         .etq-header { background: var(--warn); padding: 10px; text-align: center; font-weight: 900; border-bottom: 5px solid #000; font-size: 1.2em; }
         .res-box { text-align: center; padding: 20px; }
-        .cat-val { font-size: 3em; font-weight: 900; margin: 10px 0; }
+        .cat-val { font-size: 3.5em; font-weight: 900; margin: 5px 0; }
         .hidden { display: none; }
+        .info-tab { font-size: 0.8em; color: #d0021b; font-weight: bold; margin-top: 5px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="header">Evaluación de Riesgos para Trabajo Eléctrico</div>
+    <div class="header">Seguridad Eléctrica - NFPA 70E</div>
 
-    <div id="paso-inicio" class="section">
+    <div id="p-inicio" class="section">
         <div class="scope-box">
-            <strong>ALCANCE:</strong> Aplicable para apertura de tableros. Si la tarea implica recambio de equipos (equipo a intervenir), es obligatorio desenergizar.
+            <strong>EQUIPO A INTERVENIR:</strong> Seleccione la ubicación y el tipo de equipo para determinar el EPP según las tablas de la NFPA 70E.
         </div>
-        <h3>1. Definir Tarea</h3>
-        <button class="btn btn-blue" onclick="mostrar('paso-lugar')">Inspección / Medición (Con Tensión)</button>
-        <button class="btn" style="background:#6c757d; color:white;" onclick="mostrar('paso-oro')">Recambio de Equipo (Intervención)</button>
-    </div>
-
-    <div id="paso-oro" class="section hidden">
-        <h3 style="color:var(--stop)">⚠️ AISLAR INSTALACIÓN</h3>
-        <p>Cumpla las 5 Reglas de Oro para intervenir el equipo:</p>
-        <div class="gold-rule"><input type="checkbox" class="chk-o"> 1. Corte efectivo de fuentes.</div>
-        <div class="gold-rule"><input type="checkbox" class="chk-o"> 2. Bloqueo y Etiquetado (LOTO).</div>
-        <div class="gold-rule"><input type="checkbox" class="chk-o"> 3. Verificar ausencia de tensión.</div>
-        <div class="gold-rule"><input type="checkbox" class="chk-o"> 4. Puesta a tierra y cortocircuito.</div>
-        <div class="gold-rule"><input type="checkbox" class="chk-o"> 5. Señalización de la zona.</div>
-        <button class="btn btn-blue" onclick="validarOro()">Confirmar y Finalizar</button>
-    </div>
-
-    <div id="paso-lugar" class="section hidden">
-        <h3>2. Parámetros del Equipo</h3>
         
-        <label>Tipo de Equipo:</label>
-        <select id="tipo_equipo">
-            <option value="1">Tablero de distribución (Panels) <= 240V</option>
-            <option value="2">Tablero de distribución / CCM (600V max)</option>
-            <option value="3">Equipo en Cabecera (Barras principales)</option>
-            <option value="4">Otros (Cajas de empalme, motores)</option>
+        <label>Ubicación del Trabajo:</label>
+        <select id="ubicacion" onchange="cambiarUbicacion()">
+            <option value="cabecera">Entre Transformador y Barras (Cabecera)</option>
+            <option value="circuito">Aguas abajo de Protección (Circuito/Tablero)</option>
         </select>
 
-        <label>Voltaje del Sistema (V):</label>
-        <input type="number" id="voltaje" value="380">
+        <label>Tipo de Equipo (NFPA 70E):</label>
+        <select id="equipo">
+            <option value="tablero">Tableros de distribución (Panels) <= 240V</option>
+            <option value="ccm">CCM y Tableros (240V a 600V)</option>
+            <option value="switchgear">Switchgear (Cabecera / Celdas)</option>
+        </select>
 
-        <label>Isc Corriente de Falla Disponible (kA):</label>
-        <input type="number" id="isc" placeholder="Ver Unifilar (ej. 15)">
+        <div id="div-trafo">
+            <label>KVA Trafo:</label>
+            <input type="number" id="kva" value="500">
+            <label>%Z Impedancia:</label>
+            <input type="number" id="z" value="5">
+            <label>Distancia Trafo a Barras (metros):</label>
+            <input type="number" id="dist_m" value="5">
+        </div>
 
-        <label>Tiempo de Despeje (seg):</label>
-        <input type="number" id="tiempo" step="0.01" value="0.03">
-        
+        <div id="div-circuito" class="hidden">
+            <label>Corriente de Cortocircuito Disponible (kA):</label>
+            <input type="number" id="isc_ka" placeholder="Ej: 25">
+        </div>
+
+        <label>Tiempo de Actuación de Protección (seg):</label>
+        <input type="number" id="tiempo" step="0.01" value="0.1">
+
         <label>Distancia de Trabajo (cm):</label>
-        <input type="number" id="dist" value="45">
+        <input type="number" id="dist_trabajo" value="45">
 
-        <button class="btn btn-blue" onclick="calcularNFPA()">Determinar Categoría EPP</button>
+        <button class="btn btn-blue" onclick="evaluarNFPA()">Calcular y Clasificar EPP</button>
     </div>
 
-    <div id="paso-res" class="etiqueta hidden">
-        <div class="etq-header">⚠️ PELIGRO - RIESGO ELÉCTRICO</div>
+    <div id="p-res" class="etiqueta hidden">
+        <div class="etq-header">⚠️ RIESGO DE ARCO ELÉCTRICO</div>
         <div class="res-box">
-            <div style="font-weight:bold; color:#555;">CATEGORÍA DE EPP REQUERIDA:</div>
+            <div id="res-ei" style="font-size: 1.2em; font-weight: bold;"></div>
             <div id="res-cat" class="cat-val"></div>
-            <div id="res-ei" style="font-weight:bold; margin-bottom:10px;"></div>
-            <div id="res-epp" style="text-align:left; background:#f9f9f9; padding:10px; border-radius:5px; font-size:0.85em;"></div>
+            <div id="res-epp" style="text-align:left; background:#f9f9f9; padding:15px; border:1px solid #ddd; font-size:0.9em;"></div>
         </div>
-        <button class="btn btn-blue" onclick="location.reload()" style="border-radius:0">Nueva Evaluación</button>
+        <button class="btn btn-blue" onclick="location.reload()" style="border-radius:0">Nueva Medición</button>
     </div>
 </div>
 
 <script>
-    function mostrar(id) {
-        document.querySelectorAll('.section, .etiqueta').forEach(s => s.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
+    function cambiarUbicacion() {
+        const u = document.getElementById('ubicacion').value;
+        document.getElementById('div-trafo').style.display = (u === 'cabecera') ? 'block' : 'none';
+        document.getElementById('div-circuito').style.display = (u === 'circuito') ? 'block' : 'none';
     }
 
-    function validarOro() {
-        if(Array.from(document.querySelectorAll('.chk-o')).every(c => c.checked)) {
-            alert("SISTEMA SEGURO. Proceda."); location.reload();
-        } else { alert("Faltan Reglas de Oro."); }
-    }
-
-    function calcularNFPA() {
-        const isc = parseFloat(document.getElementById('isc').value);
+    function evaluarNFPA() {
+        const u = document.getElementById('ubicacion').value;
         const t = parseFloat(document.getElementById('tiempo').value);
-        const d = parseFloat(document.getElementById('dist').value);
-        
-        if(!isc || !t) { alert("Ingrese Isc y Tiempo"); return; }
+        const d_trab = parseFloat(document.getElementById('dist_trabajo').value);
+        let ik = 0;
 
-        // Fórmula IEEE 1584-2018 (Ajustada para coincidir con límites NFPA 70E)
-        let ei = 46.2 * isc * t * 1.473 * Math.pow(45/d, 1.5);
-        
-        let cat = ""; let epp = ""; let color = "";
-
-        if (ei <= 1.2) {
-            cat = "CAT 1"; color = "#1f8c3a";
-            epp = "Mameluco FR (mín 4 cal), Gafas, Casco Clase E, Guantes de Cuero.";
-        } else if (ei <= 8) {
-            cat = "CAT 2"; color = "#e67e22";
-            epp = "Mameluco FR (mín 8 cal), Careta Arc Flash con Balaclava (8 cal), Guantes Dieléctricos.";
-        } else if (ei <= 25) {
-            cat = "CAT 3"; color = "#d35400";
-            epp = "Traje Arc Flash (mín 25 cal), Capucha (Hood), Guantes Dieléctricos, Calzado Dieléctrico.";
-        } else if (ei <= 40) {
-            cat = "CAT 4"; color = "#c0392b";
-            epp = "Traje Arc Flash completo (mín 40 cal). RIESGO EXTREMO.";
+        if (u === 'cabecera') {
+            const kva = parseFloat(document.getElementById('kva').value);
+            const z = parseFloat(document.getElementById('z').value) / 100;
+            const dist_m = parseFloat(document.getElementById('dist_m').value);
+            // Isc en bornes trafo
+            let isc_t = (kva / (1.732 * 0.38)) / z;
+            // Atenuación por distancia (impedancia cable cobre est.)
+            let r_c = (0.017 * dist_m) / 100;
+            ik = (isc_t / (1 + (isc_t * r_c / 380))) / 1000; // en kA
         } else {
-            cat = "SWA"; color = "#000";
-            epp = "PELIGRO: Energía > 40 cal/cm². TRABAJO PROHIBIDO CON TENSIÓN.";
+            ik = parseFloat(document.getElementById('isc_ka').value);
         }
 
+        if (!ik || isNaN(ik)) { alert("Por favor, complete los datos de corriente (kA)"); return; }
+
+        // FÓRMULA NFPA / IEEE 1584 Ajustada
+        // E = 46.2 * Ik * t * (45/d)^1.5
+        let ei = 46.2 * ik * t * 1.473 * Math.pow(45 / d_trab, 1.5);
+
+        let cat = ""; let epp = ""; let color = "";
+        
+        // TABLAS NFPA 70E - Selección de EPP
+        if (ei <= 1.2) {
+            cat = "CAT 1"; color = "#1f8c3a";
+            epp = "<b>EPP CATEGORÍA 1 (4 cal/cm²):</b><br>- Mameluco FR o pantalón y camisa FR.<br>- Casco, gafas, protección auditiva.<br>- Guantes de cuero.";
+        } else if (ei <= 8) {
+            cat = "CAT 2"; color = "#e67e22";
+            epp = "<b>EPP CATEGORÍA 2 (8 cal/cm²):</b><br>- Mameluco FR (8 cal).<br>- Careta Arc Flash con balaclava (8 cal).<br>- Guantes dieléctricos + protectores de cuero.";
+        } else if (ei <= 25) {
+            cat = "CAT 3"; color = "#d35400";
+            epp = "<b>EPP CATEGORÍA 3 (25 cal/cm²):</b><br>- Traje de Arc Flash completo (Suit).<br>- Capucha (Hood) de 25 cal.<br>- Guantes dieléctricos y calzado de seguridad.";
+        } else if (ei <= 40) {
+            cat = "CAT 4"; color = "#c0392b";
+            epp = "<b>EPP CATEGORÍA 4 (40 cal/cm²):</b><br>- Traje de protección extrema de 40 cal.<br>- Capucha con visor de 40 cal.<br>- Máximo nivel de protección.";
+        } else {
+            cat = "PELIGRO"; color = "#000";
+            epp = "<b>¡RIESGO SUPERIOR A 40 cal/cm²!</b><br>TRABAJO PROHIBIDO CON TENSIÓN.<br>Desenergice y aplique reglas de oro.";
+        }
+
+        document.getElementById('p-inicio').style.display = 'none';
+        document.getElementById('p-res').classList.remove('hidden');
+        document.getElementById('res-ei').innerText = "Energía Calculada: " + ei.toFixed(2) + " cal/cm²";
         document.getElementById('res-cat').innerText = cat;
         document.getElementById('res-cat').style.color = color;
-        document.getElementById('res-ei').innerText = ei.toFixed(2) + " cal/cm²";
-        document.getElementById('res-epp').innerHTML = "<strong>EPP:</strong> " + epp;
-        mostrar('paso-res');
+        document.getElementById('res-epp').innerHTML = epp;
     }
 </script>
 </body>
