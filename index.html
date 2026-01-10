@@ -2,165 +2,246 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Arc Flash El Trapial - SWA & LOTO System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arc Flash Manager - El Trapial</title>
     <style>
-        :root { --chevron-blue: #005aa2; --danger-red: #cc0000; --warning-gold: #ffcc00; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f4f9; padding: 10px; }
-        .container { max-width: 850px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 4px 25px rgba(0,0,0,0.2); overflow: hidden; }
-        .header { background: var(--chevron-blue); color: white; padding: 15px; text-align: center; }
-        .section { padding: 20px; border-bottom: 1px solid #eee; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.95rem; }
-        select, input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
+        :root {
+            --chevron-blue: #005aa2;
+            --chevron-accent: #0078d4;
+            --danger: #d32f2f;
+            --warning: #ffc107;
+            --success: #2e7d32;
+            --bg: #f8f9fa;
+            --text: #333;
+        }
  
-        /* CARTEL SWA DINÁMICO */
-        .swa-box { background: var(--danger-red); color: white; padding: 25px; border-radius: 10px; margin: 20px; display: none; text-align: center; border: 5px solid #4a0000; }
-        .swa-box h2 { margin: 0 0 10px 0; font-size: 2.5rem; font-weight: 900; letter-spacing: -1px; }
-        .swa-box p { font-size: 1.3rem; margin-bottom: 15px; font-weight: bold; }
-        .swa-list { text-align: left; display: inline-block; font-size: 1.1rem; }
- 
-        .btn-main { background: var(--chevron-blue); color: white; border: none; width: 100%; padding: 22px; font-size: 1.4rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-main:hover { background: #003d6e; }
- 
-        /* ETIQUETA SEGÚN NFPA 70E 2024 */
-        #result-display { display: none; padding: 20px; animation: fadeIn 0.5s; }
-        .etiqueta-af { border: 8px solid black; background: white; width: 100%; max-width: 650px; margin: auto; }
-        .et-head { padding: 20px; text-align: center; font-size: 3rem; font-weight: 900; border-bottom: 8px solid black; }
-        .warning { background: var(--warning-gold); color: black; }
-        .danger { background: var(--danger-red); color: white; }
-        .et-body { padding: 25px; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .app-container { max-width: 900px; margin: auto; background: white; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); overflow: hidden; border: 1px solid #ddd; }
         
-        /* CATEGORÍA GIGANTE */
-        .et-cat-box { text-align: center; border: 5px solid black; margin: 20px 0; padding: 20px; background: #f8f8f8; }
-        .et-cat-label { font-size: 1.5rem; font-weight: bold; display: block; text-transform: uppercase; }
-        .et-cat-value { font-size: 5rem; font-weight: 1000; display: block; line-height: 1; color: #000; }
-        
-        .et-row { display: flex; justify-content: space-between; font-size: 1.4rem; border-bottom: 2px solid #ddd; padding: 10px 0; }
-        .epp-detail-box { background: #fffbe6; padding: 20px; font-size: 1.1rem; margin-top: 20px; border: 2px solid #ffe58f; border-left: 10px solid #ffcc00; }
+        .header { background: var(--chevron-blue); color: white; padding: 30px; text-align: center; border-bottom: 6px solid #00447a; }
+        .header h1 { margin: 0; font-size: 2rem; letter-spacing: 1px; text-transform: uppercase; }
+        .header p { margin: 5px 0 0; opacity: 0.9; font-weight: 300; }
  
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @media print { .btn-main, .section, .header, .swa-box { display: none !important; } .container { box-shadow: none; border: none; } }
+        .main-content { padding: 30px; }
+        
+        /* Form Layout */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 20px; }
+        .full-width { grid-column: 1 / -1; }
+        
+        .field-box { display: flex; flex-direction: column; }
+        label { font-weight: 700; font-size: 0.9rem; margin-bottom: 8px; color: var(--chevron-blue); text-transform: uppercase; }
+        
+        select, input { 
+            padding: 14px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            transition: all 0.3s;
+            outline: none;
+        }
+        select:focus, input:focus { border-color: var(--chevron-accent); box-shadow: 0 0 8px rgba(0,120,212,0.2); }
+ 
+        /* SWA ALERT BOX */
+        .swa-card { 
+            background: #fff5f5; 
+            border: 3px solid var(--danger); 
+            border-left: 15px solid var(--danger);
+            border-radius: 12px; 
+            padding: 25px; 
+            margin: 20px 0; 
+            display: none; 
+            animation: shake 0.5s;
+        }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+        
+        .swa-card h2 { color: var(--danger); margin: 0 0 10px 0; font-size: 2.2rem; font-weight: 900; }
+        .swa-card p { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; }
+        .swa-steps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-weight: 600; color: #444; }
+ 
+        .btn-calculate { 
+            background: var(--chevron-blue); 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 20px; 
+            font-size: 1.4rem; 
+            font-weight: 800; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0,90,162,0.3);
+        }
+        .btn-calculate:hover { background: #00447a; transform: translateY(-2px); }
+ 
+        /* ETIQUETA PROFESIONAL NFPA 70E */
+        #result-display { display: none; padding: 40px 20px; background: #eee; border-radius: 0 0 16px 16px; }
+        .etiqueta { 
+            background: white; 
+            border: 10px solid black; 
+            max-width: 650px; 
+            margin: auto; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+        .et-header { padding: 25px; text-align: center; font-size: 3.5rem; font-weight: 1000; border-bottom: 10px solid black; }
+        .warning { background: var(--warning); color: black; }
+        .danger { background: var(--danger); color: white; }
+        
+        .et-body { padding: 30px; font-family: 'Arial Black', sans-serif; }
+        .et-cat-title { text-align: center; font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; }
+        .et-cat-value { 
+            text-align: center; 
+            font-size: 8rem; 
+            font-weight: 1000; 
+            line-height: 1; 
+            margin: 10px 0; 
+            border: 8px solid black;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        
+        .et-data-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        .et-data-item { display: flex; justify-content: space-between; font-size: 1.6rem; border-bottom: 3px solid #ddd; padding: 8px 0; }
+        
+        .epp-footer { background: #333; color: white; padding: 20px; font-size: 1.1rem; line-height: 1.4; }
+ 
+        @media print {
+            .app-container { box-shadow: none; border: none; }
+            .header, .main-content, .btn-calculate { display: none !important; }
+            #result-display { display: block !important; padding: 0; background: white; }
+        }
     </style>
 </head>
 <body>
  
-<div class="container">
+<div class="app-container">
     <div class="header">
-        <h1>Evaluación de Riesgo Arco Eléctrico</h1>
-        <p>Chevron Argentina - Planta El Trapial</p>
+        <h1>Arc Flash Safety Manager</h1>
+        <p>Chevron Argentina | Planta El Trapial</p>
     </div>
  
-    <div class="section">
-        <label>TAG / Nombre del Equipo (Ver placa o unilineal)</label>
-        <input type="text" id="tag_input" placeholder="Ej: TAB-NOC-PLAYA-01">
+    <div class="main-content">
+        <div class="form-grid">
+            <div class="field-box full-width">
+                <label>1. TAG del Equipo / Tablero</label>
+                <input type="text" id="tag_id" placeholder="Ingrese ID del equipo (ej: MCC-10-NOC)">
+            </div>
  
-        <label>¿Qué tarea va a realizar el operario?</label>
-        <select id="tarea" onchange="verificarSWA()">
-            <option value="inspeccion">Inspección Visual (Tablero Cerrado)</option>
-            <option value="medicion">Medición o Termografía (Puerta Abierta)</option>
-            <option value="maniobra">Operación de Seccionador / Disyuntor</option>
-            <option value="intervencion">Intervención / Cambio de Componentes</option>
-        </select>
-    </div>
- 
-    <div id="swa_alert" class="swa-box">
-        <h2>SWA - DETENGA LA TAREA</h2>
-        <p>NO ESTÁ PERMITIDO INTERVENIR ENERGIZADO</p>
-        <div class="swa-list">
-            • Aplicar las <strong>5 REGLAS DE ORO</strong> obligatoriamente.<br>
-            • Ejecutar Bloqueo y Etiquetado <strong>(LOTOTO)</strong>.<br>
-            • Leer y firmar JSA / Paquete de Trabajo / VIT.<br>
-            • Verificar ausencia de tensión con equipo CAT IV.
-        </div>
-    </div>
- 
-    <div class="section" id="params">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div>
-                <label>Protección (Tiempos de Despeje)</label>
-                <select id="prot_t">
-                    <option value="0.04">Fusible gG/gL (Tiempo Rápido)</option>
-                    <option value="0.10">Interruptor Automático (Estándar)</option>
-                    <option value="0.40">Protección con Retardo (Ajuste Ing.)</option>
+            <div class="field-box full-width">
+                <label>2. Tipo de Actividad a Realizar</label>
+                <select id="task_type" onchange="handleTaskChange()">
+                    <option value="none">-- Seleccione una tarea --</option>
+                    <option value="estudio">Consulta Directa: Equipos Estudio SET NOC SUR</option>
+                    <option value="medicion">Medición o Termografía (Tablero Abierto)</option>
+                    <option value="maniobra">Maniobra de Seccionador (Puerta Cerrada)</option>
+                    <option value="intervencion">SWA - Intervención / Cambio de Componentes</option>
                 </select>
             </div>
-            <div>
-                <label>Corriente Corto Barra (kA)</label>
-                <input type="number" id="ka_val" placeholder="Ej: 25">
+ 
+            <div id="estudio_fields" class="field-box full-width" style="display:none;">
+                <label>Seleccionar Equipo del Documento 25110.0-E4</label>
+                <select id="equip_select">
+                    <option value="playa1">TAB SECC PLAYA N°1 SET NOC</option>
+                    <option value="ssaa">TAB SERV AUX CA-CC SET NOC</option>
+                    <option value="shelter">TAB SECC SHELTER SET NOC</option>
+                    <option value="cargador">TAB CARG BAT 110VCC SET NOC</option>
+                    <option value="refrig">TAB REFRIG T1/T2 SET NOC</option>
+                </select>
+            </div>
+ 
+            <div class="manual_fields field-box" style="display:none;">
+                <label>I. Corto en Barra (kA)</label>
+                <input type="number" id="ka_input" placeholder="Ej: 15.5">
+            </div>
+            <div class="manual_fields field-box" style="display:none;">
+                <label>Tiempo Despeje (Seg)</label>
+                <select id="time_input">
+                    <option value="0.04">Fusible gG/gL (0.04s)</option>
+                    <option value="0.10">Interruptor (0.10s)</option>
+                    <option value="0.40">Retardo (0.40s)</option>
+                </select>
             </div>
         </div>
+ 
+        <div id="swa_card" class="swa-card">
+            <h2>SWA - DETENGA LA TAREA</h2>
+            <p>Se requiere desenergización total para intervenir componentes.</p>
+            <div class="swa-steps">
+                <div>✓ 5 REGLAS DE ORO</div>
+                <div>✓ BLOQUEO LOTO</div>
+                <div>✓ VIT COMPLETO</div>
+                <div>✓ EQUIPO CAT IV</div>
+            </div>
+        </div>
+ 
+        <button class="btn-calculate" onclick="calculate()">GENERAR ETIQUETA PROFESIONAL</button>
     </div>
  
-    <button class="btn-main" onclick="generarEtiqueta()">GENERAR ETIQUETA Y EVALUAR EPP</button>
- 
     <div id="result-display">
-        <div class="etiqueta-af">
-            <div id="et_header" class="et-head warning">ADVERTENCIA</div>
+        <div class="etiqueta">
+            <div id="et_head" class="et-header warning">ADVERTENCIA</div>
             <div class="et-body">
-                <div style="text-align:center; font-weight:900; font-size:1.6rem; color:#000;">PELIGRO DE ARCO ELÉCTRICO Y DESCARGA</div>
+                <div style="text-align:center; font-size:1.5rem; letter-spacing:1px; margin-bottom:15px;">PELIGRO DE ARCO ELÉCTRICO</div>
                 
-                <div class="et-cat-box">
-                    <span class="et-cat-label">CATEGORÍA DE EPP REQUERIDO</span>
-                    <span id="res_cat" class="et-cat-value">--</span>
+                <div class="et-cat-title">CATEGORÍA DE EPP</div>
+                <div id="et_cat" class="et-cat-value">--</div>
+ 
+                <div class="et-data-grid">
+                    <div class="et-data-item"><span>Energía Incidente:</span> <strong id="res_ene">--</strong></div>
+                    <div class="et-data-item"><span>Frontera de Arco:</span> <strong id="res_dist">--</strong></div>
+                    <div class="et-data-item"><span>ID Equipo:</span> <strong id="res_tag">--</strong></div>
                 </div>
- 
-                <div class="et-row"><span>Energía Incidente:</span> <strong id="res_ene">--</strong></div>
-                <div class="et-row"><span>Frontera de Arco:</span> <strong id="res_dist">--</strong></div>
-                <div class="et-row"><span>TAG del Equipo:</span> <strong id="res_tag">--</strong></div>
- 
-                <div id="epp_lista" class="epp-detail-box"></div>
             </div>
+            <div id="epp_desc" class="epp-footer"></div>
         </div>
-        <div style="text-align:center; margin-top:20px;">
-            <button class="btn-main" style="background:#ed7d31; width:auto; padding:15px 40px;" onclick="window.print()">🖨️ IMPRIMIR / GENERAR PDF PARA MANTENIMIENTO</button>
+        <div style="text-align:center; margin-top:30px;">
+            <button class="btn-calculate" style="background:#555; width:auto; padding:15px 50px;" onclick="window.print()">🖨️ IMPRIMIR / PDF</button>
         </div>
     </div>
 </div>
  
 <script>
-    const epp_nfpa = {
-        1: "<b>CATEGORÍA 1 (Mín. 4 cal/cm²):</b> Mameluco FR, careta para arco o capucha, antiparras, protección auditiva, guantes de cuero pesados y calzado de seguridad.",
-        2: "<b>CATEGORÍA 2 (Mín. 8 cal/cm²):</b> Mameluco FR, BALACLAVA (pasamontañas FR) + Careta para arco, protección auditiva, guantes dieléctricos con protectores de cuero y calzado de seguridad.",
-        4: "<b>CATEGORÍA 4 (Mín. 40 cal/cm²):</b> TRAJE COMPLETO (Arc Flash Suit) con capucha de 40 cal, guantes dieléctricos con protectores de cuero, doble protección auditiva y calzado de seguridad.",
-        99: "<b>⚠️ SWA - RIESGO EXTREMO:</b> Energía > 40 cal/cm². TRABAJO PROHIBIDO ENERGIZADO. Requiere desenergización total aguas arriba."
+    const data_noc = {
+        "playa1": { e: 0.28, d: 0.35, t: "TAB SECC PLAYA N°1" },
+        "ssaa": { e: 0.54, d: 0.48, t: "TAB SERV AUX CA-CC" },
+        "shelter": { e: 0.15, d: 0.25, t: "TAB SECC SHELTER" },
+        "cargador": { e: 0.10, d: 0.20, t: "TAB CARG BAT 110VCC" },
+        "refrig": { e: 0.12, d: 0.22, t: "TAB REFRIG T1/T2" }
     };
  
-    function verificarSWA() {
-        const tarea = document.getElementById('tarea').value;
-        document.getElementById('swa_alert').style.display = (tarea === 'intervencion') ? 'block' : 'none';
+    const epp_details = {
+        1: "EPP CATEGORÍA 1: Camisa/Pantalón FR, Careta para arco, Protección auditiva, Guantes de cuero.",
+        2: "EPP CATEGORÍA 2: Camisa/Pantalón FR, Balaclava FR + Careta de arco, Protección auditiva, Guantes dieléctricos + Cuero.",
+        4: "EPP CATEGORÍA 4: Traje de Arco (Arc Flash Suit 40 cal), Capucha, Doble protección auditiva, Guantes dieléctricos.",
+        "SWA": "SWA - RIESGO EXTREMO: Prohibido trabajar energizado. Requiere corte de energía aguas arriba."
+    };
+ 
+    function handleTaskChange() {
+        const type = document.getElementById('task_type').value;
+        document.getElementById('estudio_fields').style.display = (type === 'estudio') ? 'block' : 'none';
+        document.querySelectorAll('.manual_fields').forEach(el => el.style.display = (type !== 'estudio' && type !== 'none') ? 'block' : 'none');
+        document.getElementById('swa_card').style.display = (type === 'intervencion') ? 'block' : 'none';
     }
  
-    function generarEtiqueta() {
-        const tag = document.getElementById('tag_input').value || "S/D";
-        const kA = parseFloat(document.getElementById('ka_val').value);
-        const t = parseFloat(document.getElementById('prot_t').value);
+    function calculate() {
+        const type = document.getElementById('task_type').value;
+        if(type === 'none') return alert("Seleccione una tarea.");
  
-        if(!kA) return alert("Debe ingresar la corriente de cortocircuito (kA).");
+        let ene, dist, tag, cat;
  
-        // Cálculo IEEE 1584 simplificado
-        const ene = (0.123 * (kA * 0.72) * t * 1.5);
-        const dist = Math.sqrt(2.14 * kA * t);
-        let cat_val = ene <= 1.2 ? 1 : (ene <= 8 ? 2 : (ene <= 40 ? 4 : 99));
- 
-        document.getElementById('result-display').style.display = 'block';
-        document.getElementById('res_ene').innerText = ene.toFixed(2) + " cal/cm²";
-        document.getElementById('res_dist').innerText = dist.toFixed(2) + " m";
-        document.getElementById('res_tag').innerText = tag;
-        
-        const catDisp = document.getElementById('res_cat');
-        catDisp.innerText = cat_val === 99 ? "SWA" : "CAT " + cat_val;
-        document.getElementById('epp_lista').innerHTML = epp_nfpa[cat_val];
- 
-        const header = document.getElementById('et_header');
-        if (ene > 8) {
-            header.innerText = "PELIGRO";
-            header.className = "et-head danger";
-            catDisp.style.color = "#cc0000";
+        if (type === 'estudio') {
+            const e = data_noc[document.getElementById('equip_select').value];
+            ene = e.e; dist = e.d; tag = e.t;
         } else {
-            header.innerText = "ADVERTENCIA";
-            header.className = "et-head warning";
-            catDisp.style.color = "#000";
+            const kA = parseFloat(document.getElementById('ka_input').value);
+            const time = parseFloat(document.getElementById('time_input').value);
+            if(!kA) return alert("Ingrese kA del equipo.");
+            
+            tag = document.getElementById('tag_id').value || "EQUIPO EN CAMPO";
+            ene = (0.123 * (kA * 0.72) * time * 1.5); // Simplificada IEEE 1584
+            dist = Math.sqrt(2.14 * kA * time);
         }
-    }
-</script>
-</body>
-</html>
+ 
+   
+ 
+
