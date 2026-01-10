@@ -14,15 +14,14 @@
         h3 { margin-top: 0; color: var(--brand); font-size: 1.1em; }
         label { font-weight: bold; display: block; margin-top: 15px; font-size: 0.9em; }
         input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; transition: 0.3s; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
         .btn-blue { background: var(--brand); color: white; }
-        .btn-gray { background: #6c757d; color: white; }
         .btn-outline { background: #fff; border: 2px solid var(--brand); color: var(--brand); }
         .gold-rule { background: #fff; border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
         .gold-rule input { width: 22px; height: 22px; flex-shrink: 0; }
         .etiqueta { border: 4px solid #000; margin: 15px; background: white; }
         .etq-header { background: var(--warn); padding: 10px; text-align: center; font-weight: 900; border-bottom: 4px solid #000; }
-        .info-small { font-size: 0.8em; color: #666; margin-top: 4px; margin-bottom: 10px; }
+        .info-small { font-size: 0.8em; color: #666; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -30,142 +29,128 @@
 <div class="card">
     <div class="header">Evaluación de Riesgos para Trabajo Eléctrico</div>
  
-    <div id="pantalla-inicio" class="section">
+    <div id="p-inicio" class="section">
         <div class="scope-box">
-            <strong>ALCANCE:</strong> Esta aplicación es aplicable para trabajos de mantenimiento o inspección que impliquen la apertura de tableros. Si la tarea es cambiar un equipo, debe aislar la instalación.
+            <strong>ALCANCE:</strong> Esta aplicación es aplicable para mantenimiento o inspección con apertura de tableros. Si debe cambiar un equipo, aplique Reglas de Oro.
         </div>
-        <h3>Seleccione el tipo de tarea:</h3>
-        <button class="btn btn-blue" onclick="mostrarSeccion('pantalla-lugar')">Inspección / Medición (Con Tensión)</button>
-        <button class="btn btn-gray" onclick="mostrarSeccion('pantalla-oro')">Intervención / Recambio de Equipo</button>
+        <h3>Seleccione la tarea:</h3>
+        <button class="btn btn-blue" onclick="navegar('p-lugar')">Inspección / Medición (Con Tensión)</button>
+        <button class="btn" style="background:#6c757d; color:white;" onclick="navegar('p-oro')">Intervención / Recambio de Equipo</button>
     </div>
  
-    <div id="pantalla-oro" class="section" style="display:none;">
+    <div id="p-oro" class="section" style="display:none;">
         <h3 style="color: var(--stop);">⚠️ AISLAR LA INSTALACIÓN</h3>
-        <p>Para recambio de equipos, aplique las 5 Reglas de Oro:</p>
+        <p>Para recambio, marque el cumplimiento de las 5 Reglas de Oro:</p>
         <div class="gold-rule"><input type="checkbox" class="chk-oro"> 1. Corte efectivo de fuentes.</div>
         <div class="gold-rule"><input type="checkbox" class="chk-oro"> 2. Bloqueo y Etiquetado (LOTO).</div>
         <div class="gold-rule"><input type="checkbox" class="chk-oro"> 3. Verificar ausencia de tensión.</div>
         <div class="gold-rule"><input type="checkbox" class="chk-oro"> 4. Puesta a tierra y cortocircuito.</div>
         <div class="gold-rule"><input type="checkbox" class="chk-oro"> 5. Señalización de la zona.</div>
-        <button class="btn btn-blue" onclick="validarOro()">Confirmar Bloqueo</button>
-        <button class="btn" style="background:none; color:var(--brand);" onclick="mostrarSeccion('pantalla-inicio')">← Volver</button>
+        <button class="btn btn-blue" onclick="validarOro()">Confirmar Seguridad</button>
+        <button class="btn" style="background:none; color:var(--brand);" onclick="navegar('p-inicio')">← Volver</button>
     </div>
  
-    <div id="pantalla-lugar" class="section" style="display:none;">
-        <h3>¿Dónde realiza la inspección?</h3>
-        <button class="btn btn-outline" onclick="setZona('cabecera')">Entre Trafo y Barras (Cabecera)</button>
-        <div class="info-small">Considera la falla máxima del transformador atenuada por distancia.</div>
-        
-        <button class="btn btn-outline" onclick="setZona('circuito')">Aguas abajo de Protecciones</button>
-        <div class="info-small">Considera la actuación del fusible o térmica local.</div>
-        <button class="btn" style="background:none; color:var(--brand);" onclick="mostrarSeccion('pantalla-inicio')">← Volver</button>
+    <div id="p-lugar" class="section" style="display:none;">
+        <h3>Punto de Trabajo:</h3>
+        <button class="btn btn-outline" onclick="setModo('cabecera')">Entre Trafo y Barras (Cabecera)</button>
+        <button class="btn btn-outline" onclick="setModo('circuito')">Entre Protección y Equipo (Circuito)</button>
+        <button class="btn" style="background:none; color:var(--brand);" onclick="navegar('p-inicio')">← Volver</button>
     </div>
  
-    <div id="pantalla-datos" class="section" style="display:none;">
-        <h3 id="txt-datos">Datos del Sistema</h3>
+    <div id="p-datos" class="section" style="display:none;">
+        <h3 id="titulo-datos">Datos Técnicos</h3>
         
-        <label>Potencia del Transformador (kVA):</label>
-        <input type="number" id="kva" value="500">
-        
-        <label>Impedancia del Trafo (%Z):</label>
-        <input type="number" id="zpct" value="5" step="0.1">
-        
-        <label>Distancia Trafo a Tablero (metros):</label>
-        <input type="number" id="distancia" value="10">
+        <div id="bloque-trafo">
+            <label>Potencia Trafo (kVA):</label>
+            <input type="number" id="kva" value="500">
+            <label>Impedancia (%Z):</label>
+            <input type="number" id="zpct" value="5" step="0.1">
+            <label>Distancia Trafo-Tablero (m):</label>
+            <input type="number" id="distancia" value="10">
+        </div>
  
-        <label id="lbl-prot">Protección actuante (Tiempo en seg):</label>
+        <div id="bloque-circuito" style="display:none;">
+            <label>Corriente de Cortocircuito en el punto (kA):</label>
+            <input type="number" id="isc_manual" placeholder="Ej: 5.5">
+            <div class="info-small">Dato obtenido del unifilar o medición previa.</div>
+        </div>
+ 
+        <label>Tiempo de Protección (seg):</label>
         <select id="tiempo_sel">
             <option value="0.01">Fusible gG Rápido (0.01s)</option>
             <option value="0.08">Fusible gG Estándar (0.08s)</option>
             <option value="0.1">Interruptor Automático (0.1s)</option>
-            <option value="0.2">Protección Lenta (0.2s)</option>
+            <option value="0.2">Interruptor Lento (0.2s)</option>
         </select>
  
-        <button class="btn btn-blue" onclick="calcular()">Calcular Energía incidente</button>
-        <button class="btn" style="background:none; color:var(--brand);" onclick="mostrarSeccion('pantalla-lugar')">← Volver</button>
+        <button class="btn btn-blue" onclick="calcular()">Calcular Energía</button>
     </div>
  
-    <div id="pantalla-resultado" class="etiqueta" style="display:none;">
-        <div class="etq-header">RIESGO ELÉCTRICO ANALIZADO</div>
-        <div style="padding: 15px;">
+    <div id="p-res" class="etiqueta" style="display:none;">
+        <div class="etq-header">RIESGO DE ARCO ELÉCTRICO</div>
+        <div style="padding:15px;">
             <p>Energía Incidente: <strong id="res-ei"></strong> cal/cm²</p>
-            <div id="res-cat" style="font-size: 1.8em; font-weight: 900; text-align: center; margin: 10px 0;"></div>
-            <div id="res-epp" style="background: #f0f0f0; padding: 12px; border-radius: 5px; font-size: 0.85em; border-left: 5px solid var(--brand);"></div>
+            <div id="res-cat" style="font-size:1.8em; font-weight:900; text-align:center; margin:10px 0;"></div>
+            <div id="res-epp" style="background:#f0f0f0; padding:12px; border-radius:5px; font-size:0.85em; border-left:5px solid var(--brand);"></div>
         </div>
-        <button class="btn btn-gray" onclick="location.reload()">Nueva Evaluación</button>
+        <button class="btn btn-blue" onclick="location.reload()">Nueva Evaluación</button>
     </div>
 </div>
  
 <script>
-    let zonaSeleccionada = '';
+    let modoActual = '';
  
-    function mostrarSeccion(id) {
-        // Ocultar todas las secciones
-        document.getElementById('pantalla-inicio').style.display = 'none';
-        document.getElementById('pantalla-oro').style.display = 'none';
-        document.getElementById('pantalla-lugar').style.display = 'none';
-        document.getElementById('pantalla-datos').style.display = 'none';
-        document.getElementById('pantalla-resultado').style.display = 'none';
-        // Mostrar la solicitada
+    function navegar(id) {
+        const pantallas = ['p-inicio', 'p-oro', 'p-lugar', 'p-datos', 'p-res'];
+        pantallas.forEach(p => document.getElementById(p).style.display = 'none');
         document.getElementById(id).style.display = 'block';
     }
  
-    function setZona(zona) {
-        zonaSeleccionada = zona;
-        document.getElementById('txt-datos').innerText = (zona === 'cabecera') ? "Datos de Cabecera" : "Datos de Circuito";
-        mostrarSeccion('pantalla-datos');
+    function setModo(modo) {
+        modoActual = modo;
+        document.getElementById('bloque-trafo').style.display = (modo === 'cabecera') ? 'block' : 'none';
+        document.getElementById('bloque-circuito').style.display = (modo === 'circuito') ? 'block' : 'none';
+        document.getElementById('titulo-datos').innerText = (modo === 'cabecera') ? 'Análisis de Cabecera' : 'Análisis de Circuito';
+        navegar('p-datos');
     }
  
     function validarOro() {
-        const checks = document.querySelectorAll('.chk-oro');
-        const todos = Array.from(checks).every(c => c.checked);
-        if (todos) {
-            alert("✅ REGLAS DE ORO VERIFICADAS. Proceda con seguridad.");
+        if (Array.from(document.querySelectorAll('.chk-oro')).every(c => c.checked)) {
+            alert("Bloqueo confirmado. Proceda.");
             location.reload();
-        } else {
-            alert("❌ ¡ATENCIÓN! Debe cumplir las 5 Reglas de Oro.");
-        }
+        } else { alert("Faltan pasos de las Reglas de Oro."); }
     }
  
     function calcular() {
-        const kva = parseFloat(document.getElementById('kva').value);
-        const z = parseFloat(document.getElementById('zpct').value) / 100;
-        const d = parseFloat(document.getElementById('distancia').value);
+        let ik_ka = 0;
         const t = parseFloat(document.getElementById('tiempo_sel').value);
-        const v = 380;
- 
-        // 1. Corriente de falla en bornes del trafo
-        let isc_trafo = (kva / (1.732 * (v/1000))) / z;
         
-        // 2. Impedancia de línea (Atenuación por distancia)
-        // Usamos una resistencia promedio de conductores industriales
-        let r_cable = (0.016 * d) / 100; 
-        let isc_final = isc_trafo / (1 + (isc_trafo * r_cable / v));
-        let ik_ka = isc_final / 1000;
- 
-        // 3. Energía Incidente (IEEE 1584 simplificado d=61cm)
-        let ei = 46.2 * ik_ka * t * 1.473 * Math.pow(45/61, 1.5);
-        
-        mostrarSeccion('pantalla-resultado');
-        document.getElementById('res-ei').innerText = ei.toFixed(2);
-        
-        let cat = ""; let epp = ""; let color = "";
- 
-        if (ei <= 1.2) {
-            cat = "CATEGORÍA 1"; color = "#1f8c3a";
-            epp = "Mameluco FR (4 cal), casco, gafas y guantes de cuero.";
-        } else if (ei <= 8) {
-            cat = "CATEGORÍA 2"; color = "#e67e22";
-            epp = "Mameluco FR (8 cal), careta arc flash (8 cal) con balaclava y guantes dieléctricos.";
+        if (modoActual === 'cabecera') {
+            const kva = parseFloat(document.getElementById('kva').value);
+            const z = parseFloat(document.getElementById('zpct').value) / 100;
+            const d = parseFloat(document.getElementById('distancia').value);
+            let isc_trafo = (kva / (1.732 * 0.38)) / z;
+            let r_cable = (0.016 * d) / 100; 
+            ik_ka = (isc_trafo / (1 + (isc_trafo * r_cable / 380))) / 1000;
         } else {
-            cat = "SWA - PARAR TRABAJO"; color = "#d0021b";
-            epp = "RIESGO EXTREMO. No trabajar con tensión. Se requiere desenergizar.";
+            ik_ka = parseFloat(document.getElementById('isc_manual').value);
+            if (!ik_ka) { alert("Ingrese los kA del tablero."); return; }
         }
  
-        const resCat = document.getElementById('res-cat');
-        resCat.innerText = cat;
-        resCat.style.color = color;
+        let ei = 46.2 * ik_ka * t * 1.473 * Math.pow(45/61, 1.5);
+        
+        document.getElementById('res-ei').innerText = ei.toFixed(2);
+        let cat = (ei <= 1.2) ? "CAT 1" : (ei <= 8) ? "CAT 2" : "SWA - PELIGRO";
+        let color = (ei <= 1.2) ? "#1f8c3a" : (ei <= 8) ? "#e67e22" : "#d0021b";
+        let epp = (ei <= 1.2) ? "Mameluco FR, casco, gafas, guantes cuero." : 
+                  (ei <= 8) ? "Mameluco FR (8 cal), careta arc flash, guantes dieléctricos." : 
+                  "ENERGÍA EXTREMA. No trabajar con tensión.";
+        
+        const rCat = document.getElementById('res-cat');
+        rCat.innerText = cat;
+        rCat.style.color = color;
         document.getElementById('res-epp').innerText = epp;
+        navegar('p-res');
     }
 </script>
 </body>
@@ -173,6 +158,8 @@
  
  
  
+ 
+
 
 
 
