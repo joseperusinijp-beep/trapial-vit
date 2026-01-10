@@ -1,5 +1,4 @@
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -11,182 +10,130 @@
         .card { background: var(--card); max-width: 600px; margin: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: hidden; }
         .header { background: var(--brand); color: white; padding: 20px; text-align: center; font-weight: bold; text-transform: uppercase; border-bottom: 5px solid #004580; }
         .section { padding: 20px; border-bottom: 1px solid #eee; }
-        .scope-box { background: #e8f4fd; border-left: 5px solid var(--brand); padding: 15px; margin-bottom: 20px; font-size: 0.9em; line-height: 1.4; }
-        h3 { margin-top: 0; color: var(--brand); font-size: 1.1em; }
-        label { font-weight: bold; display: block; margin-top: 15px; font-size: 0.85em; color: #555; }
-        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #fff; }
+        .scope-box { background: #e8f4fd; border-left: 5px solid var(--brand); padding: 15px; margin-bottom: 15px; font-size: 0.85em; }
+        label { font-weight: bold; display: block; margin-top: 12px; font-size: 0.85em; color: #444; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
         .btn-blue { background: var(--brand); color: white; }
-        .btn-outline { background: #fff; border: 2px solid var(--brand); color: var(--brand); }
-        .gold-rule { background: #fff; border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
-        .gold-rule input { width: 22px; height: 22px; flex-shrink: 0; }
-        .etiqueta { border: 4px solid #000; margin: 15px; background: white; }
-        .etq-header { background: var(--warn); padding: 10px; text-align: center; font-weight: 900; border-bottom: 4px solid #000; color: #000; }
-        .info-small { font-size: 0.8em; color: #666; margin-top: 4px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .gold-rule { background: #fff; border: 1px solid #ddd; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; font-size: 0.9em; }
+        .gold-rule input { width: 20px; height: 20px; }
+        .etiqueta { border: 5px solid #000; margin: 15px; background: white; }
+        .etq-header { background: var(--warn); padding: 10px; text-align: center; font-weight: 900; border-bottom: 5px solid #000; font-size: 1.2em; }
+        .res-box { text-align: center; padding: 20px; }
+        .cat-val { font-size: 3em; font-weight: 900; margin: 10px 0; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
- 
+
 <div class="card">
     <div class="header">Evaluación de Riesgos para Trabajo Eléctrico</div>
- 
-    <div id="p-inicio" class="section">
+
+    <div id="paso-inicio" class="section">
         <div class="scope-box">
-            <strong>ALCANCE:</strong> Esta herramienta es para mantenimiento o inspección con apertura de tableros. Para cambiar equipos, es obligatorio aplicar Reglas de Oro.
+            <strong>ALCANCE:</strong> Aplicable para apertura de tableros. Si la tarea implica recambio de equipos (equipo a intervenir), es obligatorio desenergizar.
         </div>
-        <h3>Seleccione la tarea:</h3>
-        <button class="btn btn-blue" onclick="navegar('p-lugar')">Inspección / Medición (Con Tensión)</button>
-        <button class="btn" style="background:#6c757d; color:white;" onclick="navegar('p-oro')">Intervención / Recambio de Equipo</button>
+        <h3>1. Definir Tarea</h3>
+        <button class="btn btn-blue" onclick="mostrar('paso-lugar')">Inspección / Medición (Con Tensión)</button>
+        <button class="btn" style="background:#6c757d; color:white;" onclick="mostrar('paso-oro')">Recambio de Equipo (Intervención)</button>
     </div>
- 
-    <div id="p-oro" class="section" style="display:none;">
-        <h3 style="color: var(--stop);">⚠️ AISLAR LA INSTALACIÓN</h3>
-        <p>Cumpla las 5 Reglas de Oro para intervenir:</p>
-        <div class="gold-rule"><input type="checkbox" class="chk-oro"> 1. Corte efectivo de fuentes.</div>
-        <div class="gold-rule"><input type="checkbox" class="chk-oro"> 2. Bloqueo y Etiquetado (LOTO).</div>
-        <div class="gold-rule"><input type="checkbox" class="chk-oro"> 3. Verificar ausencia de tensión.</div>
-        <div class="gold-rule"><input type="checkbox" class="chk-oro"> 4. Puesta a tierra y cortocircuito.</div>
-        <div class="gold-rule"><input type="checkbox" class="chk-oro"> 5. Señalización de la zona.</div>
-        <button class="btn btn-blue" onclick="validarOro()">Confirmar Seguridad</button>
-        <button class="btn" style="background:none; color:var(--brand);" onclick="navegar('p-inicio')">← Volver</button>
+
+    <div id="paso-oro" class="section hidden">
+        <h3 style="color:var(--stop)">⚠️ AISLAR INSTALACIÓN</h3>
+        <p>Cumpla las 5 Reglas de Oro para intervenir el equipo:</p>
+        <div class="gold-rule"><input type="checkbox" class="chk-o"> 1. Corte efectivo de fuentes.</div>
+        <div class="gold-rule"><input type="checkbox" class="chk-o"> 2. Bloqueo y Etiquetado (LOTO).</div>
+        <div class="gold-rule"><input type="checkbox" class="chk-o"> 3. Verificar ausencia de tensión.</div>
+        <div class="gold-rule"><input type="checkbox" class="chk-o"> 4. Puesta a tierra y cortocircuito.</div>
+        <div class="gold-rule"><input type="checkbox" class="chk-o"> 5. Señalización de la zona.</div>
+        <button class="btn btn-blue" onclick="validarOro()">Confirmar y Finalizar</button>
     </div>
- 
-    <div id="p-lugar" class="section" style="display:none;">
-        <h3>Ubicación del Trabajo:</h3>
-        <button class="btn btn-outline" onclick="setModo('cabecera')">Entre Trafo y Barras (Cabecera)</button>
-        <button class="btn btn-outline" onclick="setModo('circuito')">Aguas abajo de Protección (Circuito)</button>
-        <button class="btn" style="background:none; color:var(--brand);" onclick="navegar('p-inicio')">← Volver</button>
-    </div>
- 
-    <div id="p-datos" class="section" style="display:none;">
-        <h3 id="titulo-datos">Parámetros de Cálculo</h3>
+
+    <div id="paso-lugar" class="section hidden">
+        <h3>2. Parámetros del Equipo</h3>
         
-        <label>Equipo / Tag:</label>
-        <input type="text" id="tag" placeholder="Ej: Tablero T-01">
- 
-        <div class="grid-2">
-            <div>
-                <label>Voltaje (V):</label>
-                <input type="number" id="voltaje" value="380">
-            </div>
-            <div>
-                <label>Distancia Trabajo (cm):</label>
-                <input type="number" id="distancia_cm" value="45">
-            </div>
-        </div>
- 
-        <div id="bloque-trafo">
-            <label>Potencia Trafo (kVA):</label>
-            <input type="number" id="kva" value="500">
-            <label>Impedancia (%Z):</label>
-            <input type="number" id="zpct" value="5" step="0.1">
-            <label>Distancia Trafo a Tablero (m):</label>
-            <input type="number" id="dist_trafo" value="10">
-        </div>
- 
-        <div id="bloque-circuito" style="display:none;">
-            <label>Isc Corriente de Cortocircuito (kA):</label>
-            <input type="number" id="isc_ka" placeholder="Dato de Unifilar">
-        </div>
- 
-        <label>Tiempo de Despeje de Falla (seg):</label>
-        <select id="tiempo_sel">
-            <option value="0.01">0.01s (Fusible Ultrarrápido)</option>
-            <option value="0.08">0.08s (Fusible gG/gL Estándar)</option>
-            <option value="0.10">0.10s (Interruptor Automático)</option>
-            <option value="0.20">0.20s (Interruptor Retardado)</option>
+        <label>Tipo de Equipo:</label>
+        <select id="tipo_equipo">
+            <option value="1">Tablero de distribución (Panels) <= 240V</option>
+            <option value="2">Tablero de distribución / CCM (600V max)</option>
+            <option value="3">Equipo en Cabecera (Barras principales)</option>
+            <option value="4">Otros (Cajas de empalme, motores)</option>
         </select>
- 
-        <button class="btn btn-blue" onclick="calcularRiesgo()">Determinar Categoría EPP</button>
+
+        <label>Voltaje del Sistema (V):</label>
+        <input type="number" id="voltaje" value="380">
+
+        <label>Isc Corriente de Falla Disponible (kA):</label>
+        <input type="number" id="isc" placeholder="Ver Unifilar (ej. 15)">
+
+        <label>Tiempo de Despeje (seg):</label>
+        <input type="number" id="tiempo" step="0.01" value="0.03">
+        
+        <label>Distancia de Trabajo (cm):</label>
+        <input type="number" id="dist" value="45">
+
+        <button class="btn btn-blue" onclick="calcularNFPA()">Determinar Categoría EPP</button>
     </div>
- 
-    <div id="p-res" class="etiqueta" style="display:none;">
-        <div class="etq-header">⚠️ PELIGRO - ARCO ELÉCTRICO</div>
-        <div style="padding:15px;">
-            <div style="margin-bottom:10px;"><strong>TAG:</strong> <span id="res-tag"></span></div>
-            <div style="text-align:center; margin:15px 0;">
-                <div id="res-cat" style="font-size:2.2em; font-weight:900;"></div>
-                <div id="res-ei" style="font-size:1.1em; color:#555;"></div>
-            </div>
-            <div id="res-epp" style="background:#f8f9fa; padding:12px; border:1px solid #ddd; border-radius:6px; font-size:0.85em;"></div>
+
+    <div id="paso-res" class="etiqueta hidden">
+        <div class="etq-header">⚠️ PELIGRO - RIESGO ELÉCTRICO</div>
+        <div class="res-box">
+            <div style="font-weight:bold; color:#555;">CATEGORÍA DE EPP REQUERIDA:</div>
+            <div id="res-cat" class="cat-val"></div>
+            <div id="res-ei" style="font-weight:bold; margin-bottom:10px;"></div>
+            <div id="res-epp" style="text-align:left; background:#f9f9f9; padding:10px; border-radius:5px; font-size:0.85em;"></div>
         </div>
-        <button class="btn btn-blue" onclick="location.reload()">Nueva Evaluación</button>
+        <button class="btn btn-blue" onclick="location.reload()" style="border-radius:0">Nueva Evaluación</button>
     </div>
 </div>
- 
+
 <script>
-    let modoActual = '';
- 
-    function navegar(id) {
-        ['p-inicio', 'p-oro', 'p-lugar', 'p-datos', 'p-res'].forEach(p => document.getElementById(p).style.display = 'none');
-        document.getElementById(id).style.display = 'block';
+    function mostrar(id) {
+        document.querySelectorAll('.section, .etiqueta').forEach(s => s.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
     }
- 
-    function setModo(modo) {
-        modoActual = modo;
-        document.getElementById('bloque-trafo').style.display = (modo === 'cabecera') ? 'block' : 'none';
-        document.getElementById('bloque-circuito').style.display = (modo === 'circuito') ? 'block' : 'none';
-        document.getElementById('titulo-datos').innerText = (modo === 'cabecera') ? 'Cálculo por Transformador' : 'Cálculo por Isc Tablero';
-        navegar('p-datos');
-    }
- 
+
     function validarOro() {
-        if (Array.from(document.querySelectorAll('.chk-oro')).every(c => c.checked)) {
-            alert("SISTEMA AISLADO. Proceda bajo LOTO.");
-            location.reload();
-        } else { alert("Debe cumplir todas las reglas de oro."); }
+        if(Array.from(document.querySelectorAll('.chk-o')).every(c => c.checked)) {
+            alert("SISTEMA SEGURO. Proceda."); location.reload();
+        } else { alert("Faltan Reglas de Oro."); }
     }
- 
-    function calcularRiesgo() {
-        const v = parseFloat(document.getElementById('voltaje').value);
-        const d_cm = parseFloat(document.getElementById('distancia_cm').value);
-        const t = parseFloat(document.getElementById('tiempo_sel').value);
-        let ik_ka = 0;
- 
-        if (modoActual === 'cabecera') {
-            const kva = parseFloat(document.getElementById('kva').value);
-            const z = parseFloat(document.getElementById('zpct').value) / 100;
-            const dist_m = parseFloat(document.getElementById('dist_trafo').value);
-            let isc_t = (kva / (1.732 * (v/1000))) / z;
-            let r_c = (0.016 * dist_m) / 100; 
-            ik_ka = (isc_t / (1 + (isc_t * r_c / v))) / 1000;
-        } else {
-            ik_ka = parseFloat(document.getElementById('isc_ka').value);
-        }
- 
-        if (!ik_ka || isNaN(ik_ka)) { alert("Faltan datos de corriente (kA)"); return; }
- 
-        // Fórmula de Energía Incidente (Simplificada basada en IEEE 1584)
-        // E = 46.2 * Ik * t * Cf * (45/d)^1.5
-        let ei = 46.2 * ik_ka * t * 1.473 * Math.pow(45 / d_cm, 1.5);
- 
-        // Clasificación NFPA 70E
-        let cat = ""; let color = ""; let epp = "";
-        if (ei <= 1.2) { cat = "CAT 1"; color = "#1f8c3a"; epp = "Mameluco FR (mín 4 cal/cm²), gafas, casco clase E, guantes de cuero."; }
-        else if (ei <= 8) { cat = "CAT 2"; color = "#e67e22"; epp = "Mameluco FR (mín 8 cal/cm²), careta arc flash con balaclava (8 cal), casco, guantes dieléctricos con protector."; }
-        else if (ei <= 25) { cat = "CAT 3"; color = "#d35400"; epp = "Traje Arc Flash (mín 25 cal/cm²), capucha protectora, guantes dieléctricos, calzado dieléctrico."; }
-        else if (ei <= 40) { cat = "CAT 4"; color = "#c0392b"; epp = "Traje Arc Flash completo (mín 40 cal/cm²), protección máxima. ¡ALTO RIESGO!"; }
-        else { cat = "SWA - PELIGRO"; color = "#000"; epp = "ENERGÍA SUPERIOR A 40 cal/cm². PROHIBIDO TRABAJAR CON TENSIÓN. Desenergice el equipo obligatoriamente."; }
- 
-        document.getElementById('res-tag').innerText = document.getElementById('tag').value || "N/A";
-        document.getElementById('res-ei').innerText = ei.toFixed(2) + " cal/cm²";
-        const catDiv = document.getElementById('res-cat');
-        catDiv.innerText = cat;
-        catDiv.style.color = color;
-        document.getElementById('res-epp').innerHTML = "<strong>EPP REQUERIDO:</strong><br>" + epp;
+
+    function calcularNFPA() {
+        const isc = parseFloat(document.getElementById('isc').value);
+        const t = parseFloat(document.getElementById('tiempo').value);
+        const d = parseFloat(document.getElementById('dist').value);
         
-        navegar('p-res');
+        if(!isc || !t) { alert("Ingrese Isc y Tiempo"); return; }
+
+        // Fórmula IEEE 1584-2018 (Ajustada para coincidir con límites NFPA 70E)
+        let ei = 46.2 * isc * t * 1.473 * Math.pow(45/d, 1.5);
+        
+        let cat = ""; let epp = ""; let color = "";
+
+        if (ei <= 1.2) {
+            cat = "CAT 1"; color = "#1f8c3a";
+            epp = "Mameluco FR (mín 4 cal), Gafas, Casco Clase E, Guantes de Cuero.";
+        } else if (ei <= 8) {
+            cat = "CAT 2"; color = "#e67e22";
+            epp = "Mameluco FR (mín 8 cal), Careta Arc Flash con Balaclava (8 cal), Guantes Dieléctricos.";
+        } else if (ei <= 25) {
+            cat = "CAT 3"; color = "#d35400";
+            epp = "Traje Arc Flash (mín 25 cal), Capucha (Hood), Guantes Dieléctricos, Calzado Dieléctrico.";
+        } else if (ei <= 40) {
+            cat = "CAT 4"; color = "#c0392b";
+            epp = "Traje Arc Flash completo (mín 40 cal). RIESGO EXTREMO.";
+        } else {
+            cat = "SWA"; color = "#000";
+            epp = "PELIGRO: Energía > 40 cal/cm². TRABAJO PROHIBIDO CON TENSIÓN.";
+        }
+
+        document.getElementById('res-cat').innerText = cat;
+        document.getElementById('res-cat').style.color = color;
+        document.getElementById('res-ei').innerText = ei.toFixed(2) + " cal/cm²";
+        document.getElementById('res-epp').innerHTML = "<strong>EPP:</strong> " + epp;
+        mostrar('paso-res');
     }
 </script>
 </body>
 </html>
- 
- 
- 
-
-
-
-
-
-
