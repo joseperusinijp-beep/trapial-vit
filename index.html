@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trapial VIT - Arc Flash & SWC</title>
+    <title>Análisis de Riesgo para Trabajo Eléctrico</title>
     <link rel="manifest" href="./manifest.json">
     <style>
         :root { 
@@ -12,215 +13,37 @@
         }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--fg); margin: 0; padding: 10px; }
         .card { background: var(--card); max-width: 800px; margin: auto; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; padding-bottom: 20px; }
-        .header { background: var(--brand-prim); color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2em; }
+        .header { background: var(--brand-prim); color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2em; text-transform: uppercase; }
+        
+        /* Banners de Seguridad */
+        .safety-banner { background: #fff3cd; border: 2px solid #ffeeba; padding: 15px; margin: 15px; border-radius: 8px; color: #856404; font-size: 0.9em; }
+        .pre-requisitos { background: #e8f4fd; border: 2px solid #b8daff; padding: 15px; margin: 15px; border-radius: 8px; color: #004085; }
+        
         .section { padding: 20px; border-bottom: 1px solid #eee; }
         label { font-weight: bold; display: block; margin-top: 10px; font-size: 0.9em; }
-        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        
         .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1em; text-transform: uppercase; }
         .btn-calc { background: var(--brand-prim); color: white; }
         
-        /* Overlay SWA (Stop Work Authority) */
-        #swa-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; color: white; text-align: center; padding: 40px 20px; }
-        .swa-box { border: 8px solid var(--stop); padding: 30px; border-radius: 25px; max-width: 500px; margin: auto; }
-        .stop-sign { font-size: 100px; color: var(--stop); margin-bottom: 10px; }
+        /* Estilos de Checkboxes */
+        .check-group { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9em; }
+        .check-group input { width: 22px; height: 22px; margin: 0; cursor: pointer; }
 
-        /* Estilo Etiqueta Arc Flash (Copia fiel del Estudio Chevron) */
-        .etiqueta-estudio { display: none; border: 5px solid #000; margin: 20px; background: white; color: black; font-family: Arial, sans-serif; }
+        /* Etiqueta y SWC */
+        #swc-section, #calc-section, #etiqueta-final { display: none; }
+        .etiqueta-estudio { border: 5px solid #000; margin: 20px; background: white; color: black; }
         .etq-header { background: #FFCC00; padding: 10px; text-align: center; font-size: 1.8em; font-weight: 900; border-bottom: 5px solid #000; }
         .etq-body { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; padding: 15px; }
         .etq-cat-box { font-size: 2.2em; font-weight: 900; color: #d0021b; text-align: center; border: 2px solid #000; padding: 5px; }
 
-        /* SWC IOGP */
-        #swc-section { display: none; background: #fff; margin: 20px; border-radius: 12px; padding: 20px; border: 3px solid var(--brand-prim); }
-        .swc-item { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; border-left: 5px solid var(--brand-prim); }
-        .swc-icon { width: 60px; height: 60px; flex-shrink: 0; }
-        .swc-item input[type="checkbox"] { width: 30px; height: 30px; margin-top: 0; }
+        /* Overlay SWA */
+        #swa-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; color: white; text-align: center; padding: 40px 20px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="header">VIT ELÉCTRICA - CHEVRON EL TRAPIAL</div>
+    <div class="header">Análisis de Riesgo para Trabajo Eléctrico</div>
     
-    <div class="section">
-        <label>Equipo / Tag / Activo:</label>
-        <input type="text" id="equipo" placeholder="Ej: TAB SECC PLAYA N1" oninput="checkEstudio()">
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div><label>Tensión (V):</label><input type="number" id="volt" value="380"></div>
-            <div><label>Distancia Trabajo (cm):</label><input type="number" id="dist" value="61"></div>
-        </div>
-        
-        <label>Potencia Transformador (kVA):</label>
-        <input type="number" id="kva" placeholder="Solo si no es SET NOC">
-        
-        <label>Impedancia Tx (%Z):</label>
-        <input type="number" id="zpct" value="5">
-        
-        <label>Tiempo de Despeje (seg):</label>
-        <input type="number" id="tiempo" step="0.01" placeholder="Ej: 0.15">
-        
-        <button class="btn btn-calc" onclick="procesarCalculo()">CALCULAR Y EVALUAR RIESGO</button>
-    </div>
-
-    <div id="swc-section">
-        <h2 style="color: var(--brand-prim); margin-top: 0; text-align: center;">🛡️ CONTROLES CRÍTICOS (SWC IOGP)</h2>
-        <p style="text-align: center; font-style: italic;">Debe verificar cada punto para generar la etiqueta.</p>
-        
-        <div class="swc-item">
-            <img src="https://img.icons8.com/color/96/lock.png" class="swc-icon" alt="LOTO">
-            <div>
-                <b>Aislamiento y Bloqueo (LOTO):</b> ¿Se confirmó ausencia de tensión y bloqueo físico?
-            </div>
-            <input type="checkbox" class="swc-check">
-        </div>
-        
-        <div class="swc-item">
-            <img src="https://img.icons8.com/color/96/safety-gloves.png" class="swc-icon" alt="EPP">
-            <div>
-                <b>EPP Específico:</b> ¿El EPP de arco y guantes dieléctricos están en buen estado?
-            </div>
-            <input type="checkbox" class="swc-check">
-        </div>
-
-        <div class="swc-item">
-            <img src="https://img.icons8.com/color/96/barrier.png" class="swc-icon" alt="Distancias">
-            <div>
-                <b>Límites de Aproximación:</b> ¿Se han demarcado las distancias de seguridad?
-            </div>
-            <input type="checkbox" class="swc-check">
-        </div>
-
-        <button class="btn" style="background: var(--ok); color: white;" onclick="generarEtiqueta()">VALIDAR SWC Y GENERAR ETIQUETA</button>
-    </div>
-
-    <div id="etiqueta-final" class="etiqueta-estudio">
-        <div class="etq-header">⚠️ WARNING / ADVERTENCIA</div>
-        <div class="etq-body">
-            <div style="font-weight: bold; font-size: 0.9em; border-right: 3px solid #000; padding-right: 10px;">
-                <p>Arc Flash and Shock Hazard</p>
-                <p>Peligro de Arco Eléctrico y Descarga</p>
-                <hr>
-                <p>Distancia de Protección (AFB): <br> <span id="etq-afb" style="font-size: 1.2em;"></span></p>
-            </div>
-            <div>
-                <div style="font-size: 0.9em;">Energía Incidente:</div>
-                <div id="etq-ei" style="font-size: 1.5em; font-weight: 900;"></div>
-                <div style="margin-top: 10px; font-size: 0.9em;">Categoría de EPP:</div>
-                <div id="etq-cat" class="etq-cat-box"></div>
-                <div id="etq-volt" style="margin-top:10px; font-weight: bold;"></div>
-            </div>
-        </div>
-        <div style="background: #000; color: #fff; padding: 8px; text-align: center; font-size: 0.9em;">
-            EQUIPO: <span id="etq-tag"></span> | FECHA: <span id="etq-fecha"></span>
-        </div>
-        <button class="btn" style="background: #444; color: #fff; margin: 10px;" onclick="enviarEmail()">📧 ENVIAR A MANTENIMIENTO</button>
-    </div>
-</div>
-
-<div id="swa-overlay">
-    <div class="swa-box">
-        <div class="stop-sign">🛑</div>
-        <h1 style="font-size: 3.5em; margin: 0;">SWA</h1>
-        <h2 style="color: var(--stop);">STOP WORK AUTHORITY</h2>
-        <p style="font-size: 1.4em; margin-top: 20px;">
-            Riesgo Eléctrico No Tolerable: <br>
-            <b style="font-size: 1.8em; color: var(--stop);">CATEGORÍA <span id="swa-cat"></span></b>
-        </p>
-        <p>La energía incidente supera los límites seguros. <b>No inicie el trabajo.</b> Contacte a su supervisor inmediatamente.</p>
-        <button class="btn" style="background: white; color: black; margin-top: 30px;" onclick="location.reload()">VOLVER / REEVALUAR</button>
-    </div>
-</div>
-
-<script>
-    const ESTUDIO_NOC = {
-        "PLAYA N1": { ik: 8.0, t: 0.15 }, "AUX CA-CC": { ik: 6.0, t: 0.15 },
-        "SHELTER": { ik: 5.0, t: 0.10 }, "CARG BAT": { ik: 5.0, t: 0.10 },
-        "REFRIG": { ik: 5.0, t: 0.10 }, "UPS": { ik: 5.0, t: 0.10 }
-    };
-
-    let calcEI = 0; let calcIK = 0; let calcCAT = "";
-
-    function checkEstudio() {
-        const val = document.getElementById('equipo').value.toUpperCase();
-        for(let k in ESTUDIO_NOC) {
-            if(val.includes(k)) {
-                document.getElementById('tiempo').value = ESTUDIO_NOC[k].t;
-                document.getElementById('tiempo').style.boxShadow = "0 0 10px var(--ok)";
-                return;
-            }
-        }
-        document.getElementById('tiempo').style.boxShadow = "none";
-    }
-
-    function procesarCalculo() {
-        const v = parseFloat(document.getElementById('volt').value);
-        const t = parseFloat(document.getElementById('tiempo').value);
-        const dist = parseFloat(document.getElementById('dist').value);
-        const eq = document.getElementById('equipo').value.toUpperCase();
-        let ik;
-
-        if (!t) { alert("Ingrese el tiempo de despeje."); return; }
-
-        const match = Object.keys(ESTUDIO_NOC).find(k => eq.includes(k));
-        if (match) {
-            ik = ESTUDIO_NOC[match].ik;
-        } else {
-            const kva = parseFloat(document.getElementById('kva').value);
-            const z = parseFloat(document.getElementById('zpct').value);
-            if (!kva) { alert("Ingrese kVA del transformador."); return; }
-            ik = (kva / (Math.sqrt(3) * (v/1000))) / (z/100) / 1000;
-        }
-
-        calcIK = ik;
-        // Fórmula IEEE 1584
-        calcEI = 46.2 * ik * t * Math.pow(480/v, 0.5) * Math.pow(45/dist, 1.5);
-        
-        if (calcEI <= 1.2) calcCAT = "1";
-        else if (calcEI <= 8) calcCAT = "2";
-        else if (calcEI <= 25) calcCAT = "3";
-        else calcCAT = "4";
-
-        if (parseInt(calcCAT) >= 3) {
-            document.getElementById('swa-cat').innerText = calcCAT;
-            document.getElementById('swa-overlay').style.display = "block";
-        } else {
-            document.getElementById('swc-section').style.display = "block";
-            document.getElementById('swc-section').scrollIntoView({ behavior: 'smooth' });
-        }
-    }
-
-    function generarEtiqueta() {
-        const checks = document.querySelectorAll('.swc-check');
-        if (!Array.from(checks).every(c => c.checked)) {
-            alert("⚠️ ALERTA: Debe verificar todos los Controles Críticos de IOGP antes de generar la etiqueta.");
-            return;
-        }
-        
-        document.getElementById('etiqueta-final').style.display = "block";
-        document.getElementById('etq-ei').innerText = calcEI.toFixed(2) + " cal/cm²";
-        document.getElementById('etq-cat').innerText = "CAT " + calcCAT;
-        document.getElementById('etq-afb').innerText = "1.10 metros"; // Valor conservador estudio
-        document.getElementById('etq-volt').innerText = "Tensión Nominal: " + document.getElementById('volt').value + " V";
-        document.getElementById('etq-tag').innerText = document.getElementById('equipo').value.toUpperCase();
-        document.getElementById('etq-fecha').innerText = new Date().toLocaleDateString();
-        document.getElementById('etiqueta-final').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function enviarEmail() {
-        const mail = "mantenimientotrapialelectrico@chevron.com";
-        const subject = `VIT Arc Flash: ${document.getElementById('equipo').value}`;
-        const body = `REPORTE DE TRABAJO ELÉCTRICO - EL TRAPIAL%0A
---------------------------------------------------%0A
-Equipo: ${document.getElementById('equipo').value}%0A
-Energía Incidente: ${calcEI.toFixed(2)} cal/cm²%0A
-Categoría EPP: ${calcCAT}%0A
-Isc (kA): ${calcIK.toFixed(2)}%0A
-SWC IOGP: Verificado y Aprobado OK%0A
---------------------------------------------------`;
-        window.location.href = `mailto:${mail}?subject=${subject}&body=${body}`;
-    }
-</script>
-</body>
-</html>
-
+    
