@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -12,16 +13,17 @@
         .section { padding: 20px; border-bottom: 1px solid #eee; }
         .scope-box { background: #e8f4fd; border-left: 5px solid var(--brand); padding: 15px; margin-bottom: 20px; font-size: 0.9em; line-height: 1.4; }
         h3 { margin-top: 0; color: var(--brand); font-size: 1.1em; }
-        label { font-weight: bold; display: block; margin-top: 15px; font-size: 0.9em; }
-        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        label { font-weight: bold; display: block; margin-top: 15px; font-size: 0.85em; color: #555; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #fff; }
         .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
         .btn-blue { background: var(--brand); color: white; }
         .btn-outline { background: #fff; border: 2px solid var(--brand); color: var(--brand); }
         .gold-rule { background: #fff; border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
         .gold-rule input { width: 22px; height: 22px; flex-shrink: 0; }
         .etiqueta { border: 4px solid #000; margin: 15px; background: white; }
-        .etq-header { background: var(--warn); padding: 10px; text-align: center; font-weight: 900; border-bottom: 4px solid #000; }
+        .etq-header { background: var(--warn); padding: 10px; text-align: center; font-weight: 900; border-bottom: 4px solid #000; color: #000; }
         .info-small { font-size: 0.8em; color: #666; margin-top: 4px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     </style>
 </head>
 <body>
@@ -31,7 +33,7 @@
  
     <div id="p-inicio" class="section">
         <div class="scope-box">
-            <strong>ALCANCE:</strong> Esta aplicación es aplicable para mantenimiento o inspección con apertura de tableros. Si debe cambiar un equipo, aplique Reglas de Oro.
+            <strong>ALCANCE:</strong> Esta herramienta es para mantenimiento o inspección con apertura de tableros. Para cambiar equipos, es obligatorio aplicar Reglas de Oro.
         </div>
         <h3>Seleccione la tarea:</h3>
         <button class="btn btn-blue" onclick="navegar('p-lugar')">Inspección / Medición (Con Tensión)</button>
@@ -40,7 +42,7 @@
  
     <div id="p-oro" class="section" style="display:none;">
         <h3 style="color: var(--stop);">⚠️ AISLAR LA INSTALACIÓN</h3>
-        <p>Para recambio, marque el cumplimiento de las 5 Reglas de Oro:</p>
+        <p>Cumpla las 5 Reglas de Oro para intervenir:</p>
         <div class="gold-rule"><input type="checkbox" class="chk-oro"> 1. Corte efectivo de fuentes.</div>
         <div class="gold-rule"><input type="checkbox" class="chk-oro"> 2. Bloqueo y Etiquetado (LOTO).</div>
         <div class="gold-rule"><input type="checkbox" class="chk-oro"> 3. Verificar ausencia de tensión.</div>
@@ -51,47 +53,63 @@
     </div>
  
     <div id="p-lugar" class="section" style="display:none;">
-        <h3>Punto de Trabajo:</h3>
+        <h3>Ubicación del Trabajo:</h3>
         <button class="btn btn-outline" onclick="setModo('cabecera')">Entre Trafo y Barras (Cabecera)</button>
-        <button class="btn btn-outline" onclick="setModo('circuito')">Entre Protección y Equipo (Circuito)</button>
+        <button class="btn btn-outline" onclick="setModo('circuito')">Aguas abajo de Protección (Circuito)</button>
         <button class="btn" style="background:none; color:var(--brand);" onclick="navegar('p-inicio')">← Volver</button>
     </div>
  
     <div id="p-datos" class="section" style="display:none;">
-        <h3 id="titulo-datos">Datos Técnicos</h3>
+        <h3 id="titulo-datos">Parámetros de Cálculo</h3>
         
+        <label>Equipo / Tag:</label>
+        <input type="text" id="tag" placeholder="Ej: Tablero T-01">
+ 
+        <div class="grid-2">
+            <div>
+                <label>Voltaje (V):</label>
+                <input type="number" id="voltaje" value="380">
+            </div>
+            <div>
+                <label>Distancia Trabajo (cm):</label>
+                <input type="number" id="distancia_cm" value="45">
+            </div>
+        </div>
+ 
         <div id="bloque-trafo">
             <label>Potencia Trafo (kVA):</label>
             <input type="number" id="kva" value="500">
             <label>Impedancia (%Z):</label>
             <input type="number" id="zpct" value="5" step="0.1">
-            <label>Distancia Trafo-Tablero (m):</label>
-            <input type="number" id="distancia" value="10">
+            <label>Distancia Trafo a Tablero (m):</label>
+            <input type="number" id="dist_trafo" value="10">
         </div>
  
         <div id="bloque-circuito" style="display:none;">
-            <label>Corriente de Cortocircuito en el punto (kA):</label>
-            <input type="number" id="isc_manual" placeholder="Ej: 5.5">
-            <div class="info-small">Dato obtenido del unifilar o medición previa.</div>
+            <label>Isc Corriente de Cortocircuito (kA):</label>
+            <input type="number" id="isc_ka" placeholder="Dato de Unifilar">
         </div>
  
-        <label>Tiempo de Protección (seg):</label>
+        <label>Tiempo de Despeje de Falla (seg):</label>
         <select id="tiempo_sel">
-            <option value="0.01">Fusible gG Rápido (0.01s)</option>
-            <option value="0.08">Fusible gG Estándar (0.08s)</option>
-            <option value="0.1">Interruptor Automático (0.1s)</option>
-            <option value="0.2">Interruptor Lento (0.2s)</option>
+            <option value="0.01">0.01s (Fusible Ultrarrápido)</option>
+            <option value="0.08">0.08s (Fusible gG/gL Estándar)</option>
+            <option value="0.10">0.10s (Interruptor Automático)</option>
+            <option value="0.20">0.20s (Interruptor Retardado)</option>
         </select>
  
-        <button class="btn btn-blue" onclick="calcular()">Calcular Energía</button>
+        <button class="btn btn-blue" onclick="calcularRiesgo()">Determinar Categoría EPP</button>
     </div>
  
     <div id="p-res" class="etiqueta" style="display:none;">
-        <div class="etq-header">RIESGO DE ARCO ELÉCTRICO</div>
+        <div class="etq-header">⚠️ PELIGRO - ARCO ELÉCTRICO</div>
         <div style="padding:15px;">
-            <p>Energía Incidente: <strong id="res-ei"></strong> cal/cm²</p>
-            <div id="res-cat" style="font-size:1.8em; font-weight:900; text-align:center; margin:10px 0;"></div>
-            <div id="res-epp" style="background:#f0f0f0; padding:12px; border-radius:5px; font-size:0.85em; border-left:5px solid var(--brand);"></div>
+            <div style="margin-bottom:10px;"><strong>TAG:</strong> <span id="res-tag"></span></div>
+            <div style="text-align:center; margin:15px 0;">
+                <div id="res-cat" style="font-size:2.2em; font-weight:900;"></div>
+                <div id="res-ei" style="font-size:1.1em; color:#555;"></div>
+            </div>
+            <div id="res-epp" style="background:#f8f9fa; padding:12px; border:1px solid #ddd; border-radius:6px; font-size:0.85em;"></div>
         </div>
         <button class="btn btn-blue" onclick="location.reload()">Nueva Evaluación</button>
     </div>
@@ -101,8 +119,7 @@
     let modoActual = '';
  
     function navegar(id) {
-        const pantallas = ['p-inicio', 'p-oro', 'p-lugar', 'p-datos', 'p-res'];
-        pantallas.forEach(p => document.getElementById(p).style.display = 'none');
+        ['p-inicio', 'p-oro', 'p-lugar', 'p-datos', 'p-res'].forEach(p => document.getElementById(p).style.display = 'none');
         document.getElementById(id).style.display = 'block';
     }
  
@@ -110,46 +127,55 @@
         modoActual = modo;
         document.getElementById('bloque-trafo').style.display = (modo === 'cabecera') ? 'block' : 'none';
         document.getElementById('bloque-circuito').style.display = (modo === 'circuito') ? 'block' : 'none';
-        document.getElementById('titulo-datos').innerText = (modo === 'cabecera') ? 'Análisis de Cabecera' : 'Análisis de Circuito';
+        document.getElementById('titulo-datos').innerText = (modo === 'cabecera') ? 'Cálculo por Transformador' : 'Cálculo por Isc Tablero';
         navegar('p-datos');
     }
  
     function validarOro() {
         if (Array.from(document.querySelectorAll('.chk-oro')).every(c => c.checked)) {
-            alert("Bloqueo confirmado. Proceda.");
+            alert("SISTEMA AISLADO. Proceda bajo LOTO.");
             location.reload();
-        } else { alert("Faltan pasos de las Reglas de Oro."); }
+        } else { alert("Debe cumplir todas las reglas de oro."); }
     }
  
-    function calcular() {
-        let ik_ka = 0;
+    function calcularRiesgo() {
+        const v = parseFloat(document.getElementById('voltaje').value);
+        const d_cm = parseFloat(document.getElementById('distancia_cm').value);
         const t = parseFloat(document.getElementById('tiempo_sel').value);
-        
+        let ik_ka = 0;
+ 
         if (modoActual === 'cabecera') {
             const kva = parseFloat(document.getElementById('kva').value);
             const z = parseFloat(document.getElementById('zpct').value) / 100;
-            const d = parseFloat(document.getElementById('distancia').value);
-            let isc_trafo = (kva / (1.732 * 0.38)) / z;
-            let r_cable = (0.016 * d) / 100; 
-            ik_ka = (isc_trafo / (1 + (isc_trafo * r_cable / 380))) / 1000;
+            const dist_m = parseFloat(document.getElementById('dist_trafo').value);
+            let isc_t = (kva / (1.732 * (v/1000))) / z;
+            let r_c = (0.016 * dist_m) / 100; 
+            ik_ka = (isc_t / (1 + (isc_t * r_c / v))) / 1000;
         } else {
-            ik_ka = parseFloat(document.getElementById('isc_manual').value);
-            if (!ik_ka) { alert("Ingrese los kA del tablero."); return; }
+            ik_ka = parseFloat(document.getElementById('isc_ka').value);
         }
  
-        let ei = 46.2 * ik_ka * t * 1.473 * Math.pow(45/61, 1.5);
+        if (!ik_ka || isNaN(ik_ka)) { alert("Faltan datos de corriente (kA)"); return; }
+ 
+        // Fórmula de Energía Incidente (Simplificada basada en IEEE 1584)
+        // E = 46.2 * Ik * t * Cf * (45/d)^1.5
+        let ei = 46.2 * ik_ka * t * 1.473 * Math.pow(45 / d_cm, 1.5);
+ 
+        // Clasificación NFPA 70E
+        let cat = ""; let color = ""; let epp = "";
+        if (ei <= 1.2) { cat = "CAT 1"; color = "#1f8c3a"; epp = "Mameluco FR (mín 4 cal/cm²), gafas, casco clase E, guantes de cuero."; }
+        else if (ei <= 8) { cat = "CAT 2"; color = "#e67e22"; epp = "Mameluco FR (mín 8 cal/cm²), careta arc flash con balaclava (8 cal), casco, guantes dieléctricos con protector."; }
+        else if (ei <= 25) { cat = "CAT 3"; color = "#d35400"; epp = "Traje Arc Flash (mín 25 cal/cm²), capucha protectora, guantes dieléctricos, calzado dieléctrico."; }
+        else if (ei <= 40) { cat = "CAT 4"; color = "#c0392b"; epp = "Traje Arc Flash completo (mín 40 cal/cm²), protección máxima. ¡ALTO RIESGO!"; }
+        else { cat = "SWA - PELIGRO"; color = "#000"; epp = "ENERGÍA SUPERIOR A 40 cal/cm². PROHIBIDO TRABAJAR CON TENSIÓN. Desenergice el equipo obligatoriamente."; }
+ 
+        document.getElementById('res-tag').innerText = document.getElementById('tag').value || "N/A";
+        document.getElementById('res-ei').innerText = ei.toFixed(2) + " cal/cm²";
+        const catDiv = document.getElementById('res-cat');
+        catDiv.innerText = cat;
+        catDiv.style.color = color;
+        document.getElementById('res-epp').innerHTML = "<strong>EPP REQUERIDO:</strong><br>" + epp;
         
-        document.getElementById('res-ei').innerText = ei.toFixed(2);
-        let cat = (ei <= 1.2) ? "CAT 1" : (ei <= 8) ? "CAT 2" : "SWA - PELIGRO";
-        let color = (ei <= 1.2) ? "#1f8c3a" : (ei <= 8) ? "#e67e22" : "#d0021b";
-        let epp = (ei <= 1.2) ? "Mameluco FR, casco, gafas, guantes cuero." : 
-                  (ei <= 8) ? "Mameluco FR (8 cal), careta arc flash, guantes dieléctricos." : 
-                  "ENERGÍA EXTREMA. No trabajar con tensión.";
-        
-        const rCat = document.getElementById('res-cat');
-        rCat.innerText = cat;
-        rCat.style.color = color;
-        document.getElementById('res-epp').innerText = epp;
         navegar('p-res');
     }
 </script>
@@ -158,7 +184,7 @@
  
  
  
- 
+
 
 
 
