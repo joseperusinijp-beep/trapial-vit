@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ART Eléctrico de Precisión</title>
+    <title>ART Eléctrico Pro - El Trapial</title>
     <style>
         :root { --brand-prim: #005daa; --bg: #eef2f3; --card: #fff; --ok: #1f8c3a; --stop: #d0021b; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
@@ -11,6 +11,9 @@
         .header { background: var(--brand-prim); color: white; padding: 20px; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         .safety-banner { background: #fff3cd; border-left: 5px solid #ffc107; padding: 15px; margin: 15px; border-radius: 4px; font-size: 0.85em; }
         .section { padding: 20px; border-bottom: 1px solid #eee; }
+        .help-box { background: #e9ecef; padding: 10px; border-radius: 8px; font-size: 0.8em; margin-top: 10px; display: none; border-left: 4px solid #6c757d; }
+        .help-box h5 { color: var(--brand-prim); margin-top: 5px; margin-bottom: 5px; }
+        .help-box img { max-width: 100%; height: auto; border-radius: 5px; margin-top: 5px; margin-bottom: 10px; border: 1px solid #ccc; }
         label { font-weight: bold; display: block; margin-top: 12px; font-size: 0.9em; color: var(--brand-prim); }
         input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; text-transform: uppercase; transition: 0.3s; }
@@ -42,6 +45,23 @@
 
     <div id="calc-section" class="section" style="background: #fcfcfc;">
         <h3>2. Análisis de Ingeniería (IEEE 1584)</h3>
+        <button class="btn" style="background:none; border:none; color:var(--brand-prim); text-decoration:underline; cursor:pointer; font-size:0.8em; padding:0; margin-top:0; text-align:left;" onclick="toggleHelp()">¿De dónde saco estos datos? (Haga click aquí)</button>
+        <div id="help" class="help-box">
+            <h5>⚡ Tiempo de Despeje (seg):</h5>
+            Se obtiene de la curva de actuación de la protección (fusible o interruptor).
+            - **Fusibles:** `http://googleusercontent.com/generated_image_content/0
+
+` (Ver la curva en el estudio o manual del fabricante)<br>
+            - **Interruptores (Breakers):** `http://googleusercontent.com/generated_image_content/1
+
+` (Ajustes de la unidad de disparo)<br>
+            <h5>⚡ Potencia Tx (kVA) e Impedancia (%Z):</h5>
+            Estos datos se encuentran en la placa de características del transformador.
+            `http://googleusercontent.com/generated_image_content/2
+
+`
+        </div>
+
         <label>Tag del Equipo:</label>
         <input type="text" id="equipo" placeholder="Ej: TAB SECC PLAYA N1" oninput="checkAutoFill()">
         
@@ -105,71 +125,4 @@
 </div>
 
 <script>
-    const DATA_NOC = { "PLAYA N1": 0.15, "AUX CA-CC": 0.15, "SHELTER": 0.10, "CARG BAT": 0.10, "REFRIG": 0.10, "UPS": 0.10 };
-    let ei = 0; let cat = ""; let afb = 0;
-
-    function validarIngreso() {
-        if (Array.from(document.querySelectorAll('.pre-check')).every(c => c.checked)) {
-            document.getElementById('calc-section').style.display = 'block';
-            window.scrollTo({top: document.getElementById('calc-section').offsetTop, behavior: 'smooth'});
-        } else { alert("Complete los pasos de Permisos."); }
-    }
-
-    function checkAutoFill() {
-        const val = document.getElementById('equipo').value.toUpperCase();
-        for(let key in DATA_NOC) if(val.includes(key)) document.getElementById('tiempo').value = DATA_NOC[key];
-    }
-
-    function procesar() {
-        const v = parseFloat(document.getElementById('volt').value);
-        const t = parseFloat(document.getElementById('tiempo').value);
-        const d = parseFloat(document.getElementById('dist').value);
-        const kva = parseFloat(document.getElementById('kva').value);
-        const cf = parseFloat(document.getElementById('config').value);
-        const eq = document.getElementById('equipo').value.toUpperCase();
-
-        if (!t || (!kva && !DATA_NOC[eq])) { alert("Faltan datos técnicos."); return; }
-
-        // MÁXIMA PRECISIÓN MATEMÁTICA: IEEE 1584 Simplificada con Factor de Caja
-        let ik = (DATA_NOC[eq]) ? (eq.includes("PLAYA") ? 8.0 : 5.0) : (kva / (Math.sqrt(3) * (v/1000))) / (0.05) / 1000;
-        
-        // Energía Incidente (E)
-        ei = 46.2 * ik * t * Math.pow(480/v, 0.5) * Math.pow(45/d, 1.5) * cf;
-        
-        // Cálculo Real de la Frontera de Protección (AFB)
-        afb = Math.pow((46.2 * ik * t * Math.pow(480/v, 0.5) * cf) / 1.2, 1/1.5) * 45;
-        
-        cat = (ei <= 1.2) ? "1" : (ei <= 8) ? "2" : (ei <= 25) ? "3" : "4";
-
-        if (parseInt(cat) >= 3) {
-            document.getElementById('swa-cat').innerText = cat;
-            document.getElementById('swa-overlay').style.display = "block";
-        } else {
-            document.getElementById('vit-section').style.display = 'block';
-            window.scrollTo({top: document.getElementById('vit-section').offsetTop, behavior: 'smooth'});
-        }
-    }
-
-    function validarVit() {
-        if (Array.from(document.querySelectorAll('.vit-check')).every(c => c.checked)) {
-            document.getElementById('etiqueta-final').style.display = "block";
-            document.getElementById('etq-tag').innerText = document.getElementById('equipo').value.toUpperCase();
-            document.getElementById('etq-ei').innerText = ei.toFixed(2) + " cal/cm²";
-            document.getElementById('etq-afb').innerText = (afb/100).toFixed(2) + " m";
-            document.getElementById('etq-cat').innerText = "CAT " + cat;
-            
-            document.getElementById('epp-list').innerText = (cat === "1") ? 
-                "Mameluco FR (4 cal), Casco Clase E, Lentes, Tapones auditivos y Guantes de cuero." :
-                "Mameluco FR (8 cal), Careta con Balaclava (8 cal), Guantes Dieléctricos con protectores y calzado dieléctrico.";
-            
-            window.scrollTo({top: document.getElementById('etiqueta-final').offsetTop, behavior: 'smooth'});
-        } else { alert("Debe verificar la VIT y herramientas."); }
-    }
-
-    function enviar() {
-        const body = `INFORME RIESGO ELÉCTRICO%0AEquipo: ${document.getElementById('equipo').value}%0AEnergía: ${ei.toFixed(2)} cal/cm²%0ACategoría: ${cat}%0AFrontera (AFB): ${(afb/100).toFixed(2)}m%0A✓ VIT OK`;
-        window.location.href = `mailto:mantenimientotrapialelectrico@chevron.com?subject=ART Eléctrico&body=${body}`;
-    }
-</script>
-</body>
-</html>
+    const DATA_NOC = { "PLAYA N1": 0.15, "AUX CA-CC": 0.15, "SHELTER": 0.10, "CARG BAT": 0.10,
