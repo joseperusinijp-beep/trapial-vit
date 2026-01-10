@@ -3,41 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Análisis de Riesgo para Trabajo Eléctrico</title>
-    <link rel="manifest" href="./manifest.json">
+    <title>Análisis de Riesgo Eléctrico</title>
     <style>
-        :root { 
-            --brand-prim: #005daa; --brand-sec: #ed1c24; --bg: #eef2f3; --fg: #333; 
-            --card: #fff; --ok: #1f8c3a; --warn: #f5a623; --stop: #d0021b; 
-        }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--fg); margin: 0; padding: 10px; }
-        .card { background: var(--card); max-width: 800px; margin: auto; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; padding-bottom: 20px; }
-        .header { background: var(--brand-prim); color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2em; text-transform: uppercase; }
-        
-        /* Banners */
-        .safety-banner { background: #fff3cd; border: 2px solid #ffeeba; padding: 15px; margin: 15px; border-radius: 8px; color: #856404; font-size: 0.9em; }
-        .pre-requisitos { background: #e8f4fd; border: 2px solid #b8daff; padding: 15px; margin: 15px; border-radius: 8px; color: #004085; }
-        
+        :root { --brand-prim: #005daa; --bg: #eef2f3; --card: #fff; --ok: #1f8c3a; --warn: #f5a623; --stop: #d0021b; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .card { background: var(--card); max-width: 600px; margin: auto; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; padding-bottom: 20px; }
+        .header { background: var(--brand-prim); color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: uppercase; }
+        .safety-banner { background: #fff3cd; border: 1px solid #ffeeba; padding: 12px; margin: 15px; border-radius: 8px; font-size: 0.85em; color: #856404; }
+        .pre-requisitos { background: #e8f4fd; border: 1px solid #b8daff; padding: 15px; margin: 15px; border-radius: 8px; }
         .section { padding: 20px; border-bottom: 1px solid #eee; }
         label { font-weight: bold; display: block; margin-top: 10px; font-size: 0.9em; }
         input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1em; text-transform: uppercase; }
-        .btn-calc { background: var(--brand-prim); color: white; }
-        
-        .check-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; font-size: 0.9em; }
-        .check-group input { width: 24px; height: 24px; flex-shrink: 0; cursor: pointer; }
-
-        /* Ocultar secciones inicialmente */
-        #calc-section, #swc-section, #etiqueta-final { display: none; }
-
-        /* Etiqueta Arc Flash */
-        .etiqueta-estudio { border: 5px solid #000; margin: 20px; background: white; color: black; }
-        .etq-header { background: #FFCC00; padding: 10px; text-align: center; font-size: 1.8em; font-weight: 900; border-bottom: 5px solid #000; }
-        .etq-body { display: grid; grid-template-columns: 1fr 1.5fr; gap: 10px; padding: 15px; }
-        .etq-cat-box { font-size: 2.2em; font-weight: 900; color: #d0021b; text-align: center; border: 2px solid #000; padding: 5px; }
-
-        /* Overlay SWA */
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .check-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.9em; }
+        .check-group input { width: 22px; height: 22px; margin: 0; }
+        #calc-section, #etiqueta-final { display: none; }
+        .etiqueta-estudio { border: 5px solid #000; margin: 15px; background: white; color: black; }
+        .etq-header { background: #FFCC00; padding: 10px; text-align: center; font-size: 1.5em; font-weight: 900; border-bottom: 5px solid #000; }
+        .etq-body { padding: 15px; line-height: 1.4; }
+        .epp-box { background: #f0f0f0; padding: 10px; border: 1px dashed #666; margin-top: 10px; font-size: 0.9em; }
         #swa-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; color: white; text-align: center; padding: 40px 20px; }
     </style>
 </head>
@@ -47,87 +31,59 @@
     <div class="header">Análisis de Riesgo para Trabajo Eléctrico</div>
     
     <div class="safety-banner">
-        <strong>⚠️ IMPORTANTE:</strong> Este análisis es exclusivo para <b>INSPECCIONES O MEDICIONES</b>. 
-        Para mantenimientos, aplique las <b>REGLAS DE ORO</b> y asegure la <b>AISLACIÓN TOTAL</b>.
+        <strong>⚠️ IMPORTANTE:</strong> Solo para <b>INSPECCIÓN/MEDICIÓN</b>. Para mantenimiento aplique <b>REGLAS DE ORO</b> y <b>AISLACIÓN TOTAL</b>.
     </div>
 
     <div class="pre-requisitos">
-        <h4 style="margin: 0 0 12px 0; text-align: center; text-decoration: underline;">GESTIÓN DE PERMISOS</h4>
-        <div class="check-group"><input type="checkbox" class="pre-check"> <span>Permiso de Trabajo (PT) confeccionado.</span></div>
-        <div class="check-group"><input type="checkbox" class="pre-check"> <span>JSA de la tarea leído y firmado por el equipo.</span></div>
-        <div class="check-group"><input type="checkbox" class="pre-check"> <span>Aviso realizado al dueño de la instalación.</span></div>
+        <div class="check-group"><input type="checkbox" class="pre-check"> <span>Permiso de Trabajo / JSA confeccionado.</span></div>
+        <div class="check-group"><input type="checkbox" class="pre-check"> <span>Aviso a dueño de instalación realizado.</span></div>
         <div class="check-group"><input type="checkbox" class="pre-check"> <span>VIT de Trabajo Eléctrico completada.</span></div>
-        <button class="btn" style="background: #004085; color: white;" onclick="validarIngreso()">CONTINUAR AL ANÁLISIS TÉCNICO</button>
+        <button class="btn" style="background: #004085; color: white;" onclick="validarIngreso()">CONTINUAR AL CÁLCULO</button>
     </div>
 
     <div id="calc-section" class="section">
-        <h3 style="color: var(--brand-prim); margin-top: 0;">DATOS DEL EQUIPO</h3>
-        <label>Tag / Nombre del Equipo:</label>
+        <label>Equipo (Tag):</label>
         <input type="text" id="equipo" placeholder="Ej: TAB SECC PLAYA N1" oninput="checkAutoFill()">
-        
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div><label>Tensión (V):</label><input type="number" id="volt" value="380"></div>
             <div><label>Distancia (cm):</label><input type="number" id="dist" value="61"></div>
         </div>
-        
-        <label>Potencia Tx (kVA):</label>
-        <input type="number" id="kva" placeholder="Ingrese kVA si no es SET NOC">
-        <label>Impedancia Tx (%Z):</label>
-        <input type="number" id="zpct" value="5">
-        <label>Tiempo de Despeje (seg):</label>
-        <input type="number" id="tiempo" step="0.01" placeholder="Ej: 0.15">
-        
-        <button class="btn btn-calc" onclick="calcularIngenieria()">EVALUAR ENERGÍA INCIDENTE</button>
-    </div>
-
-    <div id="swc-section" class="section">
-        <h3 style="color: var(--brand-prim); text-align: center;">🛡️ CONTROLES CRÍTICOS (SWC)</h3>
-        <div class="check-group"><input type="checkbox" class="swc-check"> <span><b>AISLAMIENTO:</b> Ausencia de tensión y bloqueo (LOTO) confirmado.</span></div>
-        <div class="check-group"><input type="checkbox" class="swc-check"> <span><b>EPP ARCO:</b> Ropa FR, guantes y careta inspeccionados.</span></div>
-        <div class="check-group"><input type="checkbox" class="swc-check"> <span><b>REGLAS DE ORO:</b> Aplicadas en su totalidad para la intervención.</span></div>
-        <button class="btn" style="background: var(--ok); color: white;" onclick="mostrarEtiqueta()">VALIDAR Y GENERAR ETIQUETA</button>
+        <label>Potencia Tx (kVA):</label><input type="number" id="kva" placeholder="kVA">
+        <label>Impedancia Tx (%Z):</label><input type="number" id="zpct" value="5">
+        <label>Tiempo Despeje (s):</label><input type="number" id="tiempo" step="0.01">
+        <button class="btn" style="background: var(--brand-prim); color: white;" onclick="procesar()">CALCULAR EPP</button>
     </div>
 
     <div id="etiqueta-final" class="etiqueta-estudio">
         <div class="etq-header">⚠️ WARNING / ADVERTENCIA</div>
         <div class="etq-body">
-            <div style="font-weight: bold; font-size: 0.85em; border-right: 3px solid #000; padding-right: 10px;">
-                <p>Peligro de Arco Eléctrico y Descarga</p>
-                <hr>
-                <p>Frontera de Arco (AFB):<br><span style="font-size: 1.2em;">1.10 Metros</span></p>
-            </div>
-            <div>
-                <div id="etq-ei" style="font-size: 1.5em; font-weight: 900;"></div>
-                <div id="etq-cat" class="etq-cat-box"></div>
-                <div id="etq-tag" style="margin-top:10px; font-weight: bold; font-size: 0.8em; text-transform: uppercase;"></div>
-            </div>
+            <b>EQUIPO:</b> <span id="etq-tag"></span><br>
+            <b>ENERGÍA INCIDENTE:</b> <span id="etq-ei" style="font-weight:900;"></span><br>
+            <b>CATEGORÍA DE EPP:</b> <span id="etq-cat" style="color:red; font-weight:900; font-size:1.2em;"></span>
+            <div id="epp-list" class="epp-box"></div>
         </div>
-        <button class="btn" style="background: #333; color: white; border-radius: 0; margin: 0;" onclick="enviarEmail()">📧 ENVIAR A MANTENIMIENTO</button>
+        <button class="btn" style="background: #444; color: white; border-radius: 0; margin: 0;" onclick="enviar()">📧 ENVIAR A MANTENIMIENTO</button>
     </div>
 </div>
 
 <div id="swa-overlay">
-    <div style="border: 8px solid var(--stop); padding: 30px; border-radius: 25px; max-width: 500px; margin: 80px auto; background: #000;">
+    <div style="border: 8px solid var(--stop); padding: 30px; border-radius: 20px; margin-top: 100px;">
         <h1 style="font-size: 4em; color: var(--stop); margin: 0;">🛑 SWA</h1>
-        <h2 style="color: white;">STOP WORK AUTHORITY</h2>
-        <p style="font-size: 1.5em; color: white;">CATEGORÍA <span id="swa-cat"></span>: PELIGRO</p>
-        <p style="color: #ccc;">Energía incidente superior a límites permitidos. Detenga la tarea e informe al supervisor.</p>
-        <button class="btn" style="background: white; color: black;" onclick="location.reload()">VOLVER</button>
+        <h2>STOP WORK AUTHORITY</h2>
+        <p style="font-size: 1.5em;">CATEGORÍA <span id="swa-cat"></span></p>
+        <p>TRABAJO PROHIBIDO. Requiere desenergización inmediata.</p>
+        <button class="btn" style="background: white;" onclick="location.reload()">VOLVER</button>
     </div>
 </div>
 
 <script>
     const DATA_NOC = { "PLAYA N1": 0.15, "AUX CA-CC": 0.15, "SHELTER": 0.10, "CARG BAT": 0.10, "REFRIG": 0.10, "UPS": 0.10 };
-    let globalEI = 0; let globalCAT = "";
+    let ei = 0; let cat = "";
 
     function validarIngreso() {
-        const checks = document.querySelectorAll('.pre-check');
-        if (Array.from(checks).every(c => c.checked)) {
+        if (Array.from(document.querySelectorAll('.pre-check')).every(c => c.checked)) {
             document.getElementById('calc-section').style.display = 'block';
-            document.getElementById('calc-section').scrollIntoView({ behavior: 'smooth' });
-        } else {
-            alert("⚠️ No puede proceder sin confirmar todos los pre-requisitos de seguridad y permisos.");
-        }
+        } else { alert("Debe tildar todos los pre-requisitos."); }
     }
 
     function checkAutoFill() {
@@ -135,53 +91,40 @@
         for(let key in DATA_NOC) if(val.includes(key)) document.getElementById('tiempo').value = DATA_NOC[key];
     }
 
-    function calcularIngenieria() {
+    function procesar() {
         const v = parseFloat(document.getElementById('volt').value);
         const t = parseFloat(document.getElementById('tiempo').value);
-        const d = parseFloat(document.getElementById('dist').value);
         const kva = parseFloat(document.getElementById('kva').value);
-        const z = parseFloat(document.getElementById('zpct').value);
         const eq = document.getElementById('equipo').value.toUpperCase();
+        let ik = 0;
 
-        if (!t) { alert("Ingrese el tiempo de despeje."); return; }
-
-        let ik;
         const match = Object.keys(DATA_NOC).find(k => eq.includes(k));
-        if (match) {
-            ik = (match.includes("PLAYA")) ? 8.0 : (match.includes("AUX")) ? 6.0 : 5.0;
-        } else {
-            if (!kva) { alert("Complete datos del Transformador."); return; }
-            ik = (kva / (Math.sqrt(3) * (v/1000))) / (z/100) / 1000;
-        }
+        if (match) { ik = (match.includes("PLAYA")) ? 8.0 : (match.includes("AUX")) ? 6.0 : 5.0; }
+        else { ik = (kva / (Math.sqrt(3) * (v/1000))) / (5/100) / 1000; }
 
-        globalEI = 46.2 * ik * t * Math.pow(480/v, 0.5) * Math.pow(45/d, 1.5);
-        globalCAT = (globalEI <= 1.2) ? "1" : (globalEI <= 8) ? "2" : (globalEI <= 25) ? "3" : "4";
+        ei = 46.2 * ik * t * Math.pow(480/v, 0.5) * Math.pow(45/61, 1.5);
+        cat = (ei <= 1.2) ? "1" : (ei <= 8) ? "2" : (ei <= 25) ? "3" : "4";
 
-        if (parseInt(globalCAT) >= 3) {
-            document.getElementById('swa-cat').innerText = globalCAT;
+        if (parseInt(cat) >= 3) {
+            document.getElementById('swa-cat').innerText = cat;
             document.getElementById('swa-overlay').style.display = "block";
         } else {
-            document.getElementById('swc-section').style.display = "block";
-            document.getElementById('swc-section').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('etiqueta-final').style.display = "block";
+            document.getElementById('etq-tag').innerText = eq;
+            document.getElementById('etq-ei').innerText = ei.toFixed(2) + " cal/cm²";
+            document.getElementById('etq-cat').innerText = "CAT " + cat;
+            
+            const eppInfo = (cat === "1") ? 
+                "EPP CAT 1: Ropa de algodón FR (≥4 cal), casco, anteojos, guantes de cuero y protección auditiva." :
+                "EPP CAT 2: Ropa de algodón FR (≥8 cal), careta de protección de arco, capucha FR, guantes dieléctricos y de cuero.";
+            document.getElementById('epp-list').innerText = eppInfo;
+            window.scrollTo(0, document.body.scrollHeight);
         }
     }
 
-    function mostrarEtiqueta() {
-        const checks = document.querySelectorAll('.swc-check');
-        if (!Array.from(checks).every(c => c.checked)) { alert("⚠️ Confirme los controles críticos."); return; }
-        
-        document.getElementById('etiqueta-final').style.display = "block";
-        document.getElementById('etq-ei').innerText = globalEI.toFixed(2) + " cal/cm²";
-        document.getElementById('etq-cat').innerText = "CAT " + globalCAT;
-        document.getElementById('etq-tag').innerText = "EQUIPO: " + document.getElementById('equipo').value;
-        document.getElementById('etiqueta-final').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function enviarEmail() {
-        const mail = "mantenimientotrapialelectrico@chevron.com";
-        const eq = document.getElementById('equipo').value;
-        const body = `ANÁLISIS DE RIESGO ELÉCTRICO - TRAPIAL%0A%0AEquipo: ${eq}%0AEnergía: ${globalEI.toFixed(2)} cal/cm²%0ACategoría: ${globalCAT}%0APermisos y VIT: Verificados OK`;
-        window.location.href = `mailto:${mail}?subject=Análisis ART - ${eq}&body=${body}`;
+    function enviar() {
+        const body = `ANÁLISIS RIESGO ELÉCTRICO%0AEquipo: ${document.getElementById('equipo').value}%0AEnergía: ${ei.toFixed(2)} cal/cm²%0ACategoría: ${cat}`;
+        window.location.href = `mailto:mantenimientotrapialelectrico@chevron.com?subject=ART Eléctrico&body=${body}`;
     }
 </script>
 </body>
