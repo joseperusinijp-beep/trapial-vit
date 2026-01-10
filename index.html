@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Evaluación de Riesgos para Trabajo Eléctrico</title>
+    <title>Evaluación de Riesgos Eléctricos</title>
     <style>
-        :root { --brand: #005daa; --bg: #f0f2f5; --card: #fff; --ok: #1f8c3a; --stop: #d0021b; --warn: #ffcc00; }
+        :root { --brand: #005daa; --bg: #f4f7f6; --card: #fff; --ok: #1f8c3a; --stop: #d0021b; --warn: #ffcc00; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
         .card { background: var(--card); max-width: 600px; margin: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); overflow: hidden; }
         .header { background: var(--brand); color: white; padding: 20px; text-align: center; font-weight: bold; text-transform: uppercase; border-bottom: 5px solid #004580; }
@@ -14,8 +14,7 @@
         h3 { margin-top: 0; color: var(--brand); font-size: 1.1em; }
         label { font-weight: bold; display: block; margin-top: 15px; font-size: 0.9em; }
         input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
         .gold-rule { background: #fff; border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
         .gold-rule input { width: 22px; height: 22px; flex-shrink: 0; }
         #workflow-intervencion, #workflow-inspeccion, #form-calculo, #resultado-final { display: none; }
@@ -31,8 +30,7 @@
  
     <div class="section">
         <div class="scope-box">
-            <strong>ALCANCE:</strong> Aplicable para mantenimiento o inspección con apertura de tableros. 
-            <br><i>Nota: Si la tarea requiere recambio de componentes, debe desenergizar.</i>
+            <strong>ALCANCE:</strong> Aplicable para tareas de mantenimiento o inspección en tableros eléctricos.
         </div>
         
         <h3>1. Tipo de Tarea:</h3>
@@ -42,64 +40,56 @@
  
     <div id="workflow-intervencion" class="section">
         <h3 style="color: var(--stop);">⚠️ AISLAR INSTALACIÓN Y APLICAR REGLAS DE ORO</h3>
-        <p style="font-size: 0.9em;">Marque el cumplimiento para proceder:</p>
+        <p style="font-size: 0.9em;">Cumpla los 5 pasos para intervenir físicamente:</p>
         <div class="gold-rule"><input type="checkbox" class="gold-chk"> 1. Corte efectivo de fuentes.</div>
-        <div class="gold-rule"><input type="checkbox" class="gold-chk"> 2. Enclavamiento / Bloqueo (LOTO).</div>
-        <div class="gold-rule"><input type="checkbox" class="gold-chk"> 3. Verificación ausencia de tensión.</div>
+        <div class="gold-rule"><input type="checkbox" class="gold-chk"> 2. Bloqueo y Etiquetado (LOTO).</div>
+        <div class="gold-rule"><input type="checkbox" class="gold-chk"> 3. Verificar ausencia de tensión.</div>
         <div class="gold-rule"><input type="checkbox" class="gold-chk"> 4. Puesta a tierra y cortocircuito.</div>
-        <div class="gold-rule"><input type="checkbox" class="gold-chk"> 5. Señalización zona de trabajo.</div>
-        <button class="btn" style="background: var(--ok); color: white;" onclick="validarLOTO()">Confirmar Bloqueo</button>
+        <div class="gold-rule"><input type="checkbox" class="gold-chk"> 5. Señalización y delimitación.</div>
+        <button class="btn" style="background: var(--ok); color: white;" onclick="validarLOTO()">Confirmar Seguridad</button>
     </div>
  
     <div id="workflow-inspeccion" class="section">
-        <h3>2. Lugar de la Medición:</h3>
+        <h3>2. Punto de Trabajo:</h3>
         <button class="btn" style="background: #fff; border: 2px solid var(--brand); color: var(--brand);" onclick="setZona('cabecera')">Entre Trafo y Barras (Cabecera)</button>
-        <div class="info-small">E.I. depende de Potencia Tx, %Z y Distancia.</div>
-        
-        <button class="btn" style="background: #fff; border: 2px solid var(--brand); color: var(--brand);" onclick="setZona('circuito')">Aguas Abajo de Protecciones</button>
-        <div class="info-small">E.I. depende de la actuación del fusible/térmica local.</div>
+        <button class="btn" style="background: #fff; border: 2px solid var(--brand); color: var(--brand);" onclick="setZona('circuito')">Aguas abajo de Protección (Circuito)</button>
     </div>
  
-    <div id="form-calculo" class="section" style="background: #fcfcfc;">
-        <h3 id="titulo-calculo">Datos Técnicos</h3>
+    <div id="form-calculo" class="section">
+        <h3 id="titulo-calculo">Parámetros de Entrada</h3>
         
-        <div id="campos-trafo">
-            <label>Potencia Transformador (kVA):</label>
-            <input type="number" id="kva" value="500">
-            <label>Impedancia Trafo (%Z):</label>
-            <input type="number" id="zpct" value="5" step="0.1">
-            <label>Distancia Trafo a Tablero (metros):</label>
-            <input type="number" id="distancia" value="10">
-            <div class="info-small">Considera resistencia de cables típicos.</div>
-        </div>
+        <label>Potencia del Transformador (kVA):</label>
+        <input type="number" id="kva" value="500">
+        
+        <label>Impedancia del Trafo (%Z):</label>
+        <input type="number" id="zpct" value="5" step="0.1">
+        
+        <label>Distancia Trafo a Tablero (metros):</label>
+        <input type="number" id="distancia" value="10">
  
-        <div id="campos-proteccion">
-            <label>Protección Actuante:</label>
-            <select id="tiempo_sel">
-                <option value="0.01">Fusible NH gG (Rápido - 10ms)</option>
-                <option value="0.05">Fusible NH gG (Medio - 50ms)</option>
-                <option value="0.1">Interruptor Automático (100ms)</option>
-                <option value="0.2">Interruptor (Lento - 200ms)</option>
-            </select>
-        </div>
+        <label>Protección que despeja la falla (Tiempo en seg):</label>
+        <select id="tiempo_sel">
+            <option value="0.01">Fusible NH gG Rápido (0.01s)</option>
+            <option value="0.08">Fusible NH gG Estándar (0.08s)</option>
+            <option value="0.1">Interruptor Automático (0.1s)</option>
+            <option value="0.2">Interruptor Retardado (0.2s)</option>
+        </select>
  
-        <button class="btn" style="background: var(--brand); color: white;" onclick="ejecutarCalculo()">Evaluar Riesgo de Arco</button>
+        <button class="btn" style="background: var(--brand); color: white;" onclick="ejecutarCalculo()">Calcular Riesgo</button>
     </div>
  
     <div id="resultado-final" class="etiqueta">
-        <div class="etq-header">RESULTADO DE SEGURIDAD</div>
+        <div class="etq-header">ETIQUETA DE SEGURIDAD ELÉCTRICA</div>
         <div style="padding: 15px;">
-            <p>Energía Incidente Est.: <strong id="res-ei"></strong> cal/cm²</p>
+            <p>Energía Calculada: <strong id="res-ei"></strong> cal/cm²</p>
             <div id="res-cat" style="font-size: 1.8em; font-weight: 900; text-align: center; margin: 10px 0;"></div>
-            <div id="res-epp" style="background: #eee; padding: 10px; border-radius: 5px; font-size: 0.85em; border-left: 4px solid var(--brand);"></div>
+            <div id="res-epp" style="background: #f9f9f9; padding: 10px; border-radius: 5px; font-size: 0.85em; border-left: 5px solid var(--brand);"></div>
         </div>
-        <button class="btn" style="background: #333; color: white; border-radius: 0;" onclick="location.reload()">Reiniciar Evaluación</button>
+        <button class="btn" style="background: #333; color: white;" onclick="location.reload()">Nueva Evaluación</button>
     </div>
 </div>
  
 <script>
-    let zonaActual = '';
- 
     function setTarea(tipo) {
         document.getElementById('workflow-intervencion').style.display = tipo === 'intervencion' ? 'block' : 'none';
         document.getElementById('workflow-inspeccion').style.display = tipo === 'inspeccion' ? 'block' : 'none';
@@ -108,59 +98,53 @@
     }
  
     function setZona(zona) {
-        zonaActual = zona;
         document.getElementById('form-calculo').style.display = 'block';
-        document.getElementById('campos-trafo').style.display = 'block';
-        document.getElementById('titulo-calculo').innerText = zona === 'cabecera' ? 'Datos de Cabecera' : 'Datos de Circuito';
-        
-        // Si es circuito, la protección es lo principal. Si es cabecera, manda el trafo.
-        document.getElementById('campos-proteccion').style.display = 'block'; 
+        document.getElementById('titulo-calculo').innerText = zona === 'cabecera' ? 'Datos de Cabecera (Trafo)' : 'Datos de Circuito';
         window.scrollTo(0, document.body.scrollHeight);
     }
  
     function validarLOTO() {
         const checks = document.querySelectorAll('.gold-chk');
         if (Array.from(checks).every(c => c.checked)) {
-            alert("✅ REGLAS DE ORO CUMPLIDAS. Puede proceder con la intervención física bloqueada.");
+            alert("Instalación segura para intervención física.");
         } else {
-            alert("❌ ¡ALTO! Debe marcar el cumplimiento de las 5 Reglas de Oro.");
+            alert("Atención: Debe cumplir las 5 Reglas de Oro.");
         }
     }
  
     function ejecutarCalculo() {
         const kva = parseFloat(document.getElementById('kva').value);
         const z = parseFloat(document.getElementById('zpct').value) / 100;
-        const d = parseFloat(document.getElementById('distancia').value);
+        const dist = parseFloat(document.getElementById('distancia').value);
         const t = parseFloat(document.getElementById('tiempo_sel').value);
         const v = 380;
  
-        // 1. Corriente en bornes del Trafo
-        let ik_trafo = (kva / (1.732 * (v/1000))) / z;
+        // Isc inicial en el trafo
+        let isc_trafo = (kva / (1.732 * (v/1000))) / z;
+        
+        // Impedancia de línea aproximada (Atenuación por distancia)
+        // R de cable promedio + reactancia
+        let z_cable = (0.018 * dist) / 100; 
+        let isc_final = isc_trafo / (1 + (isc_trafo * z_cable / v));
+        let ik_ka = isc_final / 1000;
  
-        // 2. Efecto de la distancia (Impedancia de cables est.)
-        // Agregamos una impedancia de cable de aprox 0.02 ohms/100m para el cálculo
-        let r_cable = (0.015 * d) / 100; 
-        let ik_real = ik_trafo / (1 + (ik_trafo * r_cable / v));
-        let ik_ka = ik_real / 1000;
- 
-        // 3. Energía Incidente (IEEE 1584 simplificado d=61cm)
+        // Energía Incidente (IEEE 1584 simplificada)
         let ei = 46.2 * ik_ka * t * 1.473 * Math.pow(45/61, 1.5);
         
-        // Mostrar Resultados
         document.getElementById('resultado-final').style.display = 'block';
         document.getElementById('res-ei').innerText = ei.toFixed(2);
         
         let cat = ""; let epp = ""; let color = "";
  
         if (ei <= 1.2) {
-            cat = "CATEGORÍA 1"; color = var(--ok);
-            epp = "Mameluco FR (4 cal), casco, gafas, guantes de cuero.";
+            cat = "CATEGORÍA 1"; color = "#1f8c3a";
+            epp = "Mameluco FR, casco, gafas y guantes de cuero.";
         } else if (ei <= 8) {
             cat = "CATEGORÍA 2"; color = "#e67e22";
-            epp = "Mameluco FR (8 cal), careta arc flash con balaclava, guantes dieléctricos con protector.";
+            epp = "Mameluco FR (8 cal), careta arc flash con balaclava y guantes dieléctricos.";
         } else {
-            cat = "PELIGRO: SWA"; color = var(--stop);
-            epp = "ENERGÍA EXTREMA. No trabajar con tensión. Desenergice el equipo.";
+            cat = "RIESGO: SWA"; color = "#d0021b";
+            epp = "Energía excesiva. PROHIBIDO trabajar con tensión.";
         }
  
         const catDiv = document.getElementById('res-cat');
@@ -173,4 +157,5 @@
 </body>
 </html>
  
+
 
