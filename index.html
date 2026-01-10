@@ -2,163 +2,159 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Calculador Profesional Arc Flash - Chevron Trapial</title>
+    <title>Seguridad en Mediciones - Chevron Trapial</title>
     <style>
-        :root { --primary: #005aa2; --danger: #cc0000; --warning: #ffcc00; --success: #2e7d32; }
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f3; padding: 20px; }
-        .container { background: white; max-width: 700px; margin: auto; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 10px solid var(--primary); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        label { font-weight: bold; font-size: 0.85rem; display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; background: #fff; }
-        .auto-info { font-size: 0.75rem; color: #666; font-style: italic; }
-        button { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 20px; transition: 0.3s; }
+        :root { --primary: #005aa2; --danger: #cc0000; --warning: #ffcc00; --success: #2e7d32; --dark: #1a1a1a; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; line-height: 1.5; }
+        .container { background: white; max-width: 850px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-top: 10px solid var(--primary); }
+        .guia-planos { background: #e7f3ff; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 20px; font-size: 0.9rem; }
+        .section { background: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .section-h { font-weight: bold; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #ddd; font-size: 0.9rem; text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        label { font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
+        button { width: 100%; padding: 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 10px; transition: 0.3s; }
         .btn-calc { background: var(--primary); color: white; }
-        .btn-email { background: #ed7d31; color: white; display: none; }
-        #result-display { margin-top: 25px; padding: 20px; border-radius: 10px; display: none; text-align: center; }
-        .energy-num { font-size: 3rem; font-weight: bold; margin: 10px 0; }
-        .alert-box { background: white; color: #333; padding: 15px; border-radius: 8px; text-align: left; margin-top: 15px; border-left: 6px solid #333; }
+        .btn-email { background: #ed7d31; color: white; display: none; margin-top: 15px; }
+        #result-display { margin-top: 30px; padding: 25px; border-radius: 12px; display: none; text-align: center; }
+        .energy-val { font-size: 3.5rem; font-weight: bold; line-height: 1; margin: 10px 0; }
+        .epp-box { text-align: left; background: white; padding: 20px; border-radius: 8px; margin-top: 15px; font-size: 0.95rem; border: 1px solid #ddd; color: #333; }
     </style>
 </head>
 <body>
  
 <div class="container">
-    <h1 style="text-align:center; color:var(--primary);">Seguridad Eléctrica Chevron</h1>
+    <h2 style="text-align:center; color:var(--primary); margin-top:0;">Protocolo de Medición Energizada (Puerta Abierta)</h2>
     
-    <div class="grid">
-        <div class="input-group">
-            <label>Tipo de Protección (Normativa)</label>
-            <select id="dispositivo" onchange="cargarTiempoDefault()">
-                <option value="manual">-- Selección Manual --</option>
-                <option value="fuse_gg">Fusible gG/gL (Ej: Siemens 3NA)</option>
-                <option value="breaker_inst">Interruptor Termomagnético (Disparo Inst.)</option>
-                <option value="mccb">Caja Moldeada (MCCB - Estándar)</option>
-                <option value="rcd">Diferencial (RCD/GFCI)</option>
-                <option value="fuse_fast">Fusible Ultra Rápido (Clase aR/gR)</option>
-            </select>
-        </div>
-        <div class="input-group">
-            <label>Corriente de Cortocircuito (kA)</label>
-            <input type="number" id="ka" placeholder="Ibf en kA (Ej: 15)">
-        </div>
-        <div class="input-group">
-            <label>Tiempo de Actuación (seg)</label>
-            <input type="number" id="time" placeholder="Ej: 0.1" step="0.001">
-            <span class="auto-info" id="info-t">Puede editar el tiempo manualmente</span>
-        </div>
-        <div class="input-group">
-            <label>Voltaje del Sistema (V)</label>
-            <input type="number" id="volts" value="400">
+    <div class="guia-planos">
+        <strong>Manual de Datos para el Operador:</strong><br>
+        1. <strong>Tag Tablero:</strong> Identificación del equipo según plano.<br>
+        2. <strong>I. Corto (kA):</strong> Valor "Icc" o "Isc" de la barra principal.<br>
+        3. <strong>Seguridad CAT:</strong> El multímetro DEBE ser CAT IV para tableros de potencia.
+    </div>
+ 
+    <div class="section">
+        <div class="section-h">1. Identificación y Seguridad de Instrumentos</div>
+        <div class="grid">
+            <div class="input-group">
+                <label>Tag / Nombre del Tablero</label>
+                <input type="text" id="tag_equipo" placeholder="Ej: TGD-01 / MCC-A">
+            </div>
+            <div class="input-group">
+                <label>Instrumento de Medición</label>
+                <select id="cat_multimetro">
+                    <option value="no">-- Seleccione Categoría --</option>
+                    <option value="no">CAT I / II / III (PROHIBIDO)</option>
+                    <option value="si">CAT IV (AUTORIZADO)</option>
+                </select>
+            </div>
         </div>
     </div>
  
-    <button class="btn-calc" onclick="calcular()">CALCULAR RIESGO NFPA 70E</button>
+    <div class="section">
+        <div class="section-h">2. Datos de Barra y Conductor</div>
+        <div class="grid">
+            <div class="input-group">
+                <label>I. Cortocircuito Barra (kA)</label>
+                <input type="number" id="ka_barra" placeholder="Ej: 25">
+            </div>
+            <div class="input-group">
+                <label>Longitud del Cable (m)</label>
+                <input type="number" id="cable_l" value="1" step="0.1">
+            </div>
+            <div class="input-group">
+                <label>Cables por Fase</label>
+                <input type="number" id="cables_p" value="1" min="1">
+            </div>
+        </div>
+    </div>
+ 
+    <div class="section">
+        <div class="section-h">3. Protección Aguas Arriba</div>
+        <div class="grid">
+            <div class="input-group" style="grid-column: span 2;">
+                <label>Tipo de Dispositivo</label>
+                <select id="disp" onchange="document.getElementById('time').value = this.value">
+                    <option value="0.04">Fusible gG/gL (Rápido)</option>
+                    <option value="0.10">Interruptor Automático (Standard)</option>
+                    <option value="0.02">Interruptor (Instantáneo)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Tiempo t (seg)</label>
+                <input type="number" id="time" value="0.04" step="0.01">
+            </div>
+        </div>
+    </div>
+ 
+    <button class="btn-calc" onclick="ejecutarAnalisis()">EVALUAR RIESGO DE ARCO</button>
  
     <div id="result-display">
-        <div id="cat-label" style="font-size: 1.5rem; font-weight: bold;"></div>
-        <div class="energy-num" id="e-val"></div>
-        <div id="summary-data" style="margin-bottom:10px; font-weight:500;"></div>
-        <div class="alert-box" id="epp-text"></div>
-        <button class="btn-email" id="email-btn" onclick="enviarReporte()">📧 ENVIAR A MANTENIMIENTO CHEVRON</button>
+        <div id="cat-label" style="font-size: 1.6rem; font-weight: bold; text-transform: uppercase;"></div>
+        <div class="energy-val" id="e-val">0.00</div>
+        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">cal/cm²</div>
+        <div class="epp-box" id="epp-res"></div>
+        <button class="btn-email" id="email-btn" onclick="enviarReporte()">📧 ENVIAR REPORTE A MANTENIMIENTO</button>
     </div>
 </div>
  
 <script>
-    let reportData = {};
+    let resData = {};
  
-    function cargarTiempoDefault() {
-        const disp = document.getElementById('dispositivo').value;
-        const timeField = document.getElementById('time');
-        const info = document.getElementById('info-t');
-        
-        const tiempos = {
-            "manual": "",
-            "fuse_gg": 0.04,     // Tiempo promedio para falla franca
-            "breaker_inst": 0.02, // Disparo instantáneo típico
-            "mccb": 0.05,       // Caja moldeada estándar
-            "rcd": 0.03,        // Sensibilidad estándar industrial
-            "fuse_fast": 0.005  // Ultra rápido
-        };
+    function ejecutarAnalisis() {
+        const catInstr = document.getElementById('cat_multimetro').value;
+        const tag = document.getElementById('tag_equipo').value;
  
-        if(tiempos[disp] !== undefined) {
-            timeField.value = tiempos[disp];
-            info.innerText = "Tiempo sugerido por norma para " + disp;
+        if (catInstr === "no") {
+            alert("⚠️ BLOQUEO: Solo se permite CAT IV para mediciones en estos tableros.");
+            return;
         }
-    }
+        if (!tag) return alert("Ingrese el TAG del equipo para el reporte.");
  
-    function calcular() {
-        const I = parseFloat(document.getElementById('ka').value);
+        const I_bar = parseFloat(document.getElementById('ka_barra').value);
+        const L = parseFloat(document.getElementById('cable_l').value) || 0.1;
+        const N_p = parseInt(document.getElementById('cables_p').value);
         const T = parseFloat(document.getElementById('time').value);
-        const V = parseFloat(document.getElementById('volts').value);
-        const D = 455; 
  
-        if (!I || !T) return alert("Por favor, ingrese Corriente (kA) y Tiempo (seg).");
+        if (!I_bar) return alert("Ingrese la corriente de barra.");
  
-        let Ia = I * 0.72; // Reducción de corriente de arco IEEE
-        let energy = (0.123 * Ia * T * (Math.pow(610/D, 2)));
-        let boundary = Math.sqrt(2.142 * I * T);
+        // Cálculo de atenuación simplificado (50mm2 promedio)
+        const R_eq = (0.000153 * L) / N_p;
+        const Ibf_punto = I_bar / (1 + (I_bar * Math.sqrt(3) * R_eq / 400));
+        let Ia = Ibf_punto * 0.72; 
+        let energy = (0.123 * Ia * T * Math.pow(610/455, 2)) * 1.5;
+        let boundary = Math.sqrt(2.142 * Ibf_punto * T);
  
-        reportData = { energy, boundary, I, T, V, disp: document.getElementById('dispositivo').selectedOptions[0].text };
-        actualizarUI(energy, boundary);
-    }
- 
-    function actualizarUI(e, b) {
+        resData = { energy, boundary, ibf: Ibf_punto, t: T, tag: tag, cat: "" };
+        
         const res = document.getElementById('result-display');
-        const cat = document.getElementById('cat-label');
-        const eval = document.getElementById('e-val');
-        const epp = document.getElementById('epp-text');
-        const btn = document.getElementById('email-btn');
-        const sum = document.getElementById('summary-data');
- 
         res.style.display = 'block';
-        btn.style.display = 'block';
-        eval.innerText = e.toFixed(2) + " cal/cm²";
-        sum.innerText = `Frontera de Seguridad: ${b.toFixed(2)} m | Tiempo: ${reportData.T} seg`;
+        document.getElementById('email-btn').style.display = 'block';
+        document.getElementById('e-val').innerText = energy.toFixed(2);
  
-        if (e <= 1.2) {
-            setEstilo(cat, res, "NIVEL 1 - AUTORIZADO", "#2e7d32", "EPP: Camisa/Pantalón FR (4 cal), careta, guantes de cuero.");
-            reportData.cat = "1";
-        } else if (e <= 8) {
-            setEstilo(cat, res, "NIVEL 2 - PRECAUCIÓN", "#ffcc00", "EPP: Ropa FR Nivel 2 (8 cal), careta completa + barbilla, guantes dieléctricos.");
-            reportData.cat = "2";
-            res.style.color = "#000";
+        if (energy <= 8) {
+            resData.cat = energy <= 1.2 ? "1" : "2";
+            res.style.backgroundColor = energy <= 1.2 ? "#2e7d32" : "#ffcc00";
+            res.style.color = energy <= 1.2 ? "#fff" : "#000";
+            document.getElementById('cat-label').innerText = "AUTORIZADO - NIVEL " + resData.cat;
+            document.getElementById('epp-res').innerHTML = `<b>TAG: ${tag}</b><br><b>Frontera: ${boundary.toFixed(2)}m</b><br><br>EPP: Ropa FR (${energy <= 1.2 ? '4' : '8'} cal), guantes dieléctricos con cuero, careta con barbilla. Instrumento CAT IV verificado.`;
         } else {
-            let n = e <= 25 ? "3" : "4";
-            setEstilo(cat, res, `NIVEL ${n} - ¡PROHIBIDO TRABAJAR ENERGIZADO!`, n === "3" ? "#ed7d31" : "#000", `PELIGRO: Energía de ${e.toFixed(1)} cal/cm². Requiere desenergizar y bloqueo LOTO.`);
-            reportData.cat = n;
+            resData.cat = energy <= 25 ? "3" : "4";
+            res.style.backgroundColor = "#000"; res.style.color = "#fff";
+            document.getElementById('cat-label').innerText = "🚫 PROHIBIDO";
+            document.getElementById('epp-res').innerHTML = `<b>TAG: ${tag}</b><br><b>PELIGRO:</b> Energía de ${energy.toFixed(1)} cal/cm². Tarea de medición a puerta abierta NO permitida. <b>DESENERGIZAR EQUIPO.</b>`;
         }
-    }
- 
-    function setEstilo(el, box, txt, color, eppTxt) {
-        el.innerText = txt;
-        box.style.backgroundColor = color;
-        box.style.color = (color === "#ffcc00") ? "#000" : "#fff";
-        document.getElementById('epp-text').innerHTML = "<b>Requerimiento Chevron / NFPA 70E:</b><br>" + eppTxt;
     }
  
     function enviarReporte() {
-        const mail = "mantenimientotrapialelectrico@chevron.com";
-        const subject = `REPORTE ETIQUETA ARC FLASH - CAT ${reportData.cat} - ${reportData.I}kA`;
-        const body = `REPORTE TÉCNICO ARC FLASH
---------------------------------------------------
-DISPOSITIVO: ${reportData.disp}
-TENSIÓN: ${reportData.V} V
-I. CORTO (Ibf): ${reportData.I} kA
-TIEMPO CALCULADO: ${reportData.T} seg
---------------------------------------------------
-ENERGÍA INCIDENTE: ${reportData.energy.toFixed(2)} cal/cm²
-CATEGORÍA NFPA 70E: ${reportData.cat}
-FRONTERA DE ARCO: ${reportData.boundary.toFixed(2)} metros
---------------------------------------------------
-ESTADO: ${reportData.cat > 2 ? 'NO AUTORIZADO - DESENERGIZAR' : 'AUTORIZADO CON EPP'}
---------------------------------------------------
-Generado para impresión de etiquetas de seguridad en campo.`;
- 
-        window.location.href = `mailto:${mail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const body = `REPORTE SEGURIDAD MEDICIÓN - TRAPIAL\nTAG EQUIPO: ${resData.tag}\n------------------\nENERGÍA: ${resData.energy.toFixed(2)} cal/cm²\nCAT: ${resData.cat}\nFRONTERA: ${resData.boundary.toFixed(2)}m\nINSTRUMENTO: CAT IV VERIFICADO\nESTADO: ${resData.cat > 2 ? 'PROHIBIDO' : 'AUTORIZADO'}`;
+        window.location.href = `mailto:mantenimientotrapialelectrico@chevron.com?subject=Arc Flash ${resData.tag} - Cat ${resData.cat}&body=${encodeURIComponent(body)}`;
     }
 </script>
- 
 </body>
 </html>
  
+ 
+
 
 
