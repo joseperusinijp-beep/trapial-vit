@@ -1,6 +1,6 @@
 
 // sw.js
-const CACHE_NAME = 'trapial-vit-v8'; // subir versión en cada despliegue
+const CACHE_NAME = 'trapial-vit-v9'; // subir versión en cada despliegue
 const ASSETS = ['./index.html','./manifest.json','./icons/icon-192.png','./icons/icon-512.png'];
 
 self.addEventListener('install',(e)=>{e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(ASSETS)))});
@@ -13,6 +13,7 @@ self.addEventListener('fetch',(e)=>{
   }
   e.respondWith(caches.match(req).then(c=>c||fetch(req).then(res=>{const copy=res.clone();caches.open(CACHE_NAME).then(c=>c.put(req,copy));return res})));
 });
+
 
 
 
