@@ -3,160 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluación de Riesgo para Trabajo Eléctrico</title>
+    <title>Calculador de Arco - Siemens 3NA1 200A</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #e67e22;
-            --danger: #c0392b;
-            --success: #27ae60;
-            --bg: #f4f7f6;
-        }
- 
+        :root { --primary: #005eb8; --accent: #e67e22; --danger: #c0392b; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); padding: 20px; display: flex; justify-content: center; }
         .container { background: white; max-width: 650px; width: 100%; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        
-        h1 { text-align: center; color: var(--primary); font-size: 1.6rem; border-bottom: 3px solid var(--accent); padding-bottom: 10px; }
-        .step { display: none; animation: fadeIn 0.4s; }
-        .active { display: block; }
- 
-        .btn-group { display: flex; flex-direction: column; gap: 15px; margin-top: 25px; }
-        button { padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.3s; }
-        
-        .btn-nav { background: var(--primary); color: white; }
-        .btn-nav:hover { background: #34495e; }
-        .btn-back { background: #bdc3c7; color: #333; margin-top: 20px; width: 100%; }
-        
-        .rules-card { background: #fffdf0; border-left: 5px solid #f1c40f; padding: 20px; margin-top: 15px; }
-        .rule-item { margin-bottom: 10px; font-weight: bold; color: #7f8c8d; }
-        .rule-item span { color: var(--primary); display: block; font-size: 1.1rem; }
- 
+        h1 { text-align: center; color: var(--primary); font-size: 1.5rem; border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .input-group { display: flex; flex-direction: column; }
         label { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
- 
-        #result-arc { margin-top: 20px; padding: 20px; background: #f9f9f9; border-radius: 10px; text-align: center; border: 2px solid #eee; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; background: var(--primary); color: white; }
+        #result-arc { margin-top: 20px; padding: 20px; background: #f9f9f9; border-radius: 10px; text-align: center; border: 2px solid #eee; display: none; }
         .energy-val { font-size: 2.2rem; font-weight: bold; color: var(--danger); }
         .badge { display: inline-block; padding: 8px 20px; border-radius: 20px; color: white; font-weight: bold; margin: 10px 0; }
- 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .info-text { font-size: 0.9rem; color: #666; margin-top: 10px; }
     </style>
 </head>
 <body>
  
 <div class="container">
-    <h1>Evaluación de Riesgo para Trabajo Eléctrico</h1>
- 
-    <div id="step1" class="step active">
-        <h3>Seleccione el tipo de actividad:</h3>
-        <div class="btn-group">
-            <button class="btn-nav" onclick="goToStep(2)">Medición, Pruebas o Inspección (Equipo Energizado)</button>
-            <button class="btn-nav" onclick="goToStep(3)">Mantenimiento o Reparación (Contacto Directo)</button>
+    <h1>Cálculo de Arco: Siemens 3NA1 (200A)</h1>
+    <div class="input-grid">
+        <div class="input-group">
+            <label>I Cortocircuito Bolted (kA)</label>
+            <input type="number" id="ka_bolted" placeholder="Ej: 20">
+        </div>
+        <div class="input-group">
+            <label>Distancia Trabajo (mm)</label>
+            <input type="number" id="dist" value="455">
         </div>
     </div>
- 
-    <div id="step2" class="step">
-        <h3>Cálculo de Energía Incidente (NFPA 70E)</h3>
-        <div class="input-grid">
-            <div class="input-group">
-                <label>I. Cortocircuito (kA)</label>
-                <input type="number" id="ka" placeholder="Ej: 15">
-            </div>
-            <div class="input-group">
-                <label>Tiempo Disparo (seg)</label>
-                <input type="number" id="time" placeholder="Ej: 0.1">
-            </div>
-            <div class="input-group">
-                <label>Distancia Trabajo (mm)</label>
-                <input type="number" id="dist" value="455">
-            </div>
-            <div class="input-group">
-                <label>Frontera Arco (m) - Opcional</label>
-                <input type="number" id="boundary" placeholder="Auto-calculado" readonly>
-            </div>
-        </div>
-        <button class="btn-nav" style="width: 100%; margin-top: 20px; background: var(--accent);" onclick="calculateArc()">Calcular Riesgo</button>
-        
-        <div id="result-arc" style="display:none;">
-            <div class="energy-val" id="energy-res">0.00 cal/cm²</div>
-            <div id="cat-badge" class="badge"></div>
-            <p id="boundary-res" style="font-weight:bold;"></p>
-        </div>
- 
-        <button class="btn-back" onclick="goToStep(1)">← Volver al inicio</button>
-    </div>
- 
-    <div id="step3" class="step">
-        <h3 style="color: var(--danger);">Protocolo de Mantenimiento Seguro</h3>
-        <p>Para trabajos de contacto, el cálculo de arco no aplica ya que se DEBE trabajar sin tensión.</p>
-        
-        <div class="rules-card">
-            <div class="rule-item">1. <span>Desconectar</span> Corte visible de todas las fuentes de tensión.</div>
-            <div class="rule-item">2. <span>Bloquear</span> Enclavamiento y señalización (LOTO).</div>
-            <div class="rule-item">3. <span>Verificar</span> Comprobar ausencia de tensión con equipo verificado.</div>
-            <div class="rule-item">4. <span>Aterrizar</span> Puesta a tierra y cortocircuito de fases.</div>
-            <div class="rule-item">5. <span>Señalizar</span> Delimitar la zona de trabajo segura.</div>
-        </div>
- 
-        <button class="btn-back" onclick="goToStep(1)">← Volver al inicio</button>
+    
+    <button onclick="calculateArc()">Calcular Energía de Incidente</button>
+    
+    <div id="result-arc">
+        <div class="info-text">Corriente de Arco Estimada: <span id="ia-val"></span> kA</div>
+        <div class="info-text">Tiempo de Despeje (Curva gL/gG): <span id="t-val"></span> seg</div>
+        <hr>
+        <div class="energy-val" id="energy-res">0.00 cal/cm²</div>
+        <div id="cat-badge" class="badge"></div>
+        <p id="boundary-res" style="font-weight:bold;"></p>
     </div>
 </div>
  
 <script>
-    function goToStep(stepNumber) {
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById('step' + stepNumber).classList.add('active');
-        // Limpiar resultados al volver
-        if(stepNumber === 1) document.getElementById('result-arc').style.display = 'none';
+    function getFuseTime(Ia_kA) {
+        const Amps = Ia_kA * 1000;
+        // Lógica basada en la curva característica del Siemens 3NA1 200A
+        if (Amps < 350) return 1000; // No dispara o muy lento
+        if (Amps < 500) return 100;
+        if (Amps < 800) return 5;
+        if (Amps < 1200) return 0.8;
+        if (Amps < 2000) return 0.15;
+        if (Amps < 3500) return 0.04;
+        return 0.01; // Cortocircuito franco (>3.5kA)
     }
  
     function calculateArc() {
-        const I = parseFloat(document.getElementById('ka').value);
-        const T = parseFloat(document.getElementById('time').value);
+        const Ibf = parseFloat(document.getElementById('ka_bolted').value);
         const D = parseFloat(document.getElementById('dist').value);
  
-        if (!I || !T || !D) {
-            alert("Ingrese los datos técnicos para el cálculo.");
-            return;
-        }
+        if (!Ibf || !D) return alert("Ingrese los datos necesarios.");
  
-        // Fórmula empírica simplificada IEEE 1584
-        // E = 4.184 * Cf * En * (t/0.2) * (610/D)^x
-        let energy = (524.8 * 0.000001 * I * T * (610 / D)) * 1.5;
+        // 1. Corriente de Arco (Ia) aproximada IEEE 1584 para <1kV en aire
+        // Ia = 10^(0.00402 + 0.983 * log10(Ibf))
+        let Ia = Math.pow(10, (0.00402 + 0.983 * Math.log10(Ibf)));
         
-        // Frontera de protección de arco (en metros)
-        let boundary = Math.sqrt(4.184 * I * T * 0.5) * 1.5;
+        // 2. Tiempo de despeje automático según curva del fusible
+        let T = getFuseTime(Ia);
  
-        displayArcResult(energy.toFixed(2), boundary.toFixed(2));
-    }
+        // 3. Energía Incidente (E) - Ecuación de Lee (Baja Tensión)
+        // E = 5.12 * 10^5 * V * Ibf * T / D^2 (Aprox simplificada cal/cm2)
+        // Para 500V (según tu fusible):
+        let energy = (0.123 * Ia * T * (610**2 / D**2));
  
-    function displayArcResult(energy, boundary) {
-        const resDiv = document.getElementById('result-arc');
-        const eText = document.getElementById('energy-res');
-        const badge = document.getElementById('cat-badge');
-        const bText = document.getElementById('boundary-res');
- 
-        resDiv.style.display = 'block';
-        eText.innerText = energy + " cal/cm²";
-        bText.innerText = "Frontera de Protección de Arco: " + boundary + " metros";
- 
-        let cat = "";
-        let color = "";
- 
-        if (energy <= 1.2) { cat = "Cat 0: EPP Básico"; color = "#95a5a6"; }
-        else if (energy <= 4) { cat = "Categoría 1"; color = "#3498db"; }
-        else if (energy <= 8) { cat = "Categoría 2"; color = "#f1c40f"; }
-        else if (energy <= 25) { cat = "Categoría 3"; color = "#e67e22"; }
-        else if (energy <= 40) { cat = "Categoría 4"; color = "#e74c3c"; }
-        else { cat = "PELIGRO: TRABAJO PROHIBIDO"; color = "#000000"; }
- 
-        badge.innerText = cat;
-        badge.style.backgroundColor = color;
-    }
-</script>
- 
-</body>
-</html>
- 
+        // 4. Frontera de protección (Flash Protection Boundary)
+        let boundary = Math.sqrt(2.
+
 
