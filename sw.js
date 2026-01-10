@@ -1,6 +1,6 @@
 
 // sw.js
-const CACHE_NAME = 'trapial-vit-v3'; // ¡incrementar en cada despliegue!
+const CACHE_NAME = 'trapial-vit-v3.1'; // ¡incrementar en cada despliegue!
 const ASSETS = [
   './index.html', // incluir el HTML principal
   './manifest.json',
@@ -49,6 +49,7 @@ self.addEventListener('fetch', (e) => {
   );
 });
 ``
+
 
 
 
