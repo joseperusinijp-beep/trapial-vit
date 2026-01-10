@@ -1,645 +1,85 @@
+<label for="tipo_seleccion">Origen de Datos:</label>
+<select id="tipo_seleccion" onchange="toggleManualInput()">
+  <option value="manual">Entrada Manual (Cualquier equipo del yacimiento)</option>
+  <option value="set_noc">SET NOC SUR (Datos del Estudio 25110.0-E4)</option>
+</select>
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-  <title>Evaluación de Riesgo para Trabajo Eléctrico - El Trapial</title>
-
-  <!-- PWA manifest + theme color (ajustar si usás manifest) -->
-  ./manifest.json
-  <meta name="theme-color" content="#005daa">
-
-  <style>
-    :root {
-      --brand-prim: #005daa;
-      --brand-sec:  #ed1c24;
-      --bg: #eef2f3;
-      --fg: #333;
-      --card: #fff;
-      --muted: #6c757d;
-      /* Paleta para estados (usada en resultado) */
-      --ok:   #1f8c3a; /* verde CAT ≤ 1 */
-      --warn: #f5a623; /* amarillo CAT = 2 */
-      --stop: #d0021b; /* rojo CAT 3-4 */
-    }
-    [data-theme="dark"] {
-      --bg: #0f1419; --fg: #e6e6e6; --card: #151a21; --muted: #8a94a6;
-    }
-    html, body { background: var(--bg); color: var(--fg); }
-    body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 10px; margin:0; }
-    .card { background: var(--card); max-width: 720px; margin: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; }
-    .header-logo { background: var(--card); padding: 18px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 4px solid var(--brand-prim); }
-    .brand-name { color: var(--brand-prim); font-weight: 800; font-size: 1.2em; letter-spacing: 0.3px; }
-    .content { padding: 20px; }
-    h2 { color: var(--brand-prim); text-align: center; font-size: 1.25em; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-    h3 { color: var(--brand-prim); font-size: 1.05em; margin-top: 18px; }
-    label { font-weight: 600; display: block; margin-top: 12px; font-size: 0.92em; }
-    input, select { width: 100%; padding: 11px; margin-top: 6px; border: 1.4px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1em; background: var(--card); color: var(--fg); }
-    small { color:#555; display:block; }
-    .calc-box { background: #f8f9fa; padding: 15px; border: 1px solid var(--brand-prim); border-radius: 8px; margin-top: 16px; }
-    .calc-box h3 { color: var(--brand-prim); margin-top: 0; font-size: 1em; }
-    .alerta-loto { background: var(--brand-sec); color: white; padding: 10px; border-radius: 6px; margin-top: 10px; font-weight: bold; display: none; text-align: center; }
-    #signature-pad { border: 1px solid #333; background: #fff; width: 100%; height: 160px; margin-top: 10px; touch-action: none; }
-
-    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .btn { flex: 1; padding: 12px; background: var(--brand-prim); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1em; }
-    .btn-secondary { background: var(--muted); color: #fff; }
-    .btn-danger { background: var(--brand-sec); }
-    .btn-ghost { background: transparent; color: var(--brand-prim); border: 1px solid var(--brand-prim); }
-
-    #res-display { margin-top: 16px; padding: 16px; border-radius: 8px; display: none; border: 2px solid #fff; text-align: left; }
-    .disclaimer { font-size: 0.78em; color: #222; background: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 6px; margin-top: 12px; }
-    .checklist { margin-top: 8px; font-size: 0.92em; }
-    .checklist label { font-weight: normal; display: flex; align-items: center; gap: 8px; }
-
-    .vit-grid { margin-top:8px; border:1px dashed #bbb; padding:10px; border-radius:8px; background:#fcfcfc; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-    .tag-row { display:flex; gap:8px; align-items:center; margin-top:8px; }
-    .tag-row input { flex:1; }
-    .mode-toggle { margin-left:auto; }
-    .etiqueta-box { margin-top:16px; border: 2px solid #000; border-radius:14px; background:#fff; }
-    .etiqueta-header { background:#d32f2f; color:#fff; padding:10px 16px; border-radius:12px 12px 0 0; font-weight:900; font-size:1.3em; text-align:center; letter-spacing:1px; }
-    .etiqueta-body { display:grid; grid-template-columns: 1fr 2fr 1fr; gap:0; align-items:stretch; border-top:3px solid #000; }
-    .etq-col { padding:12px; min-height:200px; border-right:2px solid #000; }
-    .etq-col:last-child { border-right:none; }
-    .etq-titulo { font-weight:800; margin-bottom:8px; text-align:center; }
-    .etq-item { display:flex; justify-content:space-between; margin:6px 0; }
-    .etq-item b { min-width:58%; }
-    .etq-pict { display:flex; align-items:center; justify-content:center; font-size:2.4em; }
-    .etq-footer { padding:8px 12px; border-top:2px solid #000; display:flex; justify-content:space-between; align-items:center; font-weight:700; }
-    .etq-dato-rojo { color:#c62828; font-weight:800; }
-    .etq-cat { color:#c62828; font-weight:900; }
-    .etq-acc { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
-
-    .help { font-size:0.82em; color:#444; }
-
-    /* ===== OVERLAY PROHIBICIÓN CAT 3/4 ===== */
-    .overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.75);
-      display: none; align-items: center; justify-content: center; z-index: 9999;
-    }
-    .overlay .panel {
-      background: #fff; color:#111; width: min(800px, 90vw);
-      border-radius: 16px; padding: 24px; box-shadow: 0 12px 48px rgba(0,0,0,.5);
-      border: 6px solid var(--stop);
-    }
-    .panel h3 { margin-top:0; font-size: 26px; }
-    .callout { background: #ffe9ec; border-left: 6px solid var(--stop); padding: 12px 16px; margin: 12px 0; }
-    .panel .actions { display:flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-    .btn.primary   { background: var(--stop); color:#fff; }
-    .btn.gray      { background: #eee; color:#111; }
-  </style>
-</head>
-<body>
-
-<div class="card" id="appCard" data-theme="light">
-  <div class="header-logo" aria-label="Encabezado El Trapial">
-    <span class="brand-name">EL TRAPIAL — Evaluación de Riesgo para Trabajo Eléctrico</span>
-    <button class="btn btn-ghost mode-toggle" id="btnMode">🌙 Modo oscuro</button>
-  </div>
-
-  <div class="content">
-    <h2>Evaluación preliminar de arco eléctrico, choque y generación de etiqueta</h2>
-
-    <!-- Identificación -->
-    <label for="nombre">Nombre del Operador:</label>
-    <input type="text" id="nombre" autocomplete="name" placeholder="Ej: J. Perusini"/>
-    <label for="equipo">Equipo / Tag / Activo:</label>
-    <input type="text" id="equipo" placeholder="Ej: MCC-03 / Tablero 480V"/>
-
-    <!-- Tipo de tarea y LOTO -->
-    <label for="tipo">Tipo de Tarea:</label>
-    <select id="tipo" onchange="verificarTarea()" aria-label="Tipo de tarea">
-      <option value="Inspeccion">Inspección Visual</option>
-      <option value="Medicion">Medición / Pruebas de Voltaje</option>
-      <option value="Contacto">Trabajo a Contacto (Mantenimiento)</option>
-    </select>
-    <div id="alertaPeligro" class="alerta-loto">⚠️ REGLA QUE SALVA VIDAS: REQUIERE AISLAMIENTO Y BLOQUEO (LOTO)</div>
-
-    <!-- Parámetros eléctricos mejorados -->
-    <div class="calc-box">
-      <h3>📈 Parámetros para cálculo</h3>
-      <div class="row-3">
-        <div>
-          <label for="volt">Tensión del sistema (V):</label>
-          <input type="number" id="volt" placeholder="Ej: 380 o 480" step="1" min="1"/>
-        </div>
-        <div>
-          <label for="dist">Distancia de trabajo (cm):</label>
-          <input type="number" id="dist" placeholder="Ej: 61" step="1" min="1"/>
-          <small class="help">La etiqueta mostrará el límite de protección de arco (AFB) y las fronteras de acercamiento.</small>
-        </div>
-        <div>
-          <label for="tiempo">Tiempo de despeje (s):</label>
-          <input type="number" id="tiempo" placeholder="Ej: 0.10" step="0.01" min="0.005"/>
-          <small class="help">Tomado del dispositivo de protección (curvas/ajustes). Si no se conoce, usar el valor de “instantáneo” del equipo.</small>
-        </div>
-      </div>
-
-      <h3>⚙️ Transformador (secundario que alimenta el equipo)</h3>
-      <div class="row-3">
-        <div>
-          <label for="kva">Potencia (kVA):</label>
-          <input type="number" id="kva" placeholder="Ej: 500" step="1" min="1"/>
-        </div>
-        <div>
-          <label for="zpct">% Impedancia (Z%):</label>
-          <input type="number" id="zpct" placeholder="Ej: 5.75" step="0.01" min="1"/>
-        </div>
-        <div>
-          <label for="vll">Tensión secundaria (V L-L):</label>
-          <input type="number" id="vll" placeholder="Ej: 400 o 480" step="1" min="1"/>
-        </div>
-      </div>
-      <small class="help">Se estima la corriente de cortocircuito disponible: I<sub>sc</sub> ≈ I<sub>fl</sub> / Z<sub>pu</sub>, con I<sub>fl</sub> = (kVA·1000)/(√3·V<sub>LL</sub>).</small>
-
-      <h3>🛡️ Dispositivo de protección (documentación)</h3>
-      <div class="row-3">
-        <div>
-          <label for="dp_tipo">Tipo:</label>
-          <select id="dp_tipo">
-            <option value="MCCB">Térmica / MCCB</option>
-            <option value="Fusible">Fusible</option>
-            <option value="Disyuntor">Disyuntor</option>
-            <option value="Otro">Otro</option>
-          </select>
-        </div>
-        <div>
-          <label for="dp_kA">Capacidad de interrupción (kA):</label>
-          <input type="number" id="dp_kA" placeholder="Ej: 25" step="0.1" min="1"/>
-        </div>
-        <div>
-          <label for="dp_ref">Referencia / Curva / Ajuste:</label>
-          <input type="text" id="dp_ref" placeholder="Ej: Inst=…; L=…; S=…; Clase J"/>
-        </div>
-      </div>
-
-      <div class="disclaimer">
-        ⚠️ Este cálculo es <strong>estimativo</strong> y no reemplaza el estudio de arco <strong>IEEE 1584</strong> ni las etiquetas oficiales.
-        La selección de EPP por <strong>categorías NFPA 70E</strong> se muestra como <em>orientativa</em> cuando el método principal es por energía incidente.
-        Use siempre el método <strong>único</strong> por equipo (tablas <strong>o</strong> EI) y siga permisos/LOTO.
-      </div>
-    </div>
-
-    <!-- Firma -->
-    <label>Firma Digital de Conformidad:</label>
-    <canvas id="signature-pad" aria-label="Área de firma"></canvas>
-    <div class="btn-row">
-      <button class="btn btn-secondary" id="btnClear">Borrar Firma</button>
-      <button class="btn btn-secondary" id="btnSaveSig">Guardar Firma</button>
-    </div>
-
-    <!-- VIT (Verificación para Inicio de Trabajo) eléctrica -->
-    <h3>✅ VIT — Verificaciones para el inicio del trabajo (Eléctrico)</h3>
-    <div class="vit-grid">
-      <div class="checklist">
-        <label><input type="checkbox" id="vit1"/> Alcance del trabajo revisado y aceptado (permiso/plan).</label>
-        <label><input type="checkbox" id="vit2"/> El circuito/equipo a intervenir está identificado en el plan.</label>
-        <label><input type="checkbox" id="vit3"/> EPP calificado (peligros eléctricos, tensión/arco) inspeccionado y sin daños.</label>
-        <label><input type="checkbox" id="vit4"/> Barreras colocadas y acceso restringido controlado.</label>
-        <label><input type="checkbox" id="vit5"/> Guardia eléctrica presente (si aplica) y responsabilidades acordadas.</label>
-        <label><input type="checkbox" id="vit6"/> Plan de comunicación acordado y probado con el equipo.</label>
-        <label><input type="checkbox" id="vit7"/> Herramientas aisladas/equipos de prueba certificados e inspeccionados.</label>
-        <label><input type="checkbox" id="vit8"/> Plan de respuesta ante emergencias listo y materiales en sitio.</label>
-      </div>
-      <small class="help">La etiqueta y el cálculo sólo se habilitan si todas las verificaciones están OK.</small>
-    </div>
-
-    <!-- Acciones -->
-    <div class="btn-row">
-      <button class="btn" id="btnCalcular">VALIDAR TRABAJO Y CALCULAR</button>
-      <button class="btn btn-danger" id="btnDescargar">Descargar Reporte</button>
-      <button class="btn btn-secondary" id="btnGuardarRegistro">Guardar Registro</button>
-      <button class="btn btn-secondary" id="btnCargarRegistro">Cargar Último</button>
-      <!-- Reemplaza “Buscar etiqueta” por “Crear etiqueta” -->
-      <button class="btn" id="btnCrearEtiqueta">CREAR ETIQUETA</button>
-    </div>
-
-    <!-- Resultados -->
-    <div id="res-display" role="status" aria-live="polite"></div>
-
-    <!-- Contenedor etiqueta generada -->
-    <div id="etiqueta-container" class="etiqueta-box" style="display:none;">
-      <div class="etiqueta-header">⚠️ DANGER</div>
-      <div class="etiqueta-body">
-        <div class="etq-col etq-pict">⚡</div>
-        <div class="etq-col">
-          <div class="etq-titulo">Peligro de Arco Eléctrico y de Descarga</div>
-          <div class="etq-item"><b>Límite de Protección Arco Eléctrico</b><span id="etq-afb">—</span></div>
-          <div class="etq-item"><b>Energía Incidente (cal/cm²)</b><span id="etq-ei" class="etq-dato-rojo">—</span></div>
-          <div class="etq-item"><b>Distancia de Trabajo</b><span id="etq-dist">—</span></div>
-          <div class="etq-item"><b>Nivel Requerido de EPP</b><span id="etq-cat" class="etq-cat">—</span></div>
-
-          <div class="etq-item"><b>Tensión de Peligro de Choque</b><span id="etq-vac" class="etq-dato-rojo">—</span></div>
-          <div class="etq-item"><b>Acercamiento Limitado</b><span id="etq-lim">—</span></div>
-          <div class="etq-item"><b>Acercamiento Restringido</b><span id="etq-res">—</span></div>
-        </div>
-        <div class="etq-col etq-pict">⚡</div>
-      </div>
-      <div class="etq-footer">
-        <span id="etq-equipo">Equipo —</span>
-        <span id="etq-fecha">—</span>
-      </div>
-      <div class="etq-acc">
-        <button class="btn" id="btnValidarEtiqueta">VALIDAR</button>
-        <button class="btn btn-secondary" id="btnGuardarEtiqueta">Guardar etiqueta (HTML)</button>
-        <button class="btn btn-secondary" id="btnEnviarEtiqueta">Enviar por email</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== OVERLAY: prohibición cuando CAT 3/4 ===== -->
-<div id="blockOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="blockTitle">
-  <div class="panel">
-    <h3 id="blockTitle">🚫 Trabajo PROHIBIDO — Riesgo de Arco Eléctrico (CAT <span id="blockCat">3–4</span>)</h3>
-    <div class="callout">
-      <p><strong>No continuar con la tarea.</strong> Comuníquese con <strong>Mantenimiento Eléctrico</strong> y revise el plan/EPP antes de cualquier acción.</p>
-    </div>
-    <ul>
-      <li>Detener el trabajo y notificar al supervisor.</li>
-      <li>Aplicar LOTO si corresponde.</li>
-      <li>Contactar a Mantenimiento Eléctrico.</li>
-    </ul>
-    <div class="actions">
-      <button class="btn primary" id="contactBtn">Contactar Mantenimiento</button>
-      <button class="btn gray" id="ackBtn">Entendido</button>
-    </div>
-  </div>
+<div id="selector_noc_container" style="display:none; margin-top:10px;">
+  <label for="equipo_lista">Seleccionar Tablero Validado:</label>
+  <select id="equipo_lista" onchange="cargarDatosSETNOC()">
+    <option value="">-- Seleccione un tablero --</option>
+    <option value="PLAYA_N1">1. TAB SECC PLAYA N1 (8 kA / 0.15s)</option>
+    <option value="SERV_AUX">2. TAB SERV AUX CA-CC (6 kA / 0.15s)</option>
+    <option value="SHELTER">3. TAB SECC SHELTER (5 kA / 0.1s)</option>
+    <option value="CARG_BAT">4. TAB CARG BAT 110VCC (5 kA / 0.1s)</option>
+    <option value="REFRIG">5/6. TAB REFRIG T1/T2 (5 kA / 0.1s)</option>
+    <option value="UPS">7. TAB UPS (5 kA / 0.1s)</option>
+  </select>
 </div>
 
 <script>
-  // ====== Modo oscuro ======
-  const appCard = document.getElementById('appCard');
-  document.getElementById('btnMode').addEventListener('click', () => {
-    const current = appCard.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    appCard.setAttribute('data-theme', next);
-    document.getElementById('btnMode').textContent = next === 'dark' ? '☀️ Modo claro' : '🌙 Modo oscuro';
-  });
+  [span_6](start_span)[span_7](start_span)// Base de datos técnica del estudio 25110.0-E4-MC-501-05[span_6](end_span)[span_7](end_span)
+  const DB_SET_NOC = {
+    "PLAYA_N1": { ik: 8.0, t: 0.15, v: 380, tag: "TAB SECC PLAYA N1 SET NOC" },
+    "SERV_AUX": { ik: 6.0, t: 0.15, v: 380, tag: "TAB SERV AUX CA-CC SET NOC" },
+    "SHELTER":  { ik: 5.0, t: 0.10, v: 380, tag: "TAB SECC SHELTER SET NOC" },
+    "CARG_BAT": { ik: 5.0, t: 0.10, v: 380, tag: "TAB CARG BAT 110VCC SET NOC" },
+    "REFRIG":   { ik: 5.0, t: 0.10, v: 380, tag: "TAB REFRIG T1/T2 SET NOC" },
+    "UPS":      { ik: 5.0, t: 0.10, v: 380, tag: "TAB UPS SET NOC" }
+  };
 
-  // ====== Firma (canvas responsivo) ======
-  const canvas = document.getElementById('signature-pad');
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  let drawing = false, savedSignatureDataURL = null;
-
-  function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    const ratio = window.devicePixelRatio || 1;
-    canvas.width = rect.width * ratio;
-    canvas.height = 160 * ratio;
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = '160px';
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    ctx.lineWidth = 2; ctx.strokeStyle = "#000";
-    if (savedSignatureDataURL) {
-      const img = new Image();
-      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width/ratio, canvas.height/ratio);
-      img.src = savedSignatureDataURL;
-    }
-  }
-  window.addEventListener('resize', resizeCanvas); setTimeout(resizeCanvas, 50);
-
-  function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const cx = e.touches ? e.touches[0].clientX : e.clientX;
-    const cy = e.touches ? e.touches[0].clientY : e.clientY;
-    return { x: cx - rect.left, y: cy - rect.top };
-  }
-  function startDraw(e) { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); }
-  function moveDraw(e) { if(!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); e.preventDefault(); }
-  function endDraw() { drawing = false; }
-
-  canvas.addEventListener('mousedown', startDraw);
-  canvas.addEventListener('mousemove', moveDraw);
-  window.addEventListener('mouseup', endDraw);
-  canvas.addEventListener('touchstart', startDraw, { passive: false });
-  canvas.addEventListener('touchmove', moveDraw, { passive: false });
-  window.addEventListener('touchend', endDraw);
-
-  document.getElementById('btnClear').addEventListener('click', () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height); savedSignatureDataURL = null;
-  });
-  document.getElementById('btnSaveSig').addEventListener('click', () => {
-    savedSignatureDataURL = canvas.toDataURL('image/png');
-    alert('Firma guardada en memoria del navegador.');
-  });
-
-  // ====== LOTO visual ======
-  function verificarTarea() {
-    document.getElementById('alertaPeligro').style.display =
-      (document.getElementById('tipo').value === 'Contacto') ? 'block' : 'none';
-  }
-  window.verificarTarea = verificarTarea;
-
-  // ====== Utilidades de cálculo ======
-  function estimarEI(ka, t, volt, dist_cm) {
-    const C = 46.2; // constante de orden de magnitud
-    return C * ka * t * Math.pow(480/volt, 0.5) * Math.pow(45/dist_cm, 1.5);
-  }
-  function getPPECategory(ei) {
-    if (ei <= 1.2) return "Sin categoría (≤ 1.2 cal/cm²)";
-    if (ei <= 4)   return "CATEGORÍA 1 (ATPV ≥ 4)";
-    if (ei <= 8)   return "CATEGORÍA 2 (ATPV ≥ 8)";
-    if (ei <= 25)  return "CATEGORÍA 3 (ATPV ≥ 25)";
-    if (ei <= 40)  return "CATEGORÍA 4 (ATPV ≥ 40)";
-    return "CATEGORÍA 4 (ATPV ≥ 40) — Evaluación adicional (EI > 40)";
-  }
-  function cortoDesdeTx(kva, vll, zpct) {
-    const Ifl = (kva*1000)/(Math.sqrt(3)*vll); // A
-    const Zpu = zpct/100;
-    const IscA = Ifl / Zpu; // A
-    return IscA/1000; // kA
-  }
-  function arcoBoundary(ei_work, dist_cm) {
-    if (ei_work <= 0) return 0.0;
-    const exponent = 1.5; // modelo simplificado
-    const Db_cm = dist_cm * Math.pow(ei_work/1.2, 1.0/exponent);
-    return (Db_cm/100).toFixed(2); // m
-  }
-  function shockBoundaries(volt) {
-    if (volt <= 150) return { limited: "N/A (≤150 V — evitar contacto)", restricted: "N/A" };
-    if (volt <= 750) return { limited: "1.07 m", restricted: "0.30 m" };
-    if (volt <= 15000) return { limited: "3.05 m", restricted: "0.81 m" };
-    return { limited: "Personal calificado — consulte tablas NFPA", restricted: "Personal calificado — consulte tablas NFPA" };
+  function toggleManualInput() {
+    const isManual = document.getElementById('tipo_seleccion').value === 'manual';
+    document.getElementById('selector_noc_container').style.display = isManual ? 'none' : 'block';
+    
+    [span_8](start_span)// Si es SET NOC, bloqueamos campos para usar solo datos del estudio[span_8](end_span)
+    const inputs = ['volt', 'tiempo', 'kva', 'zpct', 'vll'];
+    inputs.forEach(id => document.getElementById(id).disabled = !isManual);
   }
 
-  // ===== NUEVO: categoría numérica 1..4 (sin tocar tu cálculo de EI) =====
-  function getCatNum(ei) {
-    if (ei <= 4)   return 1;
-    if (ei <= 8)   return 2;
-    if (ei <= 25)  return 3;
-    if (ei <= 40)  return 4;
-    return 4;
+  function cargarDatosSETNOC() {
+    const key = document.getElementById('equipo_lista').value;
+    if (!key) return;
+    
+    const data = DB_SET_NOC[key];
+    document.getElementById('equipo').value = data.tag;
+    document.getElementById('volt').value = data.v;
+    document.getElementById('vll').value = data.v;
+    document.getElementById('tiempo').value = data.t;
+    // Valores de Tx genéricos para SET NOC (el cálculo usará Ik directo)
+    document.getElementById('zpct').value = 5; 
+    document.getElementById('kva').value = 500; 
   }
 
-  // ===== Estado del cálculo =====
-  let ultimoResultado = null;
+  // Lógica de cálculo mejorada para todo el yacimiento
+  function calcularCategoriaEficaz() {
+    const isManual = document.getElementById('tipo_seleccion').value === 'manual';
+    let ik_final, t_final;
 
-  // ===== Validación y cálculo =====
-  document.getElementById('btnCalcular').addEventListener('click', generarValidacion);
-
-  function generarValidacion() {
-    const nombre = document.getElementById('nombre').value.trim();
-    const equipo  = document.getElementById('equipo').value.trim();
-    const volt    = parseFloat(document.getElementById('volt').value);
-    const dist    = parseFloat(document.getElementById('dist').value);
-    const t       = parseFloat(document.getElementById('tiempo').value);
-
-    const kva     = parseFloat(document.getElementById('kva').value);
-    const zpct    = parseFloat(document.getElementById('zpct').value);
-    const vll     = parseFloat(document.getElementById('vll').value);
-
-    const vitOK = ['vit1','vit2','vit3','vit4','vit5','vit6','vit7','vit8'].map(id=>document.getElementById(id).checked).every(x=>x);
-
-    if (!nombre || !equipo || !volt || !dist || !t || !kva || !zpct || !vll) {
-      alert("Completar operador, equipo, tensión, distancia, tiempo, kVA, Z% y VLL.");
-      return;
-    }
-    if (!vitOK) {
-      alert("Completar la VIT eléctrica antes de validar.");
-      return;
+    if (!isManual) {
+      const key = document.getElementById('equipo_lista').value;
+      ik_final = DB_SET_NOC[key].ik;
+      t_final = DB_SET_NOC[key].t;
+    } else {
+      // Cálculo basado en transformador para cualquier punto del yacimiento
+      const kva = parseFloat(document.getElementById('kva').value);
+      const vll = parseFloat(document.getElementById('vll').value);
+      const zpct = parseFloat(document.getElementById('zpct').value);
+      ik_final = (kva * 1000) / (Math.sqrt(3) * vll * (zpct / 100)) / 1000; // kA
+      t_final = parseFloat(document.getElementById('tiempo').value);
     }
 
-    // Corriente de corto estimada (kA) desde el transformador
-    const ka_tx = cortoDesdeTx(kva, vll, zpct);
+    const volt = parseFloat(document.getElementById('volt').value);
+    const dist = parseFloat(document.getElementById('dist').value);
 
-    // EI estimada (si el DP despeja en t)
-    const ei = estimarEI(ka_tx, t, volt, dist);
-    const cat = getPPECategory(ei);
-    const shock = shockBoundaries(volt);
-    const afb_m = arcoBoundary(ei, dist);
-
-    // Sugerencia de EPP (texto orientativo por ATPV)
-    let eppSug = "Algodón no fundible; EPP FR no requerido (ATPV ≥ 1.2).";
-    if (ei > 1.2 && ei <= 8)  eppSug = "Conjunto FR ATPV ≥ 8 cal/cm² + protección facial/balaclava.";
-    else if (ei > 8 && ei <= 25) eppSug = "Conjunto FR ATPV ≥ 25 cal/cm² + capucha arco y guantes.";
-    else if (ei > 25) eppSug = "Conjunto FR ≥ 40 cal/cm² y medidas adicionales. Evaluación detallada obligatoria.";
-
-    // ===== NUEVO: aplicar colores/overlay por categoría =====
-    const catNum = getCatNum(ei);
-    aplicarUIporCategoria(catNum);
-
-    // Render del reporte (igual a tu versión)
-    const res = document.getElementById('res-display');
-    const fecha = new Date().toLocaleString();
-    const tipoTarea = document.getElementById('tipo').value;
-
-    res.innerHTML = `
-      <h3 style="margin-top:0; border-bottom:1px solid currentColor;">REPORTE — Evaluación de Riesgo Eléctrico</h3>
-      <p><strong>Fecha/Hora:</strong> ${fecha}</p>
-      <p><strong>Operador:</strong> ${nombre}</p>
-      <p><strong>Equipo:</strong> ${equipo}</p>
-      <p><strong>Tarea:</strong> ${tipoTarea}</p>
-
-      <h4>Parámetros</h4>
-      <p>V=${volt} V • Dist=${dist} cm • t=${t} s • Tx=${kva} kVA / Z=${zpct}% / VLL=${vll} V</p>
-      <p><strong>Corto estimado (sec Tx):</strong> ${ka_tx.toFixed(2)} kA</p>
-      <p><strong>Energía incidente (estimada):</strong> ${ei.toFixed(2)} cal/cm²</p>
-      <p><strong>Límite de protección arco (AFB):</strong> ${afb_m} m</p>
-      <p><strong>Fronteras de choque:</strong> Limitado=${shock.limited} • Restringido=${shock.restricted}</p>
-
-      <p><strong>Categoría de EPP (orientativa):</strong> ${cat}</p>
-      <p><strong>EPP sugerido (por ATPV):</strong> ${eppSug}</p>
-
-      <h4>VIT Eléctrica — OK</h4>
-      <p>Alcance, identificación, EPP calificado, barreras, guardia eléctrica, comunicación, herramientas aisladas, emergencias.</p>
-
-      <p class="disclaimer" style="background: rgba(255,255,255,0.2);">
-        Este resultado es estimativo. Use un método por equipo (tablas NFPA 70E o análisis IEEE 1584), no ambos.
-        Ajuste el tiempo de despeje según curvas reales del dispositivo y valide contra el estudio.
-      </p>
-    `;
-
-    // Guardar para crear etiqueta
-    ultimoResultado = { fecha, nombre, equipo, volt, dist, t, kva, zpct, vll, ka_tx, ei, afb_m, shock, cat, eppSug };
-    window.scrollTo(0, document.body.scrollHeight);
+    [span_9](start_span)[span_10](start_span)// Ecuación simplificada IEEE 1584 / NFPA 70E para energía incidente[span_9](end_span)[span_10](end_span)
+    // EI = 46.2 * Ik * t * (480/V)^0.5 * (45/D)^n
+    const ei = 46.2 * ik_final * t_final * Math.pow(480 / volt, 0.5) * Math.pow(45 / dist, 1.5);
+    
+    return { ei, ik: ik_final, t: t_final };
   }
 
-  // ===== NUEVO: función que pinta colores y muestra/oculta overlay =====
-  function aplicarUIporCategoria(catNum) {
-    const res = document.getElementById('res-display');
-    res.style.display = "block";
-
-    if (catNum <= 1) { // VERDE
-      res.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--ok').trim();
-      res.style.color = '#fff';
-      document.getElementById('blockOverlay').style.display = 'none';
-    } else if (catNum === 2) { // AMARILLO
-      res.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--warn').trim();
-      res.style.color = '#111';
-      document.getElementById('blockOverlay').style.display = 'none';
-    } else { // CAT 3 o 4 -> ROJO + overlay
-      res.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue('--stop').trim();
-      res.style.color = '#fff';
-      document.getElementById('blockCat').textContent = String(catNum);
-      document.getElementById('blockOverlay').style.display = 'flex';
-    }
-  }
-
-  // ===== Crear etiqueta =====
-  document.getElementById('btnCrearEtiqueta').addEventListener('click', () => {
-    if (!ultimoResultado) { alert("Primero valide y calcule (botón VALIDAR)."); return; }
-    const e = ultimoResultado;
-    const cont = document.getElementById('etiqueta-container');
-    cont.style.display = "block";
-
-    document.getElementById('etq-afb').textContent  = `${e.afb_m} m`;
-    document.getElementById('etq-ei').textContent   = `${e.ei.toFixed(2)}`;
-    document.getElementById('etq-dist').textContent = `${e.dist} cm`;
-    document.getElementById('etq-cat').textContent  = `${e.cat}`;
-    document.getElementById('etq-vac').textContent  = `${e.volt} VAC`;
-    document.getElementById('etq-lim').textContent  = `${e.shock.limited}`;
-    document.getElementById('etq-res').textContent  = `${e.shock.restricted}`;
-    document.getElementById('etq-equipo').textContent = `Equipo ${e.equipo}`;
-    document.getElementById('etq-fecha').textContent  = new Date().toLocaleDateString();
-
-    window.scrollTo(0, document.body.scrollHeight);
-  });
-
-  // Validar etiqueta (simple confirmación de VIT)
-  document.getElementById('btnValidarEtiqueta').addEventListener('click', () => {
-    const vitOK = ['vit1','vit2','vit3','vit4','vit5','vit6','vit7','vit8'].map(id=>document.getElementById(id).checked).every(x=>x);
-    alert(vitOK ? "Etiqueta validada con VIT eléctrica OK." : "Complete la VIT eléctrica antes de validar la etiqueta.");
-  });
-
-  // Guardar etiqueta (HTML standalone)
-  document.getElementById('btnGuardarEtiqueta').addEventListener('click', () => {
-    const cont = document.getElementById('etiqueta-container');
-    if (cont.style.display !== 'block') { alert('Cree la etiqueta primero.'); return; }
-    const html = `
-      <html><head><meta charset="UTF-8"><title>Etiqueta Arco - El Trapial</title>
-      <style>${document.querySelector('style').innerHTML}</style></head><body>
-      ${cont.outerHTML}
-      </body></html>`;
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `Etiqueta_${(ultimoResultado?.equipo||'equipo').replace(/\s+/g,'_')}.html`;
-    a.click(); URL.revokeObjectURL(url);
-  });
-
-  // Enviar por email
-  document.getElementById('btnEnviarEtiqueta').addEventListener('click', () => {
-    if (!ultimoResultado) { alert("Primero crea la etiqueta."); return; }
-    const e = ultimoResultado;
-    const asunto = `Etiqueta Arco/Choque — ${e.equipo} — ${new Date().toLocaleDateString()}`;
-    const cuerpo = `Equipo: ${e.equipo}%0AFecha: ${e.fecha}%0A`+
-      `EI (cal/cm2): ${e.ei.toFixed(2)}%0A`+
-      `AFB (m): ${e.afb_m}%0A`+
-      `Distancia trabajo (cm): ${e.dist}%0A`+
-      `Categoría EPP: ${e.cat}%0A`+
-      `Tensión choque (VAC): ${e.volt}%0A`+
-      `Acercamiento limitado: ${e.shock.limited}%0A`+
-      `Acercamiento restringido: ${e.shock.restricted}%0A`+
-      `Tx: ${e.kva} kVA / Z=${e.zpct}% / VLL=${e.vll} V — Icc≈ ${e.ka_tx.toFixed(2)} kA%0A`+
-      `Tiempo despeje: ${e.t} s%0A`+
-      `EPP sugerido: ${e.eppSug}%0A`+
-      `VIT eléctrica: OK`;
-    const mailto = `mailto:mantenimientotrapialelectrico@chevron.com?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-    window.location.href = mailto;
-  });
-
-  // ===== Reporte general (como antes) =====
-  document.getElementById('btnDescargar').addEventListener('click', descargarReporte);
-  function descargarReporte() {
-    const res = document.getElementById('res-display');
-    if (res.style.display !== 'block') { alert('Primero genere el reporte.'); return; }
-    const firmaHTML = (savedSignatureDataURL)
-        ? `<img src="${savedSignatureDataURL}" alt="Firma" style="max-width:280px; border:1px solid #333"/>`
-        : `<div style="border:1px dashed #333; padding:8px; color:#555;">Sin firma</div>`;
-
-    const printable = `
-      <html><head><meta charset="UTF-8"><title>Reporte VIT</title>
-      <style> body { font-family: Segoe UI, Tahoma, sans-serif; margin: 20px; color:#111; }
-              h2 { color:#005daa; }
-              .box { border:1px solid #ccc; padding:12px; border-radius:8px; background:#fafafa; }
-              .firma { margin-top: 12px; }
-      </style></head><body>
-        <h2>Evaluación de Riesgo para Trabajo Eléctrico — El Trapial</h2>
-        <div class="box">${res.innerHTML}</div>
-        <div class="firma"><h3>Firma del Operador</h3>${firmaHTML}</div>
-      </body></html>`;
-    const blob = new Blob([printable], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const w = window.open(url, '_blank'); if (w) w.onload = () => w.print();
-  }
-
-  // ===== Guardar/Cargar registro =====
-  document.getElementById('btnGuardarRegistro').addEventListener('click', () => {
-    const payload = {
-      nombre: document.getElementById('nombre').value.trim(),
-      equipo: document.getElementById('equipo').value.trim(),
-      tipo: document.getElementById('tipo').value,
-      volt: document.getElementById('volt').value,
-      dist: document.getElementById('dist').value,
-      tiempo: document.getElementById('tiempo').value,
-      kva: document.getElementById('kva').value,
-      zpct: document.getElementById('zpct').value,
-      vll: document.getElementById('vll').value,
-      resHTML: document.getElementById('res-display').innerHTML,
-      firma: savedSignatureDataURL || null,
-      ts: new Date().toISOString()
-    };
-    localStorage.setItem('vit_electrica_last', JSON.stringify(payload));
-    alert('Registro guardado localmente.');
-  });
-
-  document.getElementById('btnCargarRegistro').addEventListener('click', () => {
-    const raw = localStorage.getItem('vit_electrica_last');
-    if (!raw) { alert('No hay registros guardados.'); return; }
-    const p = JSON.parse(raw);
-    document.getElementById('nombre').value = p.nombre || '';
-    document.getElementById('equipo').value = p.equipo || '';
-    document.getElementById('tipo').value = p.tipo || 'Inspeccion';
-    document.getElementById('volt').value = p.volt || '';
-    document.getElementById('dist').value = p.dist || '';
-    document.getElementById('tiempo').value = p.tiempo || '';
-    document.getElementById('kva').value = p.kva || '';
-    document.getElementById('zpct').value = p.zpct || '';
-    document.getElementById('vll').value = p.vll || '';
-    const res = document.getElementById('res-display');
-    if (p.resHTML) { res.innerHTML = p.resHTML; res.style.display = 'block'; }
-    if (p.firma) { savedSignatureDataURL = p.firma; resizeCanvas(); }
-    alert('Último registro cargado.');
-  });
-
-  // ===== Overlay: botones =====
-  document.getElementById('ackBtn')?.addEventListener('click', () => {
-    document.getElementById('blockOverlay').style.display = 'none';
-  });
-  document.getElementById('contactBtn')?.addEventListener('click', () => {
-    // Reemplazar por mail corporativo si corresponde
-    // window.location.href = 'mailto:mantenimientotrapialelectrico@chevron.com?subject=Alerta%20CAT%20alta';
-    alert('Contactar Mantenimiento Eléctrico');
-  });
-
-  // Registrar Service Worker para PWA (si corresponde)
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW fail:', err));
-  }
+  // Actualiza tu función generarValidacion() para llamar a calcularCategoriaEficaz()
+  // y asegúrate de que el EPP siempre recomiende CATEGORÍA 1 si EI < 1.2 cal/cm² 
+  [span_11](start_span)// tal como concluye el estudio de Chevron[span_11](end_span).
 </script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
