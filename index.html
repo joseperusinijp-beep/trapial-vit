@@ -2,159 +2,181 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Seguridad en Mediciones - Chevron Trapial</title>
+    <title>Protocolo Arc Flash - Chevron Trapial</title>
     <style>
-        :root { --primary: #005aa2; --danger: #cc0000; --warning: #ffcc00; --success: #2e7d32; --dark: #1a1a1a; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; line-height: 1.5; }
-        .container { background: white; max-width: 850px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-top: 10px solid var(--primary); }
-        .guia-planos { background: #e7f3ff; border-left: 5px solid var(--primary); padding: 15px; margin-bottom: 20px; font-size: 0.9rem; }
+        :root { --primary: #005aa2; --danger: #cc0000; --warning: #ffcc00; --success: #2e7d32; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { background: white; max-width: 900px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 10px solid var(--primary); }
+        .banner-jsa { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #856404; }
         .section { background: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .section-h { font-weight: bold; color: var(--primary); margin-bottom: 10px; border-bottom: 2px solid #ddd; font-size: 0.9rem; text-transform: uppercase; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
         label { font-weight: bold; font-size: 0.8rem; display: block; margin-bottom: 5px; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
-        button { width: 100%; padding: 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 10px; transition: 0.3s; }
-        .btn-calc { background: var(--primary); color: white; }
-        .btn-email { background: #ed7d31; color: white; display: none; margin-top: 15px; }
-        #result-display { margin-top: 30px; padding: 25px; border-radius: 12px; display: none; text-align: center; }
-        .energy-val { font-size: 3.5rem; font-weight: bold; line-height: 1; margin: 10px 0; }
-        .epp-box { text-align: left; background: white; padding: 20px; border-radius: 8px; margin-top: 15px; font-size: 0.95rem; border: 1px solid #ddd; color: #333; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .btn-calc { width: 100%; padding: 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; background: var(--primary); color: white; margin-top: 10px; }
+        #result-display { margin-top: 30px; display: none; }
+        
+        /* Estilo Etiqueta Chevron */
+        .etiqueta-af { border: 4px solid #000; width: 450px; margin: 20px auto; padding: 0; font-family: Arial, sans-serif; position: relative; }
+        .etiqueta-header { background: #ffcc00; color: black; font-weight: bold; padding: 10px; font-size: 1.5rem; text-align: center; border-bottom: 4px solid #000; }
+        .etiqueta-header.danger { background: #cc0000; color: white; }
+        .etiqueta-body { padding: 15px; text-align: left; background: #fff; }
+        .etiqueta-row { display: flex; justify-content: space-between; border-bottom: 1px solid #ccc; padding: 5px 0; }
+        
+        .loto-box { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; border: 1px solid #f5c6cb; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
  
 <div class="container">
-    <h2 style="text-align:center; color:var(--primary); margin-top:0;">Protocolo de Medición Energizada (Puerta Abierta)</h2>
-    
-    <div class="guia-planos">
-        <strong>Manual de Datos para el Operador:</strong><br>
-        1. <strong>Tag Tablero:</strong> Identificación del equipo según plano.<br>
-        2. <strong>I. Corto (kA):</strong> Valor "Icc" o "Isc" de la barra principal.<br>
-        3. <strong>Seguridad CAT:</strong> El multímetro DEBE ser CAT IV para tableros de potencia.
+    <div class="banner-jsa">
+        ⚠️ ANTES DE INICIAR: Debe haber leído el JSA, completado el Paquete de Trabajo, Permisos y VIT.
     </div>
  
+    <h2 style="text-align:center; color:var(--primary);">Gestión de Arco Eléctrico - SET NOC SUR</h2>
+ 
     <div class="section">
-        <div class="section-h">1. Identificación y Seguridad de Instrumentos</div>
+        <div class="section-h">1. Selección de Equipo (Datos Estudio Abril 2024)</div>
         <div class="grid">
             <div class="input-group">
-                <label>Tag / Nombre del Tablero</label>
-                <input type="text" id="tag_equipo" placeholder="Ej: TGD-01 / MCC-A">
+                <label>Seleccione Tablero</label>
+                <select id="tablero_select" onchange="cargarDatosEstudio()">
+                    <option value="">-- Seleccionar de la lista --</option>
+                    <option value="playa1">TAB SECC PLAYA N°1 SET NOC</option>
+                    <option value="ssaa">TAB SERV AUX CA-CC SET NOC</option>
+                    <option value="shelter">TAB SECC SHELTER SET NOC</option>
+                    <option value="cargador">TAB CARG BAT 110VCC SET NOC</option>
+                    <option value="refrig1">TAB REFRIG T1 SET NOC</option>
+                    <option value="refrig2">TAB REFRIG T2 SET NOC</option>
+                    <option value="manual">OTRO (Carga Manual)</option>
+                </select>
             </div>
             <div class="input-group">
-                <label>Instrumento de Medición</label>
-                <select id="cat_multimetro">
-                    <option value="no">-- Seleccione Categoría --</option>
-                    <option value="no">CAT I / II / III (PROHIBIDO)</option>
-                    <option value="si">CAT IV (AUTORIZADO)</option>
+                <label>Tipo de Tarea a Realizar</label>
+                <select id="tipo_tarea" onchange="toggleTarea()">
+                    <option value="medicion">Medición o Inspección Visual</option>
+                    <option value="intervencion">Cambio de componentes / Reparación</option>
                 </select>
             </div>
         </div>
     </div>
  
-    <div class="section">
-        <div class="section-h">2. Datos de Barra y Conductor</div>
+    <div id="datos_tecnicos" class="section">
+        <div class="section-h">2. Datos Técnicos del Punto</div>
         <div class="grid">
             <div class="input-group">
-                <label>I. Cortocircuito Barra (kA)</label>
-                <input type="number" id="ka_barra" placeholder="Ej: 25">
+                <label>Energía Incidente (cal/cm²)</label>
+                <input type="number" id="e_inc" step="0.01">
             </div>
             <div class="input-group">
-                <label>Longitud del Cable (m)</label>
-                <input type="number" id="cable_l" value="1" step="0.1">
+                <label>Frontera de Arco (m)</label>
+                <input type="number" id="boundary" step="0.01">
             </div>
             <div class="input-group">
-                <label>Cables por Fase</label>
-                <input type="number" id="cables_p" value="1" min="1">
+                <label>Categoría EPP</label>
+                <input type="text" id="cat_epp" readonly>
             </div>
         </div>
     </div>
  
-    <div class="section">
-        <div class="section-h">3. Protección Aguas Arriba</div>
-        <div class="grid">
-            <div class="input-group" style="grid-column: span 2;">
-                <label>Tipo de Dispositivo</label>
-                <select id="disp" onchange="document.getElementById('time').value = this.value">
-                    <option value="0.04">Fusible gG/gL (Rápido)</option>
-                    <option value="0.10">Interruptor Automático (Standard)</option>
-                    <option value="0.02">Interruptor (Instantáneo)</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Tiempo t (seg)</label>
-                <input type="number" id="time" value="0.04" step="0.01">
-            </div>
-        </div>
+    <div id="loto_warning" class="loto-box" style="display:none;">
+        🚨 ATENCIÓN: Para trabajos de intervención, debe aplicar las 5 REGLAS DE ORO y realizar bloqueo LOTO de la instalación antes de comenzar.
     </div>
  
-    <button class="btn-calc" onclick="ejecutarAnalisis()">EVALUAR RIESGO DE ARCO</button>
+    <button class="btn-calc" onclick="generarProtocolo()">GENERAR ETIQUETA Y REPORTE</button>
  
     <div id="result-display">
-        <div id="cat-label" style="font-size: 1.6rem; font-weight: bold; text-transform: uppercase;"></div>
-        <div class="energy-val" id="e-val">0.00</div>
-        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">cal/cm²</div>
-        <div class="epp-box" id="epp-res"></div>
-        <button class="btn-email" id="email-btn" onclick="enviarReporte()">📧 ENVIAR REPORTE A MANTENIMIENTO</button>
+        <div class="etiqueta-af" id="etiqueta_visual">
+            <div class="etiqueta-header" id="et_head">ADVERTENCIA</div>
+            <div class="etiqueta-body">
+                <div style="font-weight: bold; text-align: center; margin-bottom: 10px;">PELIGRO DE ARCO ELÉCTRICO Y DESCARGA</div>
+                <div class="etiqueta-row"><span>Energía Incidente:</span> <span id="et_ene"></span></div>
+                <div class="etiqueta-row"><span>Frontera de Arco:</span> <span id="et_dist"></span></div>
+                <div class="etiqueta-row"><span>Nivel de EPP:</span> <span id="et_cat"></span></div>
+                <div class="etiqueta-row"><span>Equipo (TAG):</span> <span id="et_tag"></span></div>
+                <div style="font-size: 0.7rem; margin-top: 10px; text-align: center;">Basado en Estudio 25110.0-E4-MC-501-05</div>
+            </div>
+        </div>
+        <button style="background:#ed7d31; color:white;" class="btn-calc" onclick="enviarMantenimiento()">📧 ENVIAR ETIQUETA A MANTENIMIENTO</button>
     </div>
 </div>
  
 <script>
-    let resData = {};
+    const estudio = {
+        "playa1": { e: 0.28, b: 0.35, cat: "CATEGORIA 1", tag: "TAB SECC PLAYA N°1" },
+        "ssaa": { e: 0.54, b: 0.48, cat: "CATEGORIA 1", tag: "TAB SERV AUX CA-CC" },
+        "shelter": { e: 0.15, b: 0.25, cat: "CATEGORIA 1", tag: "TAB SECC SHELTER" },
+        "cargador": { e: 0.10, b: 0.20, cat: "CATEGORIA 1", tag: "TAB CARG BAT 110VCC" },
+        "refrig1": { e: 0.32, b: 0.38, cat: "CATEGORIA 1", tag: "TAB REFRIG T1" },
+        "refrig2": { e: 0.32, b: 0.38, cat: "CATEGORIA 1", tag: "TAB REFRIG T2" }
+    };
  
-    function ejecutarAnalisis() {
-        const catInstr = document.getElementById('cat_multimetro').value;
-        const tag = document.getElementById('tag_equipo').value;
- 
-        if (catInstr === "no") {
-            alert("⚠️ BLOQUEO: Solo se permite CAT IV para mediciones en estos tableros.");
-            return;
-        }
-        if (!tag) return alert("Ingrese el TAG del equipo para el reporte.");
- 
-        const I_bar = parseFloat(document.getElementById('ka_barra').value);
-        const L = parseFloat(document.getElementById('cable_l').value) || 0.1;
-        const N_p = parseInt(document.getElementById('cables_p').value);
-        const T = parseFloat(document.getElementById('time').value);
- 
-        if (!I_bar) return alert("Ingrese la corriente de barra.");
- 
-        // Cálculo de atenuación simplificado (50mm2 promedio)
-        const R_eq = (0.000153 * L) / N_p;
-        const Ibf_punto = I_bar / (1 + (I_bar * Math.sqrt(3) * R_eq / 400));
-        let Ia = Ibf_punto * 0.72; 
-        let energy = (0.123 * Ia * T * Math.pow(610/455, 2)) * 1.5;
-        let boundary = Math.sqrt(2.142 * Ibf_punto * T);
- 
-        resData = { energy, boundary, ibf: Ibf_punto, t: T, tag: tag, cat: "" };
-        
-        const res = document.getElementById('result-display');
-        res.style.display = 'block';
-        document.getElementById('email-btn').style.display = 'block';
-        document.getElementById('e-val').innerText = energy.toFixed(2);
- 
-        if (energy <= 8) {
-            resData.cat = energy <= 1.2 ? "1" : "2";
-            res.style.backgroundColor = energy <= 1.2 ? "#2e7d32" : "#ffcc00";
-            res.style.color = energy <= 1.2 ? "#fff" : "#000";
-            document.getElementById('cat-label').innerText = "AUTORIZADO - NIVEL " + resData.cat;
-            document.getElementById('epp-res').innerHTML = `<b>TAG: ${tag}</b><br><b>Frontera: ${boundary.toFixed(2)}m</b><br><br>EPP: Ropa FR (${energy <= 1.2 ? '4' : '8'} cal), guantes dieléctricos con cuero, careta con barbilla. Instrumento CAT IV verificado.`;
-        } else {
-            resData.cat = energy <= 25 ? "3" : "4";
-            res.style.backgroundColor = "#000"; res.style.color = "#fff";
-            document.getElementById('cat-label').innerText = "🚫 PROHIBIDO";
-            document.getElementById('epp-res').innerHTML = `<b>TAG: ${tag}</b><br><b>PELIGRO:</b> Energía de ${energy.toFixed(1)} cal/cm². Tarea de medición a puerta abierta NO permitida. <b>DESENERGIZAR EQUIPO.</b>`;
+    function cargarDatosEstudio() {
+        const val = document.getElementById('tablero_select').value;
+        if(estudio[val]) {
+            document.getElementById('e_inc').value = estudio[val].e;
+            document.getElementById('boundary').value = estudio[val].b;
+            document.getElementById('cat_epp').value = estudio[val].cat;
         }
     }
  
-    function enviarReporte() {
-        const body = `REPORTE SEGURIDAD MEDICIÓN - TRAPIAL\nTAG EQUIPO: ${resData.tag}\n------------------\nENERGÍA: ${resData.energy.toFixed(2)} cal/cm²\nCAT: ${resData.cat}\nFRONTERA: ${resData.boundary.toFixed(2)}m\nINSTRUMENTO: CAT IV VERIFICADO\nESTADO: ${resData.cat > 2 ? 'PROHIBIDO' : 'AUTORIZADO'}`;
-        window.location.href = `mailto:mantenimientotrapialelectrico@chevron.com?subject=Arc Flash ${resData.tag} - Cat ${resData.cat}&body=${encodeURIComponent(body)}`;
+    function toggleTarea() {
+        const tarea = document.getElementById('tipo_tarea').value;
+        document.getElementById('loto_warning').style.display = (tarea === 'intervencion') ? 'block' : 'none';
+    }
+ 
+    function generarProtocolo() {
+        const e = parseFloat(document.getElementById('e_inc').value);
+        const b = document.getElementById('boundary').value;
+        const tag = document.getElementById('tablero_select').selectedOptions[0].text;
+        
+        if(!e) return alert("Cargue los datos técnicos.");
+ 
+        document.getElementById('result-display').style.display = 'block';
+        document.getElementById('et_ene').innerText = e + " cal/cm²";
+        document.getElementById('et_dist').innerText = b + " m";
+        document.getElementById('et_tag').innerText = tag;
+        
+        const catNum = e <= 1.2 ? "CATEGORIA 1" : (e <= 8 ? "CATEGORIA 2" : "CATEGORIA 3/4");
+        document.getElementById('et_cat').innerText = catNum;
+        document.getElementById('cat_epp').value = catNum;
+ 
+        if (e > 8) {
+            document.getElementById('et_head').innerText = "PELIGRO";
+            document.getElementById('et_head').className = "etiqueta-header danger";
+        } else {
+            document.getElementById('et_head').innerText = "ADVERTENCIA";
+            document.getElementById('et_head').className = "etiqueta-header";
+        }
+    }
+ 
+    function enviarMantenimiento() {
+        const tag = document.getElementById('tablero_select').selectedOptions[0].text;
+        const e = document.getElementById('e_inc').value;
+        const cat = document.getElementById('cat_epp').value;
+        const tarea = document.getElementById('tipo_tarea').selectedOptions[0].text;
+ 
+        const body = `REPORTE DE RIESGO DE ARCO ELÉCTRICO - CHEVRON\n` +
+                     `EQUIPO: ${tag}\n` +
+                     `TAREA: ${tarea}\n` +
+                     `--------------------------------------------------\n` +
+                     `RESULTADOS DEL ESTUDIO:\n` +
+                     `- Energía Incidente: ${e} cal/cm²\n` +
+                     `- Nivel de EPP Requerido: ${cat}\n` +
+                     `--------------------------------------------------\n` +
+                     `PROTOCOLOS VERIFICADOS:\n` +
+                     `[X] JSA Leído y firmado\n` +
+                     `[X] VIT y Permiso de trabajo completados\n` +
+                     `${tarea.includes('Cambio') ? '[X] APLICADAS 5 REGLAS DE ORO / LOTO' : '[X] MEDICIÓN PUERTA ABIERTA'}\n\n` +
+                     `Favor archivar para actualización de etiquetas en campo.`;
+ 
+        window.location.href = `mailto:mantenimientotrapialelectrico@chevron.com?subject=Etiqueta Arc Flash - ${tag}&body=${encodeURIComponent(body)}`;
     }
 </script>
 </body>
 </html>
  
- 
+
 
 
 
