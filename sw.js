@@ -1,49 +1,54 @@
 
-/* sw.js — Service Worker simple para Trapial VIT */
-const CACHE_NAME = 'trapial-vit-v2.9 Final';
-const PRECACHE_URLS = [
-  './',
-  './index.html',
-  './manifest.json'
-  // agrega aquí otros recursos estáticos: ./icons/icon-192.png, ./icons/icon-512.png, ./style.css, etc.
+// sw.js
+const CACHE_NAME = 'trapial-vit-v3'; // ¡incrementar en cada despliegue!
+const ASSETS = [
+  './index.html', // incluir el HTML principal
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './assets/app.css',
+  './assets/app.js'
 ];
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
-      .then(self.skipWaiting())
+// Install: precache básicos
+self.addEventListener('install', (e) => {
+  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
+});
+
+// Activate: borrar caches viejos
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then(keys => Promise.all(
+      keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null))
+    ))
   );
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((key) => (key !== CACHE_NAME ? caches.delete(key) : undefined)))
-    ).then(self.clients.claim())
-  );
-});
+// Fetch: network-first para HTML; cache-first para estáticos
+self.addEventListener('fetch', (e) => {
+  const req = e.request;
+  const accept = req.headers.get('accept') || '';
 
-self.addEventListener('fetch', (event) => {
-  const req = event.request;
-  event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req).then((res) => {
-        if (req.method === 'GET' && res && res.status === 200) {
-          const resClone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
-        }
+  if (req.mode === 'navigate' || accept.includes('text/html')) {
+    e.respondWith(
+      fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then(c => c.put(req, copy));
         return res;
-      }).catch(() => {
-        if (req.mode === 'navigate') return caches.match('./index.html');
-      })
-    })
+      }).catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  e.respondWith(
+    caches.match(req).then(cached => cached || fetch(req).then(res => {
+      const copy = res.clone();
+      caches.open(CACHE_NAME).then(c => c.put(req, copy));
+      return res;
+    }))
   );
 });
-
-
-
+``
 
 
 
