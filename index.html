@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -56,12 +55,6 @@
     <small>Chevron Argentina — El Trapial</small>
   </div>
 
-  <!-- Pestañas -->
-  <div class="tabs">
-    <div id="tab_estudio" class="tab active" onclick="showPane('pane_estudio')">Con estudio (SET NOC SUR)</div>
-    <div id="tab_nfpa"   class="tab"        onclick="showPane('pane_nfpa')">Sin estudio (NFPA 70E por tablas)</div>
-  </div>
-
   <!-- Datos generales y cumplimiento -->
   <div class="section" style="background:#f8fafc;">
     <div class="grid">
@@ -79,6 +72,12 @@
       <label><input type="checkbox" id="permiso_chk"> Permiso de trabajo vigente</label>
       <label><input type="checkbox" id="vit_chk"> VIT confeccionada y firmada</label>
     </div>
+  </div>
+
+  <!-- Pestañas (MOVIDO DE ARRIBA AQUI ABAJO) -->
+  <div class="tabs">
+    <div id="tab_estudio" class="tab active" onclick="showPane('pane_estudio')">Con estudio (SET NOC SUR)</div>
+    <div id="tab_nfpa"   class="tab"        onclick="showPane('pane_nfpa')">Sin estudio (NFPA 70E por tablas)</div>
   </div>
 
   <!-- Con estudio -->
