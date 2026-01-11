@@ -2,64 +2,67 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Arc Flash Safety Control - El Trapial</title>
+  <meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT, y comparación por tablas NFPA 70E.">
 
-  <!-- Favicons corregidos: rutas relativas y sizes="any" para .ico -->
+  <!-- Favicons: rutas relativas y sizes="any" para .ico -->
   ./icons/favicon-32x32.png
   ./icons/favicon-16x16.png
-  <link relavicon.ico
+  ./icons/favicon.ico
 
-  <!-- Icono para iOS -->
+  <!-- iOS (Home Screen) -->
   ./icons/apple-touch-icon.png
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Trapial VIT">
 
-  <!-- Manifest PWA -->
+  <!-- Android / PWA -->
   ./site.webmanifest
-
-  <!-- Color del tema (Android/Chrome) -->
   <meta name="theme-color" content="#005aa2">
 
-
-<style>
-  :root { --blue:#005aa2; --red:#b71c1c; --gold:#ffcc00; --dark:#1a1a1a; }
-  body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f4f7f6;margin:0;padding:15px}
-  .app-container{max-width:900px;margin:auto;background:#fff;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden}
-  .header{background:var(--blue);color:#fff;padding:22px;text-align:center;border-bottom:5px solid #003d6e}
-  .header h1{margin:0;font-size:1.6rem;text-transform:uppercase;letter-spacing:1px}
-  .header small{display:block;margin-top:6px;opacity:.9}
-  .tabs{display:flex;gap:8px;padding:10px 10px 0;background:#f4f7f6}
-  .tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:#e8eef4;border-radius:10px 10px 0 0;font-weight:700;color:#003d6e;border:2px solid #d6e0ea}
-  .tab.active{background:#fff;border-bottom-color:#fff}
-  .section{padding:18px 24px}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .input-group{margin-bottom:14px}
-  label{display:block;font-weight:800;margin-bottom:6px;color:#005aa2;font-size:.9rem;text-transform:uppercase}
-  input,select{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:1rem;outline:none;transition:.2s;background:#fff}
-  input:focus,select:focus{border-color:#005aa2;background:#f0f7ff}
-  .help{color:#555;font-size:.85rem;margin-top:6px}
-  .checkbox-group{margin-bottom:10px;}
-  .checkbox-group label{display:flex;align-items:center;font-weight:600;color:#333;font-size:1rem;text-transform:none;margin-bottom:4px;}
-  .checkbox-group input[type="checkbox"]{margin-right:10px;width:20px;height:20px;}
-  .stop-box{background:var(--red);color:#fff;padding:18px 18px 10px 18px;border-radius:12px;margin:16px 0;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.18);display:none;}
-  .stop-box h2{margin:0 0 10px 0;font-size:1.3rem;text-shadow:1px 1px 3px rgba(0,0,0,0.35);}
-  .rules-checklist{text-align:left;margin-top:10px;background:rgba(0,0,0,.13);padding:12px;border-radius:8px;}
-  .rule-item{display:flex;align-items:center;margin-bottom:8px;font-size:1rem;font-weight:600;cursor:pointer;}
-  .rule-item input{width:20px;height:20px;margin-right:10px;cursor:pointer;}
-  .btn{background:#005aa2;color:#fff;border:none;padding:14px 16px;font-size:1.05rem;font-weight:800;border-radius:10px;cursor:pointer;transition:.2s}
-  .btn:disabled{background:#ccc;cursor:not-allowed}
-  .btn:hover:not(:disabled){background:#003d6e;transform:translateY(-1px)}
-  .btn-secondary{background:#444}
-  #result-display{display:none;padding:20px;background:#eee;border-top:2px solid #ddd}
-  .etiqueta{border:10px solid #000;background:#fff;max-width:600px;margin:auto}
-  .et-head{padding:12px;text-align:center;font-size:2.1rem;font-weight:900;border-bottom:10px solid #000}
-  .danger{background:#b71c1c;color:#fff}
-  .warning{background:#ffcc00;color:#000}
-  .et-body{padding:16px;text-align:center}
-  .cat-value{font-size:4.2rem;font-weight:1000;border:8px solid #000;display:inline-block;padding:6px 24px;margin:12px 0;background:#f0f0f0}
-  .et-row{display:flex;justify-content:space-between;gap:8px;font-size:1.05rem;border-bottom:2px solid #ddd;padding:8px 0;text-align:left}
-  .footer-info{background:#333;color:#fff;padding:12px;font-size:.95rem;text-align:left}
-  .disclaimer{color:#444;font-size:.85rem;margin:10px 0}
-  .actions{display:flex;gap:10px;justify-content:center;margin-top:14px}
-  @media print{.header,.tabs,.section .btn,.actions{display:none!important}#result-display{display:block!important;padding:0}.app-container{box-shadow:none;border:none}}
-</style>
+  <style>
+    :root { --blue:#005aa2; --red:#b71c1c; --gold:#ffcc00; --dark:#1a1a1a; }
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f4f7f6;margin:0;padding:15px}
+    .app-container{max-width:900px;margin:auto;background:#fff;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden}
+    .header{background:var(--blue);color:#fff;padding:22px;text-align:center;border-bottom:5px solid #003d6e}
+    .header h1{margin:0;font-size:1.6rem;text-transform:uppercase;letter-spacing:1px}
+    .header small{display:block;margin-top:6px;opacity:.9}
+    .tabs{display:flex;gap:8px;padding:10px 10px 0;background:#f4f7f6}
+    .tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:#e8eef4;border-radius:10px 10px 0 0;font-weight:700;color:#003d6e;border:2px solid #d6e0ea}
+    .tab.active{background:#fff;border-bottom-color:#fff}
+    .section{padding:18px 24px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .input-group{margin-bottom:14px}
+    label{display:block;font-weight:800;margin-bottom:6px;color:#005aa2;font-size:.9rem;text-transform:uppercase}
+    input,select{width:100%;padding:12px;border:2px solid #ddd;border-radius:8px;font-size:1rem;outline:none;transition:.2s;background:#fff}
+    input:focus,select:focus{border-color:#005aa2;background:#f0f7ff}
+    .help{color:#555;font-size:.85rem;margin-top:6px}
+    .checkbox-group{margin-bottom:10px;}
+    .checkbox-group label{display:flex;align-items:center;font-weight:600;color:#333;font-size:1rem;text-transform:none;margin-bottom:4px;}
+    .checkbox-group input[type="checkbox"]{margin-right:10px;width:20px;height:20px;}
+    .stop-box{background:var(--red);color:#fff;padding:18px 18px 10px 18px;border-radius:12px;margin:16px 0;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.18);display:none;}
+    .stop-box h2{margin:0 0 10px 0;font-size:1.3rem;text-shadow:1px 1px 3px rgba(0,0,0,0.35);}
+    .rules-checklist{text-align:left;margin-top:10px;background:rgba(0,0,0,.13);padding:12px;border-radius:8px;}
+    .rule-item{display:flex;align-items:center;margin-bottom:8px;font-size:1rem;font-weight:600;cursor:pointer;}
+    .rule-item input{width:20px;height:20px;margin-right:10px;cursor:pointer;}
+    .btn{background:#005aa2;color:#fff;border:none;padding:14px 16px;font-size:1.05rem;font-weight:800;border-radius:10px;cursor:pointer;transition:.2s}
+    .btn:disabled{background:#ccc;cursor:not-allowed}
+    .btn:hover:not(:disabled){background:#003d6e;transform:translateY(-1px)}
+    .btn-secondary{background:#444}
+    #result-display{display:none;padding:20px;background:#eee;border-top:2px solid #ddd}
+    .etiqueta{border:10px solid #000;background:#fff;max-width:600px;margin:auto}
+    .et-head{padding:12px;text-align:center;font-size:2.1rem;font-weight:900;border-bottom:10px solid #000}
+    .danger{background:#b71c1c;color:#fff}
+    .warning{background:#ffcc00;color:#000}
+    .et-body{padding:16px;text-align:center}
+    .cat-value{font-size:4.2rem;font-weight:1000;border:8px solid #000;display:inline-block;padding:6px 24px;margin:12px 0;background:#f0f0f0}
+    .et-row{display:flex;justify-content:space-between;gap:8px;font-size:1.05rem;border-bottom:2px solid #ddd;padding:8px 0;text-align:left}
+    .footer-info{background:#333;color:#fff;padding:12px;font-size:.95rem;text-align:left}
+    .disclaimer{color:#444;font-size:.85rem;margin:10px 0}
+    .actions{display:flex;gap:10px;justify-content:center;margin-top:14px}
+    @media print{.header,.tabs,.section .btn,.actions{display:none!important}#result-display{display:block!important;padding:0}.app-container{box-shadow:none;border:none}}
+  </style>
 </head>
 <body>
 <div class="app-container">
@@ -421,5 +424,4 @@
 </script>
 </body>
 </html>
-
-
+``
