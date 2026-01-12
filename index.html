@@ -1,34 +1,38 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Arc Flash Safety Control - El Trapial</title>
-  <img src="logo chevron.png" alt="Logo chevron" style="height: 60px; margin-bottom: 10px;">
-  <meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT, y comparación por tablas NFPA 70E.">
-<div class="header">
-</div>
-  <!-- Favicons (desktop) -->
- 
-  <!-- iOS (pantalla de inicio) -->
+  <meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT, y comparación por tablas NFPA 70E."/>
 
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Trapial VIT">
 
-  <!-- Android / PWA -->
+  icon-192.png
 
-  <meta name="theme-color" content="#005aa2">
+
+  icon-192.png
+
+  site.webmanifest
+
+
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="Trapial VIT"/>
+
+  <!-- Android / PWA (color de barra) -->
+  <meta name="theme-color" content="#005aa2"/>
 
   <style>
-
-
-
     :root { --blue:#005aa2; --red:#b71c1c; --gold:#ffcc00; --dark:#1a1a1a; }
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#f4f7f6;margin:0;padding:15px}
     .app-container{max-width:900px;margin:auto;background:#fff;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden}
     .header{background:var(--blue);color:#fff;padding:22px;text-align:center;border-bottom:5px solid #003d6e}
     .header h1{margin:0;font-size:1.6rem;text-transform:uppercase;letter-spacing:1px}
     .header small{display:block;margin-top:6px;opacity:.9}
+
+    /* Logo en cabecera */
+    .logo{height:60px;margin-bottom:10px;display:inline-block}
+
     .tabs{display:flex;gap:8px;padding:10px 10px 0;background:#f4f7f6}
     .tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:#e8eef4;border-radius:10px 10px 0 0;font-weight:700;color:#003d6e;border:2px solid #d6e0ea}
     .tab.active{background:#fff;border-bottom-color:#fff}
@@ -68,6 +72,7 @@
 <body>
 <div class="app-container">
   <div class="header">
+    Logo chevron.png
     <h1>Arc Flash Safety Control</h1>
     <small>Chevron Argentina — El Trapial</small>
   </div>
@@ -91,7 +96,7 @@
     </div>
   </div>
 
-  <!-- Pestañas (MOVIDO DE ARRIBA AQUI ABAJO) -->
+  <!-- Pestañas -->
   <div class="tabs">
     <div id="tab_estudio" class="tab active" onclick="showPane('pane_estudio')">Con estudio (SET NOC SUR)</div>
     <div id="tab_nfpa"   class="tab"        onclick="showPane('pane_nfpa')">Sin estudio (NFPA 70E por tablas)</div>
@@ -425,10 +430,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
