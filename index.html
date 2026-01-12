@@ -7,19 +7,12 @@
   <title>Arc Flash Safety Control - El Trapial</title>
   <meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT, y comparación por tablas NFPA 70E."/>
 
-
-  icon-192.png
-
-
-  icon-192.png
-
-  site.webmanifest
-
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <link rel="manifest" href="site.webmanifest"/>
 
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="Trapial VIT"/>
-
-  <!-- Android / PWA (color de barra) -->
   <meta name="theme-color" content="#005aa2"/>
 
   <style>
@@ -29,10 +22,7 @@
     .header{background:var(--blue);color:#fff;padding:22px;text-align:center;border-bottom:5px solid #003d6e}
     .header h1{margin:0;font-size:1.6rem;text-transform:uppercase;letter-spacing:1px}
     .header small{display:block;margin-top:6px;opacity:.9}
-
-    /* Logo en cabecera */
     .logo{height:60px;margin-bottom:10px;display:inline-block}
-
     .tabs{display:flex;gap:8px;padding:10px 10px 0;background:#f4f7f6}
     .tab{flex:1;text-align:center;padding:10px;cursor:pointer;background:#e8eef4;border-radius:10px 10px 0 0;font-weight:700;color:#003d6e;border:2px solid #d6e0ea}
     .tab.active{background:#fff;border-bottom-color:#fff}
@@ -72,12 +62,11 @@
 <body>
 <div class="app-container">
   <div class="header">
-    Logo chevron.png
+    <img src="Logo chevron.png" alt="Logo Chevron" class="logo"/>
     <h1>Arc Flash Safety Control</h1>
     <small>Chevron Argentina — El Trapial</small>
   </div>
 
-  <!-- Datos generales y cumplimiento -->
   <div class="section" style="background:#f8fafc;">
     <div class="grid">
       <div class="input-group">
@@ -96,13 +85,11 @@
     </div>
   </div>
 
-  <!-- Pestañas -->
   <div class="tabs">
     <div id="tab_estudio" class="tab active" onclick="showPane('pane_estudio')">Con estudio (SET NOC SUR)</div>
     <div id="tab_nfpa"   class="tab"        onclick="showPane('pane_nfpa')">Sin estudio (NFPA 70E por tablas)</div>
   </div>
 
-  <!-- Con estudio -->
   <div id="pane_estudio" class="section">
     <div class="grid">
       <div class="input-group">
@@ -133,7 +120,6 @@
       <div class="help">Valores del estudio (energía incidente y distancia) — usar los del estudio sin modificarlos.</div>
     </div>
 
-    <!-- Cartel de Reglas de Oro (solo MANTENIMIENTO) -->
     <div id="stop_card" class="stop-box" role="alert" aria-live="polite">
       <h2>¡DETENGA LA TAREA! — Aplique las 5 Reglas de Oro</h2>
       <div class="rules-checklist">
@@ -154,7 +140,6 @@
     </p>
   </div>
 
-  <!-- Sin estudio (NFPA 70E por tablas) -->
   <div id="pane_nfpa" class="section" style="display:none;">
     <h3 style="margin:6px 0 14px;">Método de Tablas NFPA 70E (≤ 600 V)</h3>
     <div class="grid">
@@ -182,7 +167,6 @@
     </p>
   </div>
 
-  <!-- Resultados / Etiqueta -->
   <div id="result-display" aria-live="polite">
     <div class="etiqueta">
       <div id="et_h" class="et-head warning">ADVERTENCIA</div>
@@ -190,7 +174,6 @@
         <div style="font-weight:900;font-size:1.2rem;">PELIGRO DE ARCO ELÉCTRICO</div>
         <div style="font-weight:bold;margin-top:8px;font-size:1.05rem;">CATEGORÍA DE EPP:</div>
         <div id="res_cat" class="cat-value">--</div>
-
         <div class="et-row"><span>Trabajador:</span> <strong id="res_trab">--</strong></div>
         <div class="et-row"><span>Fecha/hora:</span> <strong id="res_fecha">--</strong></div>
         <div class="et-row"><span>Método:</span> <strong id="res_m">--</strong></div>
@@ -212,7 +195,6 @@
 </div>
 
 <script>
-  // ====== Pestañas ======
   function showPane(id){
     document.getElementById('pane_estudio').style.display = (id==='pane_estudio')?'block':'none';
     document.getElementById('pane_nfpa').style.display    = (id==='pane_nfpa')?'block':'none';
@@ -221,7 +203,6 @@
     document.getElementById('result-display').style.display = 'none';
   }
 
-  // ====== Con estudio ======
   const data_set_noc = {
     "playa1":  { e:0.28, d:0.35, t:"TAB SECC PLAYA N°1" },
     "ssaa":    { e:0.54, d:0.48, t:"TAB SERV AUX CA-CC" },
@@ -234,13 +215,8 @@
     const btn  = document.getElementById('btn_estudio');
     const stopCard   = document.getElementById('stop_card');
     const estudioDiv = document.getElementById('estudio_div');
-
-    // Mostrar estudio de tableros si corresponde
     estudioDiv.style.display = (task === 'estudio') ? 'block' : 'none';
-    // MOSTRAR REGLAS DE ORO SOLO EN MANTENIMIENTO
     stopCard.style.display = (task === 'mantenimiento') ? 'block' : 'none';
-
-    // Habilitar botón
     if (task === '') {
       btn.disabled = true;
     } else if (task === 'mantenimiento') {
@@ -251,7 +227,6 @@
     }
   }
 
-  // ====== Textos EPP por categoría ======
   function eppText(cat){
     if (cat === 1) return "<b>CAT 1:</b> Mameluco FR, careta arco, protección auditiva y guantes de cuero.";
     if (cat === 2) return "<b>CAT 2:</b> Mameluco FR, capucha FR + careta, guantes dieléctricos y protección auditiva.";
@@ -267,7 +242,6 @@
     return 1;
   }
 
-  // ====== Render de etiqueta ======
   function renderResult({trabajador, fecha, metodo, energia, dist, equipo, tiempo, cat, permisosTxt}){
     document.getElementById('result-display').style.display = 'block';
     document.getElementById('res_trab').innerText = trabajador || "—";
@@ -279,18 +253,14 @@
     document.getElementById('res_perm').innerText = permisosTxt || "—";
     document.getElementById('res_cat').innerText = (cat==='EXTREMO') ? "NO INTERVENIR" : ("CAT " + cat);
     document.getElementById('res_desc').innerHTML = eppText(cat);
-
     const danger = (cat==='EXTREMO') || (typeof cat==='number' && cat>=3) || (energia && energia>8);
     const h = document.getElementById('et_h');
     h.innerText = danger ? "PELIGRO" : "ADVERTENCIA";
     h.className = "et-head " + (danger ? "danger" : "warning");
-
     window.scrollTo({ top: document.body.scrollHeight, behavior:'smooth' });
   }
 
-  // ====== Generar etiqueta (ambos modos) ======
   function generarEtiqueta(modo){
-    // Validación de datos generales
     const trabajador = (document.getElementById('trabajador').value || '').trim();
     let fecha = document.getElementById('fecha').value;
     if (!fecha){
@@ -302,7 +272,6 @@
     const jsa = document.getElementById('jsa_chk').checked;
     const permiso = document.getElementById('permiso_chk').checked;
     const vit = document.getElementById('vit_chk').checked;
-
     if(!trabajador){
       alert("Debes ingresar el nombre del trabajador.");
       return;
@@ -312,13 +281,9 @@
       return;
     }
     const permisosTxt = `${jsa?'JSA ✔':'JSA ✖'} • ${permiso?'Permiso ✔':'Permiso ✖'} • ${vit?'VIT ✔':'VIT ✖'}`;
-
-    // ----- Modo CON ESTUDIO -----
     if (modo === 'estudio'){
       const task = document.getElementById('task_type').value;
       if (!task){ alert("Seleccioná el tipo de tarea."); return; }
-
-      // Si es mantenimiento, exigir las 5 Reglas de Oro
       if (task === 'mantenimiento'){
         const checks = document.querySelectorAll('.rule-chk:checked').length;
         if (checks < 5){
@@ -326,7 +291,6 @@
           return;
         }
       }
-
       const tagInput = (document.getElementById('tag_id').value || '').trim();
       let e, d, tag;
       if (task === 'estudio'){
@@ -348,12 +312,9 @@
       });
       return;
     }
-
-    // ----- Modo NFPA 70E por tablas (solo V, Icc, t) -----
     const V   = parseFloat(document.getElementById('volt_nfpa').value);
     const Icc = parseFloat(document.getElementById('scc_nfpa').value);
     const t   = parseFloat(document.getElementById('t_nfpa').value);
-
     if (!V || !Icc || !t){ alert("Completá tensión (V), Icc (kA) y tiempo de despeje (s)."); return; }
     if (V > 600){
       renderResult({
@@ -370,8 +331,6 @@
         "<b>No válido:</b> el método de tablas aplica a ≤600 V. Requiere estudio IEEE 1584.";
       return;
     }
-
-    // Comparación con condiciones (resumen conservador) de NFPA 70E para equipos ≤600 V
     let categoria = null, condicion = '';
     if (V <= 240 && Icc <= 25 && t <= 0.03) {
       categoria = 1; condicion = 'Panel ≤240 V, Icc ≤25 kA, t ≤0,03 s';
@@ -382,7 +341,6 @@
     } else if (V <= 600 && Icc <= 65 && t <= 0.07) {
       categoria = 4; condicion = 'Switchgear ≤600 V, Icc ≤65 kA, t ≤0,07 s';
     } else {
-      // No cumplen tablas → instruir estudio IEEE 1584
       document.getElementById('result-display').style.display = 'block';
       document.getElementById('res_trab').innerText = trabajador;
       document.getElementById('res_fecha').innerText = fecha;
@@ -401,8 +359,6 @@
       window.scrollTo({ top: document.body.scrollHeight, behavior:'smooth' });
       return;
     }
-
-    // Mostrar categoría asignada por tablas (NFPA)
     renderResult({
       trabajador, fecha,
       metodo:'NFPA 70E por tablas',
@@ -415,7 +371,6 @@
     });
   }
 
-  // ====== Utilidades ======
   function limpiar(){
     ['tag_id','volt_nfpa','scc_nfpa','t_nfpa'].forEach(id=>{
       const el=document.getElementById(id); if(el){ el.value=''; }
@@ -430,3 +385,4 @@
 </script>
 </body>
 </html>
+``
