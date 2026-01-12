@@ -1,6 +1,6 @@
 
 // sw.js
-const CACHE_NAME = 'trapial-vit-v1';
+const CACHE_NAME = 'trapial-vit-v2';
 const ASSETS = [
   './',                // raíz del proyecto
   './index.html',
@@ -12,6 +12,7 @@ const ASSETS = [
   './icons/android-chrome-192x192.png',
   './icons/android-chrome-512x512.png'
 ];
+
 
 
 
