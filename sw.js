@@ -1,20 +1,15 @@
 
-// sw.js - tolerante a assets faltantes
-const CACHE_NAME = 'trapial-vit-v4';
+// sw.js
+const CACHE_NAME = 'trapial-vit-v5';
 const ASSETS = [
   './',
-  './index (2).html',
+  './index.html',
   './manifest.json',
-  './site.webmanifest', // por si hay referencias viejas
-  // posibles ubicaciones de logos/iconos
-  './Logo chevron.png',
-  './icon-192.png',
-  './assets/icon-192.png',
-  './assets/icon-512.png',
-  './icons/android-chrome-192x192.png',
-  './icons/android-chrome-512x512.png',
-  './icons/apple-touch-icon.png',
-  './apple-touch-icon.png'
+  // logos en /logo
+  './logo/logo-chevron.png',
+  './logo/logo%20chevron.png',  // fallback si no renombrás
+  './logo/icon-192.png',
+  './logo/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
