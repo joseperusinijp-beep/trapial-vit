@@ -7,11 +7,11 @@
   <title>Arc Flash Safety Control - El Trapial</title>
   <meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT, y comparación por tablas NFPA 70E."/>
 
-  <!-- FAVICONS (mantengo tus rutas originales para no romper nada) -->
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
-  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <!-- Favicons / Apple Touch: usamos tus archivos de /logo -->
+  <link rel="icon" type="image/png" href="logo/icon-192.png"/>
+  <link rel="apple-touch-icon" href="logo/icon-192.png"/>
 
-  <!-- MANIFEST correcto -->
+  <!-- Manifest correcto -->
   <link rel="manifest" href="manifest.json"/>
 
   <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -65,7 +65,8 @@
 <body>
 <div class="app-container">
   <div class="header">
-    <img id="brandLogo" src="Logo chevron.png" alt="Logo Chevron" class="logo"/>
+    <!-- Usamos tu carpeta /logo. Ideal renombrar a logo-chevron.png -->
+    <img id="brandLogo" src="logo/logo-chevron.png" alt="Logo Chevron" class="logo"/>
     <h1>Arc Flash Safety Control</h1>
     <small>Chevron Argentina — El Trapial</small>
   </div>
@@ -196,19 +197,18 @@
 </div>
 
 <script>
-  // Registrar SW si está disponible (no rompe nada si ya existe)
+  // Registrar SW si está disponible
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   }
 
-  // Si el logo con espacios falla, probamos rutas/formatos alternativos
+  // Fallbacks para el logo del header (por si no renombrás el archivo)
   (function(){
     const img = document.getElementById('brandLogo');
     const fallbacks = [
-      'assets/chevron-hallmark.svg',
-      'assets/chevron-hallmark.png',
-      'icons/android-chrome-192x192.png',
-      'icon-192.png'
+      'logo/logo-chevron.png',      // recomendado (sin espacios)
+      'logo/logo%20chevron.png',    // tu archivo actual con espacio (URL-encoded)
+      'logo/icon-192.png'           // como último recurso, usa el icono PWA
     ];
     let i = 0;
     img.onerror = function(){
