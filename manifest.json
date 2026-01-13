@@ -4,7 +4,7 @@
   "short_name": "ArcFlash",
   "description": "Aplicación HSE con branding corporativo.",
   "id": "/",
-  "start_url": "./index.html",
+  "start_url": "./index (2).html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0b0b0d",
