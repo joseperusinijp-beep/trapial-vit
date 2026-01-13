@@ -7,11 +7,11 @@
   <title>Arc Flash Safety Control - El Trapial</title>
   <meta name="description" content="Evaluación profesional de riesgo de arco eléctrico. Incluye cumplimiento de procedimientos, permisos y VIT, y comparación por tablas NFPA 70E."/>
 
-  <!-- Favicons / Apple Touch: usamos tus archivos de /logo -->
-  <link rel="icon" type="image/png" href="logo/icon-192.png"/>
-  <link rel="apple-touch-icon" href="logo/icon-192.png"/>
+  <!-- Iconos (usamos los que tenés en /logo) -->
+  <link rel="icon" type="image/png" sizes="192x192" href="logo/icon-192.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="logo/icon-192.png"/>
 
-  <!-- Manifest correcto -->
+  <!-- Manifest (asegurate de tener manifest.json con rutas a /logo/icon-192.png y /logo/icon-512.png) -->
   <link rel="manifest" href="manifest.json"/>
 
   <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -65,12 +65,13 @@
 <body>
 <div class="app-container">
   <div class="header">
-    <!-- Usamos tu carpeta /logo. Ideal renombrar a logo-chevron.png -->
+    <!-- Logo del header: usa tus archivos reales en /logo -->
     <img id="brandLogo" src="logo/logo-chevron.png" alt="Logo Chevron" class="logo"/>
     <h1>Arc Flash Safety Control</h1>
     <small>Chevron Argentina — El Trapial</small>
   </div>
 
+  <!-- ======== SECCIÓN DE DATOS ======== -->
   <div class="section" style="background:#f8fafc;">
     <div class="grid">
       <div class="input-group">
@@ -89,11 +90,13 @@
     </div>
   </div>
 
+  <!-- ======== TABS ======== -->
   <div class="tabs">
     <div id="tab_estudio" class="tab active" onclick="showPane('pane_estudio')">Con estudio (SET NOC SUR)</div>
     <div id="tab_nfpa" class="tab" onclick="showPane('pane_nfpa')">Sin estudio (NFPA 70E por tablas)</div>
   </div>
 
+  <!-- ======== PANE: ESTUDIO ======== -->
   <div id="pane_estudio" class="section">
     <div class="grid">
       <div class="input-group">
@@ -144,6 +147,7 @@
     </p>
   </div>
 
+  <!-- ======== PANE: NFPA ======== -->
   <div id="pane_nfpa" class="section" style="display:none;">
     <h3 style="margin:6px 0 14px;">Método de Tablas NFPA 70E (≤ 600 V)</h3>
     <div class="grid">
@@ -171,6 +175,7 @@
     </p>
   </div>
 
+  <!-- ======== RESULTADOS ======== -->
   <div id="result-display" aria-live="polite">
     <div class="etiqueta">
       <div id="et_h" class="et-head warning">ADVERTENCIA</div>
@@ -197,24 +202,25 @@
 </div>
 
 <script>
-  // Registrar SW si está disponible
+  // Registrar Service Worker (no afecta cálculos)
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(()=>{});
   }
 
-  // Fallbacks para el logo del header (por si no renombrás el archivo)
+  // Fallbacks del logo si hay caché viejo o cambia el nombre
   (function(){
     const img = document.getElementById('brandLogo');
     const fallbacks = [
-      'logo/logo-chevron.png',      // recomendado (sin espacios)
-      'logo/logo%20chevron.png',    // tu archivo actual con espacio (URL-encoded)
-      'logo/icon-192.png'           // como último recurso, usa el icono PWA
+      'logo/logo-chevron.png', // tu archivo principal
+      'logo/icon-192.png'      // último recurso: usa el icono PWA
     ];
     let i = 0;
     img.onerror = function(){
       if (i < fallbacks.length){ img.src = fallbacks[i++]; }
     }
   })();
+
+  /* ======== TU LÓGICA DE NEGOCIO ORIGINAL (sin cambios) ======== */
 
   function showPane(id){
     document.getElementById('pane_estudio').style.display = (id==='pane_estudio')?'block':'none';
